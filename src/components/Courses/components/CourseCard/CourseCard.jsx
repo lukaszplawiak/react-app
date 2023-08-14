@@ -1,6 +1,7 @@
 import React from 'react';
+import './CourseCard.css';
 
-function CourseCard({ course, authors }) {
+function CourseCard({ course, authors, onCourseSelect }) {
 	const formatDuration = (duration) => {
 		const hours = Math.floor(duration / 60);
 		const minutes = duration % 60;
@@ -33,19 +34,35 @@ function CourseCard({ course, authors }) {
 	};
 
 	return (
-		<div className='course-card'>
-			<h3>{course.title}</h3>
-			<p>Duration: {formatDuration(course.duration)}</p>
-			<p>Creation date: {formatCreationDate(course.creationDate)}</p>
-			<p>Description: {course.description}</p>
-			<p>Authors: {getAuthors(course.authors)}</p>
-			<button
-				onClick={() => {
-					// moja logika klikniecia
-				}}
-			>
-				Show course
-			</button>
+		<div className='Course-card'>
+			<div className='Course-rect'>
+				<div className='Course-info'>
+					<h3>{course.title}</h3>
+					<p>{course.description}</p>
+				</div>
+				<div className='Course-details'>
+					<div className='Course-details-info'>
+						<p>
+							<strong>Authors:</strong> {getAuthors(course.authors)}
+						</p>
+						<p>
+							<strong>Duration:</strong> {formatDuration(course.duration)}
+						</p>
+						<p>
+							<strong>Creation date:</strong>{' '}
+							{formatCreationDate(course.creationDate)}
+						</p>
+					</div>
+					<button
+						className='Course-button'
+						onClick={() => {
+							onCourseSelect(course);
+						}}
+					>
+						SHOW COURSE
+					</button>
+				</div>
+			</div>
 		</div>
 	);
 }

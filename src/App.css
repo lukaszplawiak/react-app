@@ -1,37 +1,8 @@
-
-.Header {
-    position: absolute;
-    width: 1440px;
-    height: 80px;
-    left: 0px;
-    top: 0px;
-    background: #FFFFFF;
-    filter: drop-shadow(1px 1px 4px rgba(0, 0, 0, 0.15));
+.App {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh; 
+    width: 100%; 
 }
-
-.Logo {
-    position: absolute;
-    width: 111px;
-    height: 48px;
-    left: 37px;
-    top: 12px;
-}
-
-.ButtonHeader {
-    width: 68px;
-    height: 24px;
-}
-
-.Courses {
-    position: absolute;
-    width: 1440px;
-    height: 1176px;
-    left: 0px;
-    top: 83px;
-    
-    background: #F7F7F7;
-    }
-
-
-
-

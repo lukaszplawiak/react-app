@@ -20,7 +20,6 @@ function App() {
 			<div className='Rectangle'>
 				<Header />
 			</div>
-
 			<div>
 				{selectedCourse ? (
 					<CourseInfo
