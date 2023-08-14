@@ -1,38 +1,37 @@
-.App {
-  text-align: center;
+
+.Header {
+    position: absolute;
+    width: 1440px;
+    height: 80px;
+    left: 0px;
+    top: 0px;
+    background: #FFFFFF;
+    filter: drop-shadow(1px 1px 4px rgba(0, 0, 0, 0.15));
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.Logo {
+    position: absolute;
+    width: 111px;
+    height: 48px;
+    left: 37px;
+    top: 12px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.ButtonHeader {
+    width: 68px;
+    height: 24px;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
+.Courses {
+    position: absolute;
+    width: 1440px;
+    height: 1176px;
+    left: 0px;
+    top: 83px;
+    
+    background: #F7F7F7;
+    }
 
-.App-link {
-  color: #61dafb;
-}
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
+
+
