@@ -1,0 +1,34 @@
+.Course-all {
+    width: 1000px;
+    box-shadow: 4px 4px 4px rgba(0,0,0,0.1);
+    border-radius: 8px; 
+    overflow: hidden;
+    background: white;
+    padding: 20px;
+}
+
+.Course-info {
+    display: flex;
+    flex-direction: column;
+    padding-right: 20px;
+    flex: 0.7;
+}
+
+.Course-des {
+    margin-top: 15px;
+}
+
+.Course-det {
+    display: flex;
+    flex-direction: column;
+}
+
+.Button {
+    margin-top: 30px;
+    width: 190px;
+    height: 34px;
+    color: #F7F7F7;
+    background: #007298;
+    border-radius: 4px;
+    cursor: pointer;
+}

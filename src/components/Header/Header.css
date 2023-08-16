@@ -1,0 +1,19 @@
+.Header {
+    position: absolute;
+    width: 1440px;
+    height: 80px;
+    left: 0px;
+    top: 0px;
+    background: #FFFFFF;
+    filter: drop-shadow(1px 1px 4px rgba(0, 0, 0, 0.15));
+}
+
+.ButtonHeader {
+    width: 80px;
+    height: 34px;
+    color: #F7F7F7;
+    background: #007298;
+    border-radius: 4px;
+    position: absolute;
+    left: 80%;
+}
