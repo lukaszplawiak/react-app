@@ -22,7 +22,10 @@ function CourseInfo(props) {
 				<h2>{course.title}</h2>
 				<div className='Course-info'>
 					<div className='Course-des'>
-						<p>Description: {course.description}</p>
+						<p>
+							<strong>Description: </strong>
+							{course.description}
+						</p>
 					</div>
 					<div className='Course-det'>
 						<p>
