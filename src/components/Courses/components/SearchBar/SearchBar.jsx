@@ -1,4 +1,10 @@
+import {
+	INPUT_PLACEHOLDER,
+	SEARCH_BUTTON_LABEL,
+} from '../../../../common/Constants/Constants';
+
 import React, { useState } from 'react';
+
 import Button from '../../../../common/Button/Button';
 import './SearchBar.css';
 
@@ -19,9 +25,13 @@ const SearchBar = ({ onSearch }) => {
 				type='text'
 				value={query}
 				onChange={handleChange}
-				placeholder='Input text'
+				placeholder={INPUT_PLACEHOLDER}
 			/>
-			<Button label='SEARCH' className='ButtonBar' onClick={handleSearch} />
+			<Button
+				label={SEARCH_BUTTON_LABEL}
+				className='ButtonBar'
+				onClick={handleSearch}
+			/>
 		</div>
 	);
 };

@@ -1,22 +1,22 @@
 import React from 'react';
 import './CourseCard.css';
 
+const formatDuration = (duration) => {
+	const hours = Math.floor(duration / 60);
+	const minutes = duration % 60;
+	const formattedHours = hours < 10 ? '0' + hours : hours;
+	const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+	const label = hours === 1 ? 'hour' : 'hours';
+
+	return `${formattedHours}:${formattedMinutes} ${label}`;
+};
+
+const formatCreationDate = (date) => {
+	const d = new Date(date);
+	return `${d.getDate()}.${d.getMonth() + 1}.${d.getFullYear()}`;
+};
+
 function CourseCard({ course, authors, onCourseSelect }) {
-	const formatDuration = (duration) => {
-		const hours = Math.floor(duration / 60);
-		const minutes = duration % 60;
-		const formattedHours = hours < 10 ? '0' + hours : hours;
-		const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
-		const label = hours === 1 ? 'hour' : 'hours';
-
-		return `${formattedHours}:${formattedMinutes} ${label}`;
-	};
-
-	const formatCreationDate = (date) => {
-		const d = new Date(date);
-		return `${d.getDate()}.${d.getMonth() + 1}.${d.getFullYear()}`;
-	};
-
 	const getAuthors = (courseAuthors) => {
 		if (!courseAuthors || !authors) {
 			return '';
@@ -43,13 +43,13 @@ function CourseCard({ course, authors, onCourseSelect }) {
 				<div className='Course-details'>
 					<div className='Course-details-info'>
 						<p>
-							<strong>Authors:</strong> {getAuthors(course.authors)}
+							<strong>Authors: </strong> {getAuthors(course.authors)}
 						</p>
 						<p>
-							<strong>Duration:</strong> {formatDuration(course.duration)}
+							<strong>Duration: </strong> {formatDuration(course.duration)}
 						</p>
 						<p>
-							<strong>Creation date:</strong>{' '}
+							<strong>Creation date: </strong>{' '}
 							{formatCreationDate(course.creationDate)}
 						</p>
 					</div>

@@ -1,5 +1,9 @@
+import { BACK_TO_COURSES_LABEL } from '../../common/Constants/Constants';
+
 import React from 'react';
+
 import Button from '../../common/Button/Button';
+
 import './CourseInfo.css';
 
 function CourseInfo(props) {
@@ -21,14 +25,26 @@ function CourseInfo(props) {
 						<p>Description: {course.description}</p>
 					</div>
 					<div className='Course-det'>
-						<p>ID: {course.id}</p>
-						<p>Duration: {course.duration} minutes</p>
-						<p>Authors: {authorNames}</p>
-						<p>Creation Date: {course.creationDate}</p>
+						<p>
+							<strong>ID: </strong>
+							{course.id}
+						</p>
+						<p>
+							<strong>Duration: </strong>
+							{course.duration} minutes
+						</p>
+						<p>
+							<strong>Authors: </strong>
+							{authorNames}
+						</p>
+						<p>
+							<strong>Creation Date: </strong>
+							{course.creationDate}
+						</p>
 					</div>
 				</div>
 			</div>
-			<Button label='BACK TO COURSES' onClick={props.goBack} />
+			<Button label={BACK_TO_COURSES_LABEL} onClick={props.onGoBack} />
 		</div>
 	);
 }

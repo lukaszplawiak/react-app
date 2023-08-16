@@ -1,50 +1,40 @@
-import React, { useState } from 'react';
+import { ADD_NEW_COURSE_LABEL } from '../../common/Constants/Constants';
+
+import React, { useState, useMemo } from 'react';
+
 import CourseCard from './components/CourseCard/CourseCard';
 import SearchBar from './components/SearchBar/SearchBar';
 import Button from '../../common/Button/Button';
-import CourseInfo from '../CourseInfo/CourseInfo';
+
 import './Courses.css';
 
 function Courses(props) {
-	const [filteredCourses, setFilteredCourses] = useState(props.courses);
-	const [selectedCourse, setSelectedCourse] = useState(null);
+	const [query, setQuery] = useState('');
 
-	const handleSearch = (query) => {
-		const filtered = props.courses.filter(
+	const handleSearch = (inputQuery) => {
+		setQuery(inputQuery);
+	};
+
+	const filteredCourses = useMemo(() => {
+		return props.courses.filter(
 			(course) =>
 				course.title.toLowerCase().includes(query.toLowerCase()) ||
 				course.id.toString().includes(query)
 		);
-		setFilteredCourses(filtered);
-	};
-
-	const handleBack = () => {
-		console.log('handleBack is triggered');
-		setSelectedCourse(null);
-	};
+	}, [props.courses, query]);
 
 	return (
 		<div className='Courses'>
 			<SearchBar onSearch={handleSearch} />
-			{selectedCourse ? (
-				<CourseInfo
-					course={selectedCourse}
-					authorsList={props.authors}
-					goBack={handleBack}
+			{filteredCourses.map((course) => (
+				<CourseCard
+					key={course.id}
+					course={course}
+					authors={props.authors}
+					onCourseSelect={props.onCourseSelect}
 				/>
-			) : (
-				<>
-					{filteredCourses.map((course) => (
-						<CourseCard
-							key={course.id}
-							course={course}
-							authors={props.authors}
-							onCourseSelect={setSelectedCourse}
-						/>
-					))}
-					<Button label='ADD NEW COURSE' />
-				</>
-			)}
+			))}
+			<Button label={ADD_NEW_COURSE_LABEL} />
 		</div>
 	);
 }
