@@ -1,7 +1,7 @@
 import { ADD_NEW_COURSE_LABEL } from '../../common/Constants/Constants';
 
 import React, { useState, useMemo } from 'react';
-
+import { useNavigate } from 'react-router-dom';
 import CourseCard from './components/CourseCard/CourseCard';
 import SearchBar from './components/SearchBar/SearchBar';
 import Button from '../../common/Button/Button';
@@ -10,6 +10,7 @@ import './Courses.css';
 
 function Courses(props) {
 	const [query, setQuery] = useState('');
+	const navigate = useNavigate();
 
 	const handleSearch = (inputQuery) => {
 		setQuery(inputQuery);
@@ -23,6 +24,14 @@ function Courses(props) {
 		);
 	}, [props.courses, query]);
 
+	const handleAddNewCourse = () => {
+		navigate('/courses/add');
+	};
+
+	const handleCourseSelect = (course) => {
+		navigate(`/courses/${course.id}`);
+	};
+
 	return (
 		<div className='Courses'>
 			<SearchBar onSearch={handleSearch} />
@@ -31,10 +40,10 @@ function Courses(props) {
 					key={course.id}
 					course={course}
 					authors={props.authors}
-					onCourseSelect={props.onCourseSelect}
+					onCourseSelect={handleCourseSelect}
 				/>
 			))}
-			<Button label={ADD_NEW_COURSE_LABEL} />
+			<Button label={ADD_NEW_COURSE_LABEL} onClick={handleAddNewCourse} />
 		</div>
 	);
 }
