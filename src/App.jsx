@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 
 import Header from './components/Header/Header';
@@ -18,9 +18,18 @@ function App() {
 		!!localStorage.getItem('userToken')
 	);
 
-	const handleLogin = () => {
+	const handleLogin = (email) => {
 		setIsLoggedIn(true);
+		setIsAdmin(email === 'admin@email.com');
 	};
+
+	const [isAdmin, setIsAdmin] = useState(
+		localStorage.getItem('email') === 'admin@email.com'
+	);
+
+	useEffect(() => {
+		setIsAdmin(localStorage.getItem('email') === 'admin@email.com');
+	}, [isLoggedIn]);
 
 	const [courses, setCourses] = useState(mockedCoursesList);
 	const [authors, setAuthors] = useState(mockedAuthorsList);
@@ -50,7 +59,7 @@ function App() {
 					path='/courses'
 					element={
 						isLoggedIn ? (
-							<Courses courses={courses} authors={authors} />
+							<Courses courses={courses} authors={authors} isAdmin={isAdmin} />
 						) : (
 							<Navigate to='/login' />
 						)
@@ -59,7 +68,7 @@ function App() {
 				<Route
 					path='/courses/add'
 					element={
-						isLoggedIn ? (
+						isLoggedIn && isAdmin ? (
 							<CreateCourse
 								addCourse={onAddCourse}
 								addAuthor={onAddAuthor}

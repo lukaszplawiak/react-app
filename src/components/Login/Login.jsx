@@ -40,8 +40,9 @@ function Login({ onLogin }) {
 		if (result.successful && result.result) {
 			localStorage.setItem('userToken', result.result);
 			localStorage.setItem('userName', result.user.name);
+			localStorage.setItem('email', result.user.email);
 			navigate('/courses', { replace: true });
-			if (onLogin) onLogin();
+			if (onLogin) onLogin(result.user.email);
 		} else {
 			setErrors({
 				server: result.message || 'An error occurred while logging in.',

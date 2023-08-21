@@ -9,7 +9,7 @@ import EmptyCourseList from './components/EmptyCourseList';
 
 import './Courses.css';
 
-function Courses({ courses, authors }) {
+function Courses({ courses, authors, isAdmin }) {
 	const [query, setQuery] = useState('');
 	const navigate = useNavigate();
 
@@ -46,9 +46,11 @@ function Courses({ courses, authors }) {
 					/>
 				))
 			) : (
-				<EmptyCourseList />
+				<EmptyCourseList isAdmin={isAdmin} />
 			)}
-			<Button label={ADD_NEW_COURSE_LABEL} onClick={handleAddNewCourse} />
+			{isAdmin && (
+				<Button label={ADD_NEW_COURSE_LABEL} onClick={handleAddNewCourse} />
+			)}
 		</div>
 	);
 }
