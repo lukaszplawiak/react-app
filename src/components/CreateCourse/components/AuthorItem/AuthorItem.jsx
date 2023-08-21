@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 function AuthorItem({ author, onAction, action }) {
 	return (
 		<div className='AuthorItem'>
@@ -6,5 +8,13 @@ function AuthorItem({ author, onAction, action }) {
 		</div>
 	);
 }
+
+AuthorItem.propTypes = {
+	author: PropTypes.shape({
+		name: PropTypes.string.isRequired,
+	}).isRequired,
+	onAction: PropTypes.func.isRequired,
+	action: PropTypes.string.isRequired,
+};
 
 export default AuthorItem;

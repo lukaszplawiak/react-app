@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import CourseCard from './components/CourseCard/CourseCard';
 import SearchBar from './components/SearchBar/SearchBar';
 import Button from '../../common/Button/Button';
+import EmptyCourseList from './components/EmptyCourseList';
 
 import './Courses.css';
 
@@ -35,14 +36,18 @@ function Courses(props) {
 	return (
 		<div className='Courses'>
 			<SearchBar onSearch={handleSearch} />
-			{filteredCourses.map((course) => (
-				<CourseCard
-					key={course.id}
-					course={course}
-					authors={props.authors}
-					onCourseSelect={handleCourseSelect}
-				/>
-			))}
+			{filteredCourses.length > 0 ? (
+				filteredCourses.map((course) => (
+					<CourseCard
+						key={course.id}
+						course={course}
+						authors={props.authors}
+						onCourseSelect={handleCourseSelect}
+					/>
+				))
+			) : (
+				<EmptyCourseList />
+			)}
 			<Button label={ADD_NEW_COURSE_LABEL} onClick={handleAddNewCourse} />
 		</div>
 	);

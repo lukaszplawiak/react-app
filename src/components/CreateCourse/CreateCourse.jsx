@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthorItem from './components/AuthorItem/AuthorItem';
 import { v4 as uuidv4 } from 'uuid';
+import PropTypes from 'prop-types';
 
-function CreateCourse({ authors = [], addCourse, addAuthor }) {
+function CreateCourse({ authors, addCourse, addAuthor }) {
 	const [title, setTitle] = useState('');
 	const [description, setDescription] = useState('');
 	const [duration, setDuration] = useState('');
@@ -130,5 +131,20 @@ function CreateCourse({ authors = [], addCourse, addAuthor }) {
 		</div>
 	);
 }
+
+CreateCourse.propTypes = {
+	authors: PropTypes.arrayOf(
+		PropTypes.shape({
+			id: PropTypes.string.isRequired,
+			name: PropTypes.string.isRequired,
+		})
+	),
+	addCourse: PropTypes.func.isRequired,
+	addAuthor: PropTypes.func.isRequired,
+};
+
+CreateCourse.defaultProps = {
+	authors: [],
+};
 
 export default CreateCourse;

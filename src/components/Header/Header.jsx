@@ -11,11 +11,11 @@ import './Header.css';
 function Header() {
 	const navigate = useNavigate();
 	const location = useLocation();
-	const username = localStorage.getItem('username');
+	const userName = localStorage.getItem('userName');
 
 	const handleLogout = () => {
-		localStorage.removeItem('token');
-		localStorage.removeItem('username');
+		localStorage.removeItem('userToken');
+		localStorage.removeItem('userName');
 		navigate('/login');
 	};
 
@@ -25,8 +25,8 @@ function Header() {
 			{location.pathname !== '/login' &&
 				location.pathname !== '/registration' && (
 					<>
-						{username && <span>Hello, {username}</span>}
-						{username ? (
+						{userName && <div className='Hello'>Hello, {userName}</div>}
+						{userName ? (
 							<Button
 								label='Logout'
 								className='ButtonHeader'

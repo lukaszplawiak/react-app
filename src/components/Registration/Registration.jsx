@@ -37,7 +37,7 @@ function Registration() {
 			},
 		});
 		const result = await response.json();
-		if (result.success) {
+		if (result.successful) {
 			navigate('/login');
 		} else {
 			setErrors({ server: result.message });

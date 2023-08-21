@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import Input from '../../common/Input/Input';
 import Button from '../../common/Button/Button';
 
-function Login() {
+function Login({ onLogin }) {
 	const [formData, setFormData] = useState({
 		email: '',
 		password: '',
@@ -39,9 +39,13 @@ function Login() {
 
 		if (result.successful && result.result) {
 			localStorage.setItem('userToken', result.result);
-			navigate('/courses');
+			localStorage.setItem('userName', result.user.name);
+			navigate('/courses', { replace: true });
+			if (onLogin) onLogin();
 		} else {
-			setErrors({ server: result.message });
+			setErrors({
+				server: result.message || 'An error occurred while logging in.',
+			});
 		}
 	};
 

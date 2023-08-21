@@ -12,16 +12,24 @@ import CreateCourse from './components/CreateCourse/CreateCourse';
 import './App.css';
 
 function App() {
-	const defaultPath = localStorage.getItem('token') ? '/courses' : '/login';
+	const defaultPath = localStorage.getItem('userToken') ? '/courses' : '/login';
+
+	const [isLoggedIn, setIsLoggedIn] = useState(
+		!!localStorage.getItem('userToken')
+	);
+
+	const handleLogin = () => {
+		setIsLoggedIn(true);
+	};
 
 	const [courses, setCourses] = useState(mockedCoursesList);
 	const [authors, setAuthors] = useState(mockedAuthorsList);
 
-	const addCourse = (newCourse) => {
+	const onAddCourse = (newCourse) => {
 		setCourses((prevCourses) => [...prevCourses, newCourse]);
 	};
 
-	const addAuthor = (newAuthor) => {
+	const onAddAuthor = (newAuthor) => {
 		if (!newAuthor.id || !newAuthor.name) {
 			console.error('New Author with wrong format!');
 			return;
@@ -37,24 +45,40 @@ function App() {
 			<Routes>
 				<Route path='/' element={<Navigate to={defaultPath} />} />
 				<Route path='/registration' element={<Registration />} />
-				<Route path='/login' element={<Login />} />
+				<Route path='/login' element={<Login onLogin={handleLogin} />} />
 				<Route
 					path='/courses/add'
 					element={
-						<CreateCourse
-							addCourse={addCourse}
-							addAuthor={addAuthor}
-							authors={authors}
-						/>
+						isLoggedIn ? (
+							<CreateCourse
+								addCourse={onAddCourse}
+								addAuthor={onAddAuthor}
+								authors={authors}
+							/>
+						) : (
+							<Navigate to='/login' />
+						)
 					}
 				/>
 				<Route
 					path='/courses/:courseId'
-					element={<CourseInfo courses={courses} authorsList={authors} />}
+					element={
+						isLoggedIn ? (
+							<CourseInfo courses={courses} authorsList={authors} />
+						) : (
+							<Navigate to='/login' />
+						)
+					}
 				/>
 				<Route
 					path='/courses'
-					element={<Courses courses={courses} authors={authors} />}
+					element={
+						isLoggedIn ? (
+							<Courses courses={courses} authors={authors} />
+						) : (
+							<Navigate to='/login' />
+						)
+					}
 				/>
 			</Routes>
 		</div>
