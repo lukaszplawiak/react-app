@@ -9,7 +9,7 @@ import EmptyCourseList from './components/EmptyCourseList';
 
 import './Courses.css';
 
-function Courses(props) {
+function Courses({ courses, authors }) {
 	const [query, setQuery] = useState('');
 	const navigate = useNavigate();
 
@@ -18,12 +18,12 @@ function Courses(props) {
 	};
 
 	const filteredCourses = useMemo(() => {
-		return props.courses.filter(
+		return courses.filter(
 			(course) =>
 				course.title.toLowerCase().includes(query.toLowerCase()) ||
 				course.id.toString().includes(query)
 		);
-	}, [props.courses, query]);
+	}, [courses, query]);
 
 	const handleAddNewCourse = () => {
 		navigate('/courses/add');
@@ -41,7 +41,7 @@ function Courses(props) {
 					<CourseCard
 						key={course.id}
 						course={course}
-						authors={props.authors}
+						authors={authors}
 						onCourseSelect={handleCourseSelect}
 					/>
 				))

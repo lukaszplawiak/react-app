@@ -47,6 +47,16 @@ function App() {
 				<Route path='/registration' element={<Registration />} />
 				<Route path='/login' element={<Login onLogin={handleLogin} />} />
 				<Route
+					path='/courses'
+					element={
+						isLoggedIn ? (
+							<Courses courses={courses} authors={authors} />
+						) : (
+							<Navigate to='/login' />
+						)
+					}
+				/>
+				<Route
 					path='/courses/add'
 					element={
 						isLoggedIn ? (
@@ -65,16 +75,6 @@ function App() {
 					element={
 						isLoggedIn ? (
 							<CourseInfo courses={courses} authorsList={authors} />
-						) : (
-							<Navigate to='/login' />
-						)
-					}
-				/>
-				<Route
-					path='/courses'
-					element={
-						isLoggedIn ? (
-							<Courses courses={courses} authors={authors} />
 						) : (
 							<Navigate to='/login' />
 						)
