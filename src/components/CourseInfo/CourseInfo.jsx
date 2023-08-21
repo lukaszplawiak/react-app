@@ -1,13 +1,16 @@
-import { BACK_TO_COURSES_LABEL } from '../../common/Constants/Constants';
-
 import React from 'react';
-
-import Button from '../../common/Button/Button';
+import { useParams, Link } from 'react-router-dom';
 
 import './CourseInfo.css';
 
-function CourseInfo(props) {
-	const { course, authorsList } = props;
+function CourseInfo({ courses, authorsList }) {
+	const { courseId } = useParams();
+
+	const course = courses.find((c) => c.id === courseId);
+
+	if (!course) {
+		return <p>Course not found</p>;
+	}
 
 	const authorNames = course.authors
 		.map((authorId) => {
@@ -47,7 +50,9 @@ function CourseInfo(props) {
 					</div>
 				</div>
 			</div>
-			<Button label={BACK_TO_COURSES_LABEL} onClick={props.onGoBack} />
+			<Link to='/courses' className='back-button'>
+				Back to Courses
+			</Link>
 		</div>
 	);
 }
