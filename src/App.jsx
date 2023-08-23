@@ -1,50 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 
 import Header from './components/Header/Header';
 import CourseInfo from './components/CourseInfo/CourseInfo';
 import Courses from './components/Courses/Courses';
-import { mockedCoursesList, mockedAuthorsList } from './components/mockedData';
 import Registration from './components/Registration/Registration';
 import Login from './components/Login/Login';
 import CreateCourse from './components/CreateCourse/CreateCourse';
+import { fetchCourses } from './store/courses/actions';
+import { fetchAuthors } from './store/authors/actions';
 
 import './App.css';
 
 function App() {
-	const defaultPath = localStorage.getItem('userToken') ? '/courses' : '/login';
-
-	const [isLoggedIn, setIsLoggedIn] = useState(
-		!!localStorage.getItem('userToken')
-	);
-
-	const handleLogin = (email) => {
-		setIsLoggedIn(true);
-		setIsAdmin(email === 'admin@email.com');
-	};
-
-	const [isAdmin, setIsAdmin] = useState(
-		localStorage.getItem('email') === 'admin@email.com'
-	);
+	const dispatch = useDispatch();
+	const { user, courses, authors } = useSelector((state) => ({
+		user: state.user,
+		courses: state.courses.courses,
+		authors: state.authors.authors,
+	}));
+	const userToken = localStorage.getItem('userToken');
+	const defaultPath = userToken ? '/courses' : '/login';
 
 	useEffect(() => {
-		setIsAdmin(localStorage.getItem('email') === 'admin@email.com');
-	}, [isLoggedIn]);
-
-	const [courses, setCourses] = useState(mockedCoursesList);
-	const [authors, setAuthors] = useState(mockedAuthorsList);
-
-	const onAddCourse = (newCourse) => {
-		setCourses((prevCourses) => [...prevCourses, newCourse]);
-	};
-
-	const onAddAuthor = (newAuthor) => {
-		if (!newAuthor.id || !newAuthor.name) {
-			console.error('New Author with wrong format!');
-			return;
-		}
-		setAuthors((prevAuthors) => [...prevAuthors, newAuthor]);
-	};
+		dispatch(fetchCourses());
+		dispatch(fetchAuthors());
+	}, [dispatch]);
 
 	return (
 		<div className='App'>
@@ -54,12 +36,16 @@ function App() {
 			<Routes>
 				<Route path='/' element={<Navigate to={defaultPath} />} />
 				<Route path='/registration' element={<Registration />} />
-				<Route path='/login' element={<Login onLogin={handleLogin} />} />
+				<Route path='/login' element={<Login />} />
 				<Route
 					path='/courses'
 					element={
-						isLoggedIn ? (
-							<Courses courses={courses} authors={authors} isAdmin={isAdmin} />
+						user.isAuth ? (
+							<Courses
+								courses={courses}
+								authors={authors}
+								isAdmin={user.email === 'admin@email.com'}
+							/>
 						) : (
 							<Navigate to='/login' />
 						)
@@ -68,12 +54,8 @@ function App() {
 				<Route
 					path='/courses/add'
 					element={
-						isLoggedIn && isAdmin ? (
-							<CreateCourse
-								addCourse={onAddCourse}
-								addAuthor={onAddAuthor}
-								authors={authors}
-							/>
+						user.isAuth && user.isAdmin ? (
+							<CreateCourse />
 						) : (
 							<Navigate to='/login' />
 						)
@@ -82,7 +64,7 @@ function App() {
 				<Route
 					path='/courses/:courseId'
 					element={
-						isLoggedIn ? (
+						user.isAuth ? (
 							<CourseInfo courses={courses} authorsList={authors} />
 						) : (
 							<Navigate to='/login' />

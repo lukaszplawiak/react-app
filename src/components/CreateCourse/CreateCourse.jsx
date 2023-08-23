@@ -3,8 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import AuthorItem from './components/AuthorItem/AuthorItem';
 import { v4 as uuidv4 } from 'uuid';
 import PropTypes from 'prop-types';
+import { useDispatch, useSelector } from 'react-redux';
+import { createCourse } from '../../store/courses/actions';
+import { createAuthor } from '../../store/authors/actions';
 
-function CreateCourse({ authors, addCourse, addAuthor }) {
+function CreateCourse() {
 	const [title, setTitle] = useState('');
 	const [description, setDescription] = useState('');
 	const [duration, setDuration] = useState('');
@@ -12,6 +15,9 @@ function CreateCourse({ authors, addCourse, addAuthor }) {
 	const [newAuthorName, setNewAuthorName] = useState('');
 	const [errors, setErrors] = useState({});
 	const navigate = useNavigate();
+	const dispatch = useDispatch();
+	const authors = useSelector((state) => state.authors.authors);
+	const user = useSelector((state) => state.user);
 
 	const handleAddAuthorToCourse = (authorId) => {
 		setCourseAuthors((prevAuthors) => [...prevAuthors, authorId]);
@@ -36,8 +42,7 @@ function CreateCourse({ authors, addCourse, addAuthor }) {
 			id: uuidv4(),
 			name: newAuthorName,
 		};
-
-		addAuthor(newAuthor);
+		dispatch(createAuthor(newAuthor, user.token));
 		setNewAuthorName('');
 	};
 
@@ -66,7 +71,7 @@ function CreateCourse({ authors, addCourse, addAuthor }) {
 			authors: courseAuthors,
 		};
 
-		addCourse(newCourse);
+		dispatch(createCourse(newCourse));
 		navigate('/courses');
 	};
 	return (
@@ -139,12 +144,6 @@ CreateCourse.propTypes = {
 			name: PropTypes.string.isRequired,
 		})
 	),
-	addCourse: PropTypes.func.isRequired,
-	addAuthor: PropTypes.func.isRequired,
-};
-
-CreateCourse.defaultProps = {
-	authors: [],
 };
 
 export default CreateCourse;
