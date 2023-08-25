@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Input from '../../common/Input/Input';
 import Button from '../../common/Button/Button';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginUser } from '../../store/user/actions';
 
 function Login({ onLogin }) {
 	const [formData, setFormData] = useState({
@@ -10,6 +12,15 @@ function Login({ onLogin }) {
 	});
 	const [errors, setErrors] = useState({});
 	const navigate = useNavigate();
+	const dispatch = useDispatch();
+
+	const user = useSelector((state) => state.user);
+	useEffect(() => {
+		if (user.isAuth) {
+			navigate('/courses', { replace: true });
+			if (onLogin) onLogin(formData.email);
+		}
+	}, [user.isAuth, formData.email, onLogin, navigate]);
 
 	const handleChange = (e) => {
 		const { name, value } = e.target;
@@ -27,25 +38,11 @@ function Login({ onLogin }) {
 			return;
 		}
 
-		const response = await fetch('http://localhost:4000/login', {
-			method: 'POST',
-			body: JSON.stringify(formData),
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		});
-
-		const result = await response.json();
-
-		if (result.successful && result.result) {
-			localStorage.setItem('userToken', result.result);
-			localStorage.setItem('userName', result.user.name);
-			localStorage.setItem('email', result.user.email);
-			navigate('/courses', { replace: true });
-			if (onLogin) onLogin(result.user.email);
-		} else {
+		try {
+			dispatch(loginUser(formData));
+		} catch (error) {
 			setErrors({
-				server: result.message || 'An error occurred while logging in.',
+				server: error.message || 'An error occurred while logging in.',
 			});
 		}
 	};
@@ -68,7 +65,7 @@ function Login({ onLogin }) {
 				error={errors.password}
 				placeholder='Your Password'
 			/>
-			<Button label='Login' />
+			<Button label='Login' onClick={handleSubmit} />
 			<Link to='/registration'>Don't have an account? Register here</Link>
 		</form>
 	);
