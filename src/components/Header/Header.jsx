@@ -1,8 +1,8 @@
+import React from 'react';
 import { LOGIN_LABEL } from '../../common/Constants/Constants';
 import { useNavigate, useLocation } from 'react-router-dom';
-
-import React from 'react';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { logout } from '../../store/user/actions';
 import Logo from './components/Logo/Logo';
 import Button from '../../common/Button/Button';
 
@@ -11,11 +11,11 @@ import './Header.css';
 function Header() {
 	const navigate = useNavigate();
 	const location = useLocation();
-	const userName = localStorage.getItem('userName');
+	const dispatch = useDispatch();
+	const user = useSelector((state) => state.user);
 
 	const handleLogout = () => {
-		localStorage.removeItem('userToken');
-		localStorage.removeItem('userName');
+		dispatch(logout());
 		navigate('/login');
 	};
 
@@ -25,8 +25,8 @@ function Header() {
 			{location.pathname !== '/login' &&
 				location.pathname !== '/registration' && (
 					<>
-						{userName && <div className='Hello'>Hello, {userName}</div>}
-						{userName ? (
+						{user.name && <div className='Hello'>Hello, {user.name}</div>}
+						{user.isAuth ? (
 							<Button
 								label='Logout'
 								className='ButtonHeader'

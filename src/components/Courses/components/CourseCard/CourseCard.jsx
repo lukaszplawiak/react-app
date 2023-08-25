@@ -1,4 +1,5 @@
 import React from 'react';
+import Button from '../../../../common/Button/Button';
 
 import './CourseCard.css';
 
@@ -17,7 +18,7 @@ const formatCreationDate = (date) => {
 	return `${d.getDate()}.${d.getMonth() + 1}.${d.getFullYear()}`;
 };
 
-function CourseCard({ course, authors, onCourseSelect }) {
+function CourseCard({ course, authors, onCourseSelect, onDelete }) {
 	const getAuthors = (courseAuthors) => {
 		if (!courseAuthors || !authors) {
 			return '';
@@ -54,14 +55,15 @@ function CourseCard({ course, authors, onCourseSelect }) {
 							{formatCreationDate(course.creationDate)}
 						</p>
 					</div>
-					<button
+					<Button
+						label='SHOW COURSE'
 						className='Course-button'
 						onClick={() => {
 							onCourseSelect(course);
 						}}
-					>
-						SHOW COURSE
-					</button>
+					/>
+					<Button label='DELETE' onClick={() => onDelete(course.id)} />
+					<Button label='UPDATE' />
 				</div>
 			</div>
 		</div>
