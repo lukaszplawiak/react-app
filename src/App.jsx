@@ -20,8 +20,8 @@ function App() {
 		courses: state.courses.courses,
 		authors: state.authors.authors,
 	}));
-	const userToken = localStorage.getItem('userToken');
-	const defaultPath = userToken ? '/courses' : '/login';
+
+	const defaultPath = user.isAuth ? '/courses' : '/login';
 
 	useEffect(() => {
 		dispatch(fetchCourses());

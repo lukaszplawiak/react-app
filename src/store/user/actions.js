@@ -7,18 +7,21 @@ export const loginUser = (user) => async (dispatch) => {
 		const result = response.data;
 
 		if (result.successful && result.result) {
+			const isAdmin = result.user.email === 'admin@email.com';
 			dispatch(
 				setUser({
 					name: result.user.name,
 					token: result.result,
 					email: result.user.email,
 					isAuth: true,
-					isAdmin: result.user.email === 'admin@email.com',
+					isAdmin: isAdmin,
 				})
 			);
 			localStorage.setItem('userToken', result.result);
 			localStorage.setItem('userName', result.user.name);
-			localStorage.setItem('email', result.user.email);
+			localStorage.setItem('userEmail', result.user.email);
+			localStorage.setItem('isAuth', 'true');
+			localStorage.setItem('isAdmin', isAdmin ? 'true' : 'false');
 		} else {
 			throw new Error(result.message || 'An error occurred while logging in.');
 		}
@@ -34,6 +37,8 @@ export const loginUser = (user) => async (dispatch) => {
 export const logout = () => async (dispatch) => {
 	localStorage.removeItem('userToken');
 	localStorage.removeItem('userName');
-	localStorage.removeItem('email');
+	localStorage.removeItem('userEmail');
+	localStorage.removeItem('isAuth');
+	localStorage.removeItem('isAdmin');
 	dispatch(logoutUser());
 };

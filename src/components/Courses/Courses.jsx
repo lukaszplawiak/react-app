@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import CourseCard from './components/CourseCard/CourseCard';
@@ -6,8 +6,7 @@ import SearchBar from './components/SearchBar/SearchBar';
 import Button from '../../common/Button/Button';
 import EmptyCourseList from './components/EmptyCourseList';
 import { ADD_NEW_COURSE_LABEL } from '../../common/Constants/Constants';
-import { fetchCourses, deleteCourse } from '../../store/courses/actions';
-import { fetchAuthors } from '../../store/authors/actions';
+import { deleteCourse } from '../../store/courses/actions';
 import './Courses.css';
 
 function Courses() {
@@ -17,11 +16,6 @@ function Courses() {
 	const authors = useSelector((state) => state.authors.authors);
 	const user = useSelector((state) => state.user);
 	const [query, setQuery] = useState('');
-
-	useEffect(() => {
-		dispatch(fetchCourses());
-		dispatch(fetchAuthors());
-	}, [dispatch]);
 
 	const handleSearch = (inputQuery) => {
 		setQuery(inputQuery);

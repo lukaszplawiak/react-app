@@ -1,13 +1,19 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+const userName = localStorage.getItem('userName');
+const userToken = localStorage.getItem('userToken');
+const userEmail = localStorage.getItem('userEmail');
+const userIsAuth = localStorage.getItem('isAuth') === 'true';
+const userIsAdmin = localStorage.getItem('isAdmin') === 'true';
+
 const userSlice = createSlice({
 	name: 'user',
 	initialState: {
-		name: null,
-		token: null,
-		email: null,
-		isAuth: false,
-		isAdmin: false,
+		name: userName || null,
+		token: userToken || null,
+		email: userEmail || null,
+		isAuth: userIsAuth || false,
+		isAdmin: userIsAdmin || false,
 		error: null,
 	},
 	reducers: {

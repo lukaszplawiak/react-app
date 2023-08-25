@@ -1,15 +1,9 @@
-import {
-	getCoursesService,
-	deleteCourseService,
-	createCourseService,
-} from '../../services';
+import { getCoursesService } from '../../services';
 import {
 	FETCH_COURSES_SUCCESS,
 	FETCH_COURSES_FAILURE,
 	DELETE_COURSES_SUCCESS,
-	DELETE_COURSES_FAILURE,
 	CREATE_COURSES_SUCCESS,
-	CREATE_COURSES_FAILURE,
 } from './types';
 
 export const fetchCourses = () => async (dispatch) => {
@@ -35,48 +29,16 @@ export const fetchCourses = () => async (dispatch) => {
 	}
 };
 
-export const deleteCourse = (courseId) => async (dispatch) => {
-	try {
-		const response = await deleteCourseService(courseId);
-
-		if (response.data.successful) {
-			dispatch({
-				type: DELETE_COURSES_SUCCESS,
-				payload: courseId,
-			});
-		} else {
-			dispatch({
-				type: DELETE_COURSES_FAILURE,
-				error: 'Application level request failed',
-			});
-		}
-	} catch (error) {
-		dispatch({
-			type: DELETE_COURSES_FAILURE,
-			error: error.message || 'An error occurred while deleting course',
-		});
-	}
+export const deleteCourse = (courseId) => (dispatch) => {
+	dispatch({
+		type: DELETE_COURSES_SUCCESS,
+		payload: courseId,
+	});
 };
 
-export const createCourse = (courses) => async (dispatch) => {
-	try {
-		const response = await createCourseService(courses);
-
-		if (response.data.successful) {
-			dispatch({
-				type: CREATE_COURSES_SUCCESS,
-				payload: courses,
-			});
-		} else {
-			dispatch({
-				type: CREATE_COURSES_FAILURE,
-				error: 'Application level request failed',
-			});
-		}
-	} catch (error) {
-		dispatch({
-			type: CREATE_COURSES_FAILURE,
-			error: error.message || 'An error occurred while creating course',
-		});
-	}
+export const createCourse = (course) => async (dispatch) => {
+	dispatch({
+		type: CREATE_COURSES_SUCCESS,
+		payload: course,
+	});
 };
