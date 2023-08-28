@@ -1,6 +1,8 @@
 import React from 'react';
 import Button from '../../../../common/Button/Button';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { deleteCourse } from '../../../../store/courses/thunk';
+import { useNavigate } from 'react-router-dom';
 import './CourseCard.css';
 
 const formatDuration = (duration) => {
@@ -19,6 +21,10 @@ const formatCreationDate = (date) => {
 };
 
 function CourseCard({ course, authors, onCourseSelect, onDelete }) {
+	const dispatch = useDispatch();
+	const navigate = useNavigate();
+	const user = useSelector((state) => state.user);
+
 	const getAuthors = (courseAuthors) => {
 		if (!courseAuthors || !authors) {
 			return '';
@@ -33,6 +39,14 @@ function CourseCard({ course, authors, onCourseSelect, onDelete }) {
 			.join(', ');
 
 		return names.length > 30 ? names.substr(0, 27) + '...' : names;
+	};
+
+	const handleDelete = async (courseId) => {
+		await dispatch(deleteCourse(courseId));
+	};
+
+	const handleUpdate = (courseId) => {
+		navigate(`/courses/update/${courseId}`);
 	};
 
 	return (
@@ -62,8 +76,12 @@ function CourseCard({ course, authors, onCourseSelect, onDelete }) {
 							onCourseSelect(course);
 						}}
 					/>
-					<Button label='DELETE' onClick={() => onDelete(course.id)} />
-					<Button label='UPDATE' />
+					{user.role === 'admin' && (
+						<Button label='DELETE' onClick={() => handleDelete(course.id)} />
+					)}
+					{user.role === 'admin' && (
+						<Button label='UPDATE' onClick={() => handleUpdate(course.id)} />
+					)}
 				</div>
 			</div>
 		</div>

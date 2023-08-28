@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthorItem from './components/AuthorItem/AuthorItem';
-import { v4 as uuidv4 } from 'uuid';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
-import { createCourse } from '../../store/courses/actions';
-import { createAuthor } from '../../store/authors/actions';
+import { createCourse } from '../../store/courses/thunk';
+import { createAuthor } from '../../store/authors/thunk';
 
-function CreateCourse() {
+function CourseForm() {
 	const [title, setTitle] = useState('');
 	const [description, setDescription] = useState('');
 	const [duration, setDuration] = useState('');
@@ -17,18 +16,14 @@ function CreateCourse() {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 	const authors = useSelector((state) => state.authors.authors);
-	const user = useSelector((state) => state.user);
-
 	const handleAddAuthorToCourse = (authorId) => {
 		setCourseAuthors((prevAuthors) => [...prevAuthors, authorId]);
 	};
-
 	const handleRemoveAuthorFromCourse = (authorId) => {
 		setCourseAuthors((prevAuthors) =>
 			prevAuthors.filter((id) => id !== authorId)
 		);
 	};
-
 	const handleCreateAuthor = () => {
 		if (newAuthorName.length < 2) {
 			setErrors({
@@ -37,18 +32,15 @@ function CreateCourse() {
 			});
 			return;
 		}
-
 		const newAuthor = {
-			id: uuidv4(),
 			name: newAuthorName,
 		};
-		dispatch(createAuthor(newAuthor, user.token));
+		dispatch(createAuthor(newAuthor));
 		setNewAuthorName('');
 	};
 
-	const handleCreateCourse = () => {
+	const handleCreateCourse = async () => {
 		const validationErrors = {};
-
 		if (title.length < 2)
 			validationErrors.title = 'Title should be at least 2 characters';
 		if (description.length < 2)
@@ -61,18 +53,16 @@ function CreateCourse() {
 			setErrors(validationErrors);
 			return;
 		}
-
 		const newCourse = {
-			id: uuidv4(),
 			title,
 			description,
-			creationDate: new Date().toISOString(),
 			duration: Number(duration),
 			authors: courseAuthors,
 		};
-
-		dispatch(createCourse(newCourse));
-		navigate('/courses');
+		const result = await dispatch(createCourse(newCourse));
+		if (result.payload) {
+			navigate('/courses');
+		}
 	};
 	return (
 		<div className='CreateCourse'>
@@ -136,8 +126,7 @@ function CreateCourse() {
 		</div>
 	);
 }
-
-CreateCourse.propTypes = {
+CourseForm.propTypes = {
 	authors: PropTypes.arrayOf(
 		PropTypes.shape({
 			id: PropTypes.string.isRequired,
@@ -145,5 +134,4 @@ CreateCourse.propTypes = {
 		})
 	),
 };
-
-export default CreateCourse;
+export default CourseForm;
