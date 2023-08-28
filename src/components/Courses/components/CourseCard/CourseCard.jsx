@@ -71,6 +71,8 @@ function CourseCard({ course, authors, onCourseSelect, onDelete }) {
 					</div>
 					<Button
 						label='SHOW COURSE'
+					<Button
+						label='SHOW COURSE'
 						className='Course-button'
 						onClick={() => {
 							onCourseSelect(course);

@@ -16,6 +16,12 @@ function Courses() {
 	const courses = useSelector((state) => state.courses.courses);
 	const authors = useSelector((state) => state.authors.authors);
 	const user = useSelector((state) => state.user);
+function Courses() {
+	const dispatch = useDispatch();
+	const navigate = useNavigate();
+	const courses = useSelector((state) => state.courses.courses);
+	const authors = useSelector((state) => state.authors.authors);
+	const user = useSelector((state) => state.user);
 	const [query, setQuery] = useState('');
 
 	useEffect(() => {
@@ -27,6 +33,10 @@ function Courses() {
 
 	const handleSearch = (inputQuery) => {
 		setQuery(inputQuery);
+	};
+
+	const handleDeleteCourse = (courseId) => {
+		dispatch(deleteCourse(courseId));
 	};
 
 	const handleDeleteCourse = (courseId) => {
@@ -60,9 +70,11 @@ function Courses() {
 						authors={authors}
 						onCourseSelect={handleCourseSelect}
 						onDelete={handleDeleteCourse}
+						onDelete={handleDeleteCourse}
 					/>
 				))
 			) : (
+				<EmptyCourseList isAdmin={user.isAdmin} />
 				<EmptyCourseList isAdmin={user.isAdmin} />
 			)}
 			{user.role === 'admin' && (
