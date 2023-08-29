@@ -1,6 +1,6 @@
 .Course-card {
     width: 1000px;
-    height: 270px;
+    height: 290px;
     margin-bottom: 30px;
     margin-left: 30px;
     box-shadow: 4px 4px 4px rgba(0,0,0,0.1);
@@ -28,8 +28,8 @@
 
 .Course-button {
     width: 190px;
-    height: 34px;
-    margin-top: 30px;
+    height: 30px;
+    margin-top: 10px;
     color: #F7F7F7;
     background: #007298;
     border-radius: 4px;
