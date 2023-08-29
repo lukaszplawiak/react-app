@@ -51,7 +51,6 @@ export const getUserService = () =>
 export const logoutUserService = () =>
 	axios.delete(`${baseURL}/logout`, {
 		headers: {
-			// Authorization: `Bearer ${localStorage.getItem('userToken')}`,
 			Authorization: localStorage.getItem('userToken'),
 			'Content-Type': 'application/json',
 		},
