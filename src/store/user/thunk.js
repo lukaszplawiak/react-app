@@ -62,7 +62,7 @@ export const loginUser = createAsyncThunk(
 
 export const logoutUser = createAsyncThunk(
 	'user/logoutUser',
-	async ({ rejectWithValue }) => {
+	async (_, { rejectWithValue }) => {
 		try {
 			await logoutUserService();
 
