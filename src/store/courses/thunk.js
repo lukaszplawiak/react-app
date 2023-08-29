@@ -3,6 +3,7 @@ import {
 	getCoursesService,
 	deleteCourseService,
 	createCourseService,
+	updateCourseService,
 } from '../../services';
 
 export const fetchCourses = createAsyncThunk(
@@ -18,9 +19,8 @@ export const fetchCourses = createAsyncThunk(
 
 export const deleteCourse = createAsyncThunk(
 	'courses/deleteCourse',
-	async (courseId, thunkAPI) => {
-		const user = thunkAPI.getState().user;
-		const response = await deleteCourseService(courseId, user.token);
+	async (courseId) => {
+		const response = await deleteCourseService(courseId);
 		if (response.data.successful) {
 			return courseId;
 		}
@@ -30,9 +30,19 @@ export const deleteCourse = createAsyncThunk(
 
 export const createCourse = createAsyncThunk(
 	'courses/createCourse',
-	async (course, thunkAPI) => {
-		const user = thunkAPI.getState().user;
-		const response = await createCourseService(course, user.token);
+	async (course) => {
+		const response = await createCourseService(course);
+		if (response.data.successful) {
+			return response.data.result;
+		}
+		throw new Error('Application level request failed');
+	}
+);
+
+export const updateCourse = createAsyncThunk(
+	'courses/updateCourse',
+	async (updatedCourse) => {
+		const response = await updateCourseService(updatedCourse);
 		if (response.data.successful) {
 			return response.data.result;
 		}

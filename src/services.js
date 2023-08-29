@@ -4,46 +4,54 @@ const baseURL = 'http://localhost:4000';
 
 export const getCoursesService = () => axios.get(`${baseURL}/courses/all`);
 
-export const createCourseService = (course, token) =>
+export const createCourseService = (course) =>
 	axios.post(`${baseURL}/courses/add`, course, {
 		headers: {
-			Authorization: `${token}`,
+			Authorization: localStorage.getItem('userToken'),
 			'Content-Type': 'application/json',
 		},
 	});
 
-export const deleteCourseService = (courseId, token) =>
+export const deleteCourseService = (courseId) =>
 	axios.delete(`${baseURL}/courses/${courseId}`, {
 		headers: {
-			Authorization: `${token}`,
+			Authorization: localStorage.getItem('userToken'),
+			'Content-Type': 'application/json',
+		},
+	});
+
+export const updateCourseService = (course) =>
+	axios.put(`${baseURL}/courses/${course.id}`, course, {
+		headers: {
+			Authorization: localStorage.getItem('userToken'),
 			'Content-Type': 'application/json',
 		},
 	});
 
 export const getAuthorsService = () => axios.get(`${baseURL}/authors/all`);
 
-export const createAuthorService = (author, token) =>
+export const createAuthorService = (author) =>
 	axios.post(`${baseURL}/authors/add`, author, {
 		headers: {
-			Authorization: `${token}`,
+			Authorization: localStorage.getItem('userToken'),
 			'Content-Type': 'application/json',
 		},
 	});
 
 export const loginUserService = (user) => axios.post(`${baseURL}/login`, user);
 
-export const getUserService = (user) =>
+export const getUserService = () =>
 	axios.get(`${baseURL}/users/me`, {
 		headers: {
-			Authorization: `Bearer ${user.token}`,
+			Authorization: `Bearer ${localStorage.getItem('userToken')}`,
 			'Content-Type': 'application/json',
 		},
 	});
 
-export const logoutUserService = (token) =>
-	axios.post(`${baseURL}/logout`, {
+export const logoutUserService = () =>
+	axios.delete(`${baseURL}/logout`, {
 		headers: {
-			Authorization: `Bearer ${token}`,
+			Authorization: `Bearer ${localStorage.getItem('userToken')}`,
 			'Content-Type': 'application/json',
 		},
 	});

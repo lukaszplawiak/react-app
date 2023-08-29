@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { fetchUser } from './thunk';
+import { fetchUser, loginUser, logoutUser } from './thunk';
 
 const userName = localStorage.getItem('userName');
 const userToken = localStorage.getItem('userToken');
@@ -29,17 +29,6 @@ const userSlice = createSlice({
 		setError: (state, action) => {
 			state.error = action.payload;
 		},
-		logoutUser: (state) => {
-			Object.assign(state, {
-				name: null,
-				token: null,
-				email: null,
-				isAuth: false,
-				role: null,
-			});
-
-			localStorage.clear();
-		},
 	},
 	extraReducers: (builder) => {
 		builder
@@ -57,10 +46,28 @@ const userSlice = createSlice({
 			.addCase(fetchUser.rejected, (state, action) => {
 				state.status = 'failed';
 				state.error = action.payload;
+			})
+			.addCase(loginUser.fulfilled, (state, action) => {
+				state.status = 'succeeded';
+				state.name = action.payload.name;
+				state.token = action.payload.token;
+				state.email = action.payload.email;
+				state.isAuth = true;
+			})
+			.addCase(logoutUser.fulfilled, (state) => {
+				state.status = 'succeeded';
+				Object.assign(state, {
+					name: null,
+					token: null,
+					email: null,
+					isAuth: false,
+					role: null,
+				});
+				localStorage.clear();
 			});
 	},
 });
 
-export const { setUser, setError, logoutUser } = userSlice.actions;
+export const { setUser, setError } = userSlice.actions;
 
 export default userSlice.reducer;

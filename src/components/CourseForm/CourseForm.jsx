@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import AuthorItem from './components/AuthorItem/AuthorItem';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
-import { createCourse } from '../../store/courses/thunk';
+import { createCourse, updateCourse } from '../../store/courses/thunk';
 import { createAuthor } from '../../store/authors/thunk';
 
 function CourseForm() {
@@ -16,14 +16,29 @@ function CourseForm() {
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
 	const authors = useSelector((state) => state.authors.authors);
+	const courses = useSelector((state) => state.courses.courses);
+	const { courseId } = useParams();
+
+	useEffect(() => {
+		if (courseId) {
+			const courseToUpdate = courses.find((course) => course.id === courseId);
+			setTitle(courseToUpdate.title);
+			setDescription(courseToUpdate.description);
+			setDuration(courseToUpdate.duration);
+			setCourseAuthors(courseToUpdate.authors);
+		}
+	}, [courses, courseId]);
+
 	const handleAddAuthorToCourse = (authorId) => {
 		setCourseAuthors((prevAuthors) => [...prevAuthors, authorId]);
 	};
+
 	const handleRemoveAuthorFromCourse = (authorId) => {
 		setCourseAuthors((prevAuthors) =>
 			prevAuthors.filter((id) => id !== authorId)
 		);
 	};
+
 	const handleCreateAuthor = () => {
 		if (newAuthorName.length < 2) {
 			setErrors({
@@ -37,6 +52,20 @@ function CourseForm() {
 		};
 		dispatch(createAuthor(newAuthor));
 		setNewAuthorName('');
+	};
+
+	const handleUpdateCourse = async () => {
+		const updatedCourse = {
+			id: courseId,
+			title,
+			description,
+			duration: Number(duration),
+			authors: courseAuthors,
+		};
+		const result = await dispatch(updateCourse(updatedCourse));
+		if (result.payload) {
+			navigate('/courses');
+		}
 	};
 
 	const handleCreateCourse = async () => {
@@ -64,6 +93,7 @@ function CourseForm() {
 			navigate('/courses');
 		}
 	};
+
 	return (
 		<div className='CreateCourse'>
 			<label>
@@ -123,9 +153,11 @@ function CourseForm() {
 				<button onClick={handleCreateAuthor}>Create Author</button>
 			</label>
 			<button onClick={handleCreateCourse}>Create Course</button>
+			<button onClick={handleUpdateCourse}>Update Course</button>
 		</div>
 	);
 }
+
 CourseForm.propTypes = {
 	authors: PropTypes.arrayOf(
 		PropTypes.shape({
@@ -134,4 +166,5 @@ CourseForm.propTypes = {
 		})
 	),
 };
+
 export default CourseForm;

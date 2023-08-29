@@ -62,23 +62,16 @@ export const loginUser = createAsyncThunk(
 
 export const logoutUser = createAsyncThunk(
 	'user/logoutUser',
-	async (token, { rejectWithValue }) => {
+	async ({ rejectWithValue }) => {
 		try {
-			const response = await logoutUserService({ token });
-			const result = response.data;
+			await logoutUserService();
 
-			if (result.successful) {
-				localStorage.removeItem('userToken');
-				localStorage.removeItem('userName');
-				localStorage.removeItem('userEmail');
-				localStorage.removeItem('isAuth');
-				localStorage.removeItem('userRole');
-				return null;
-			} else {
-				throw new Error(
-					result.message || 'An error occurred while logging out.'
-				);
-			}
+			localStorage.removeItem('userToken');
+			localStorage.removeItem('userName');
+			localStorage.removeItem('userEmail');
+			localStorage.removeItem('isAuth');
+			localStorage.removeItem('userRole');
+			return null;
 		} catch (error) {
 			return rejectWithValue(
 				error.message || 'An error occurred while logging out.'
