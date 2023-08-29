@@ -43,7 +43,7 @@ export const loginUserService = (user) => axios.post(`${baseURL}/login`, user);
 export const getUserService = () =>
 	axios.get(`${baseURL}/users/me`, {
 		headers: {
-			Authorization: `Bearer ${localStorage.getItem('userToken')}`,
+			Authorization: localStorage.getItem('userToken'),
 			'Content-Type': 'application/json',
 		},
 	});
@@ -51,7 +51,8 @@ export const getUserService = () =>
 export const logoutUserService = () =>
 	axios.delete(`${baseURL}/logout`, {
 		headers: {
-			Authorization: `Bearer ${localStorage.getItem('userToken')}`,
+			// Authorization: `Bearer ${localStorage.getItem('userToken')}`,
+			Authorization: localStorage.getItem('userToken'),
 			'Content-Type': 'application/json',
 		},
 	});

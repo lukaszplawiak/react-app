@@ -1,5 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { fetchCourses, deleteCourse, createCourse } from '../courses/thunk';
+import {
+	fetchCourses,
+	deleteCourse,
+	createCourse,
+	updateCourse,
+} from '../courses/thunk';
 
 const coursesSlice = createSlice({
 	name: 'courses',
@@ -26,6 +31,13 @@ const coursesSlice = createSlice({
 			})
 			.addCase(createCourse.fulfilled, (state, action) => {
 				state.courses.push(action.payload);
+				state.error = null;
+			})
+			.addCase(updateCourse.fulfilled, (state, action) => {
+				const index = state.courses.findIndex(
+					(course) => course.id === action.payload.id
+				);
+				state.courses[index] = action.payload;
 				state.error = null;
 			});
 	},
