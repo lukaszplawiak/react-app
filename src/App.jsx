@@ -1,15 +1,15 @@
 import React, { useEffect } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-
+import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 import Header from './components/Header/Header';
 import CourseInfo from './components/CourseInfo/CourseInfo';
 import Courses from './components/Courses/Courses';
 import Registration from './components/Registration/Registration';
 import Login from './components/Login/Login';
-import CreateCourse from './components/CreateCourse/CreateCourse';
-import { fetchCourses } from './store/courses/actions';
-import { fetchAuthors } from './store/authors/actions';
+import CourseForm from './components/CourseForm/CourseForm';
+import { fetchCourses } from './store/courses/thunk';
+import { fetchAuthors } from './store/authors/thunk';
 
 import './App.css';
 
@@ -21,7 +21,7 @@ function App() {
 		authors: state.authors.authors,
 	}));
 
-	const defaultPath = user.isAuth ? '/courses' : '/login';
+	const defaultPath = user && user.isAuth ? '/courses' : '/login';
 
 	useEffect(() => {
 		dispatch(fetchCourses());
@@ -39,26 +39,14 @@ function App() {
 				<Route path='/login' element={<Login />} />
 				<Route
 					path='/courses'
-					element={
-						user.isAuth ? (
-							<Courses
-								courses={courses}
-								authors={authors}
-								isAdmin={user.email === 'admin@email.com'}
-							/>
-						) : (
-							<Navigate to='/login' />
-						)
-					}
+					element={user.isAuth ? <Courses /> : <Navigate to='/login' />}
 				/>
 				<Route
 					path='/courses/add'
 					element={
-						user.isAuth && user.isAdmin ? (
-							<CreateCourse />
-						) : (
-							<Navigate to='/login' />
-						)
+						<PrivateRoute>
+							<CourseForm />
+						</PrivateRoute>
 					}
 				/>
 				<Route
@@ -69,6 +57,14 @@ function App() {
 						) : (
 							<Navigate to='/login' />
 						)
+					}
+				/>
+				<Route
+					path='/courses/update/:courseId'
+					element={
+						<PrivateRoute>
+							<CourseForm />
+						</PrivateRoute>
 					}
 				/>
 			</Routes>
