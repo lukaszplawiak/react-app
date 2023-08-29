@@ -1,10 +1,10 @@
 import { combineReducers } from 'redux';
-import slice from './user/slice';
+import userReducer from './user/reducer';
 import coursesReducer from './courses/reducer';
 import authorsReducer from './authors/reducer';
 
 const rootReducer = combineReducers({
-	user: slice,
+	user: userReducer,
 	courses: coursesReducer,
 	authors: authorsReducer,
 });
