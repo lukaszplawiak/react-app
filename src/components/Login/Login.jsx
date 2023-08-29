@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Input from '../../common/Input/Input';
 import Button from '../../common/Button/Button';
-import { useDispatch, useSelector } from 'react-redux';
-import { loginUser } from '../../store/user/actions';
+import { useDispatch } from 'react-redux';
+import { loginUser } from '../../store/user/thunk';
 
-function Login({ onLogin }) {
+function Login() {
 	const [formData, setFormData] = useState({
 		email: '',
 		password: '',
@@ -13,14 +13,6 @@ function Login({ onLogin }) {
 	const [errors, setErrors] = useState({});
 	const navigate = useNavigate();
 	const dispatch = useDispatch();
-
-	const user = useSelector((state) => state.user);
-	useEffect(() => {
-		if (user.isAuth) {
-			navigate('/courses', { replace: true });
-			if (onLogin) onLogin(formData.email);
-		}
-	}, [user.isAuth, formData.email, onLogin, navigate]);
 
 	const handleChange = (e) => {
 		const { name, value } = e.target;
@@ -39,7 +31,11 @@ function Login({ onLogin }) {
 		}
 
 		try {
-			dispatch(loginUser(formData));
+			const resultAction = await dispatch(loginUser(formData));
+			const { payload } = resultAction;
+			if (payload && payload.isAuth) {
+				setTimeout(() => navigate('/courses', { replace: true }), 0);
+			}
 		} catch (error) {
 			setErrors({
 				server: error.message || 'An error occurred while logging in.',
