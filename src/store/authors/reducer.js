@@ -1,42 +1,26 @@
-import {
-	FETCH_AUTHORS_SUCCESS,
-	FETCH_AUTHORS_FAILURE,
-	CREATE_AUTHORS_SUCCESS,
-	CREATE_AUTHORS_FAILURE,
-} from './types';
+import { createSlice } from '@reduxjs/toolkit';
+import { fetchAuthors, createAuthor } from './thunk';
 
-const initialState = {
-	authors: [],
-	error: null,
-};
+const authorsSlice = createSlice({
+	name: 'authors',
+	initialState: { authors: [], error: null },
+	extraReducers: (builder) => {
+		builder
+			.addCase(fetchAuthors.fulfilled, (state, action) => {
+				state.authors = action.payload;
+				state.error = null;
+			})
+			.addCase(fetchAuthors.rejected, (state, action) => {
+				state.error =
+					action.error.message || 'An error occurred while fetching authors';
+			})
+			.addCase(createAuthor.fulfilled, (state, action) => {
+				state.authors.push(action.payload);
+			})
+			.addCase(createAuthor.rejected, (state, action) => {
+				state.error = action.error.message || 'Failed to create author';
+			});
+	},
+});
 
-export default function authorsReducer(state = initialState, action) {
-	switch (action.type) {
-		case FETCH_AUTHORS_SUCCESS:
-			return {
-				...state,
-				authors: action.payload,
-				error: null,
-			};
-		case FETCH_AUTHORS_FAILURE:
-			console.error(action.error);
-			return {
-				...state,
-				error: action.error,
-			};
-		case CREATE_AUTHORS_SUCCESS:
-			return {
-				...state,
-				authors: [...state.authors, action.payload],
-				error: null,
-			};
-		case CREATE_AUTHORS_FAILURE:
-			console.error(action.error);
-			return {
-				...state,
-				error: action.error,
-			};
-		default:
-			return state;
-	}
-}
+export default authorsSlice.reducer;
