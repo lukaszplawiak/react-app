@@ -58,16 +58,9 @@ function CourseCard({ course, authors, onCourseSelect, onDelete }) {
 				</div>
 				<div className='Course-details'>
 					<div className='Course-details-info'>
-						<p>
-							<strong>Authors: </strong> {getAuthors(course.authors)}
-						</p>
-						<p>
-							<strong>Duration: </strong> {formatDuration(course.duration)}
-						</p>
-						<p>
-							<strong>Creation date: </strong>{' '}
-							{formatCreationDate(course.creationDate)}
-						</p>
+						<p>Authors: {getAuthors(course.authors)}</p>
+						<p>Duration: {formatDuration(course.duration)}</p>
+						<p>Creation date: {formatCreationDate(course.creationDate)}</p>
 					</div>
 					<Button
 						label='SHOW COURSE'
