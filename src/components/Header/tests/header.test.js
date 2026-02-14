@@ -7,35 +7,35 @@ import { MemoryRouter as Router } from 'react-router-dom';
 import rootReducer from '../../../store/rootReducer';
 
 const initialState = {
-	user: {
-		isAuth: true,
-		name: 'username',
-	},
-	courses: [],
-	authors: [],
+  user: {
+    isAuth: true,
+    name: 'username',
+  },
+  courses: [],
+  authors: [],
 };
 
 const store = configureStore({
-	reducer: rootReducer,
-	preloadedState: initialState,
+  reducer: rootReducer,
+  preloadedState: initialState,
 });
 
 describe('Header Component', () => {
-	beforeEach(() => {
-		render(
-			<Provider store={store}>
-				<Router>
-					<Header />
-				</Router>
-			</Provider>
-		);
-	});
+  beforeEach(() => {
+    render(
+      <Provider store={store}>
+        <Router>
+          <Header />
+        </Router>
+      </Provider>
+    );
+  });
 
-	it('should contain a logo', () => {
-		expect(screen.getByAltText(/logo/i)).toBeInTheDocument();
-	});
+  it('should contain a logo', () => {
+    expect(screen.getByAltText(/logo/i)).toBeInTheDocument();
+  });
 
-	it('should display the username', () => {
-		expect(screen.getByText('Hello, username')).toBeInTheDocument();
-	});
+  it('should display the username', () => {
+    expect(screen.getByText('Hello, username')).toBeInTheDocument();
+  });
 });

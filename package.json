@@ -34,7 +34,10 @@
     "eslint:fix": "eslint --fix --ext .js --ext .jsx src",
     "test:nowatch": "react-scripts test --watchAll=false",
     "prepare": "husky install",
-    "prepublish": "npm run eslint:fix && npm run test:nowatch"
+    "prepublish": "npm run eslint:fix && npm run test:nowatch",
+    "lint": "eslint 'src/**/*.{js,jsx}'",
+    "lint:fix": "eslint 'src/**/*.{js,jsx}' --fix",
+    "format": "prettier --write 'src/**/*.{js,jsx,json,css,scss,md}'"
   },
   "eslintConfig": {
     "extends": [
@@ -59,14 +62,14 @@
     "@trivago/prettier-plugin-sort-imports": "^4.2.0",
     "eslint": "^8.47.0",
     "eslint-config-airbnb": "^19.0.4",
-    "eslint-config-prettier": "^9.0.0",
+    "eslint-config-prettier": "^9.1.2",
     "eslint-plugin-import": "^2.28.0",
     "eslint-plugin-jsx-a11y": "^6.7.1",
-    "eslint-plugin-prettier": "^5.0.0",
+    "eslint-plugin-prettier": "^5.5.5",
     "eslint-plugin-react": "^7.33.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "husky": "^8.0.3",
     "jest": "^27.5.1",
-    "prettier": "^3.0.1"
+    "prettier": "^3.8.1"
   }
 }

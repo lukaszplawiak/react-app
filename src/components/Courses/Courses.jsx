@@ -11,69 +11,69 @@ import { fetchUser } from '../../store/user/thunk';
 import './Courses.css';
 
 function Courses() {
-	const dispatch = useDispatch();
-	const navigate = useNavigate();
-	const courses = useSelector((state) => state.courses.courses);
-	const authors = useSelector((state) => state.authors.authors);
-	const user = useSelector((state) => state.user);
-	const [query, setQuery] = useState('');
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const courses = useSelector((state) => state.courses.courses);
+  const authors = useSelector((state) => state.authors.authors);
+  const user = useSelector((state) => state.user);
+  const [query, setQuery] = useState('');
 
-	useEffect(() => {
-		dispatch(fetchUser());
-		if (!user.isAuth) {
-			navigate('/login');
-		}
-	}, [dispatch, user.isAuth, navigate]);
+  useEffect(() => {
+    dispatch(fetchUser());
+    if (!user.isAuth) {
+      navigate('/login');
+    }
+  }, [dispatch, user.isAuth, navigate]);
 
-	const handleSearch = (inputQuery) => {
-		setQuery(inputQuery);
-	};
+  const handleSearch = (inputQuery) => {
+    setQuery(inputQuery);
+  };
 
-	const handleDeleteCourse = (courseId) => {
-		dispatch(deleteCourse(courseId));
-	};
+  const handleDeleteCourse = (courseId) => {
+    dispatch(deleteCourse(courseId));
+  };
 
-	const filteredCourses = useMemo(() => {
-		return courses.filter(
-			(course) =>
-				course.title.toLowerCase().includes(query.toLowerCase()) ||
-				course.id.toString().includes(query)
-		);
-	}, [courses, query]);
+  const filteredCourses = useMemo(() => {
+    return courses.filter(
+      (course) =>
+        course.title.toLowerCase().includes(query.toLowerCase()) ||
+        course.id.toString().includes(query)
+    );
+  }, [courses, query]);
 
-	const handleAddNewCourse = () => {
-		navigate('/courses/add');
-	};
+  const handleAddNewCourse = () => {
+    navigate('/courses/add');
+  };
 
-	const handleCourseSelect = (course) => {
-		navigate(`/courses/${course.id}`);
-	};
+  const handleCourseSelect = (course) => {
+    navigate(`/courses/${course.id}`);
+  };
 
-	return (
-		<div className='Courses'>
-			<SearchBar onSearch={handleSearch} />
-			{filteredCourses.length > 0 ? (
-				filteredCourses.map((course) => (
-					<CourseCard
-						key={course.id}
-						course={course}
-						authors={authors}
-						onCourseSelect={handleCourseSelect}
-						onDelete={handleDeleteCourse}
-					/>
-				))
-			) : (
-				<EmptyCourseList isAdmin={user.isAdmin} />
-			)}
-			{user.role === 'admin' && (
-				<Button
-					label={ADD_NEW_COURSE_LABEL}
-					className='ButtonAdd'
-					onClick={handleAddNewCourse}
-				/>
-			)}
-		</div>
-	);
+  return (
+    <div className="Courses">
+      <SearchBar onSearch={handleSearch} />
+      {filteredCourses.length > 0 ? (
+        filteredCourses.map((course) => (
+          <CourseCard
+            key={course.id}
+            course={course}
+            authors={authors}
+            onCourseSelect={handleCourseSelect}
+            onDelete={handleDeleteCourse}
+          />
+        ))
+      ) : (
+        <EmptyCourseList isAdmin={user.isAdmin} />
+      )}
+      {user.role === 'admin' && (
+        <Button
+          label={ADD_NEW_COURSE_LABEL}
+          className="ButtonAdd"
+          onClick={handleAddNewCourse}
+        />
+      )}
+    </div>
+  );
 }
 
 export default Courses;

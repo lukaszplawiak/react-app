@@ -1,23 +1,23 @@
 .Search-bar input {
-    flex-grow: 1;
-    border: none;
-    padding: 10px;
-    font-size: 100%;
-    border-radius: 4px 0 0 4px;
+  flex-grow: 1;
+  border: none;
+  padding: 10px;
+  font-size: 100%;
+  border-radius: 4px 0 0 4px;
 }
 
 .Search-bar input::placeholder {
-    font-size: 115%; 
+  font-size: 115%;
 }
 
 .Search-bar button {
-    border-radius: 0 4px 4px 0; 
+  border-radius: 0 4px 4px 0;
 }
 
 .ButtonBar {
-    width: 90px;
-    height: 34px;
-    color: #F7F7F7;
-    background: #007298;
-    border-radius: 4px;    
+  width: 90px;
+  height: 34px;
+  color: #f7f7f7;
+  background: #007298;
+  border-radius: 4px;
 }
