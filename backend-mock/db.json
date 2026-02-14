@@ -1,0 +1,83 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "name": "Admin User",
+      "email": "admin@test.com",
+      "password": "admin123",
+      "role": "admin",
+      "token": "admin-token-123"
+    },
+    {
+      "id": "2",
+      "name": "Regular User",
+      "email": "user@test.com",
+      "password": "user123",
+      "role": "user",
+      "token": "user-token-456"
+    }
+  ],
+  "courses": [
+    {
+      "id": "2",
+      "title": "Advanced JavaScript",
+      "description": "Deep dive into ES6+, async programming, and modern JavaScript patterns.",
+      "duration": 240,
+      "authors": [
+        "1"
+      ],
+      "creationDate": "2024-02-01T10:00:00Z"
+    },
+    {
+      "id": "3",
+      "title": "Redux Toolkit Masterclass",
+      "description": "Master state management with Redux Toolkit, slices, and thunks.",
+      "duration": 150,
+      "authors": [
+        "2",
+        "3"
+      ],
+      "creationDate": "2024-01-20T10:00:00Z"
+    },
+    {
+      "title": "123",
+      "description": "123",
+      "duration": 1,
+      "authors": [
+        "1771076299836"
+      ],
+      "id": "1771076307471",
+      "creationDate": "2026-02-14T13:38:27.471Z"
+    }
+  ],
+  "authors": [
+    {
+      "id": "1",
+      "name": "John Doe"
+    },
+    {
+      "id": "2",
+      "name": "Jane Smith"
+    },
+    {
+      "id": "3",
+      "name": "Bob Johnson"
+    },
+    {
+      "name": "Jan Kow",
+      "id": "1770992431261"
+    },
+    {
+      "name": "New One",
+      "id": "1771021481126"
+    },
+    {
+      "name": "qw q ",
+      "id": "1771022409671"
+    },
+    {
+      "name": "123",
+      "id": "1771076299836"
+    }
+  ]
+}
