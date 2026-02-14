@@ -14,62 +14,62 @@ import { fetchAuthors } from './store/authors/thunk';
 import './App.css';
 
 function App() {
-	const dispatch = useDispatch();
-	const { user, courses, authors } = useSelector((state) => ({
-		user: state.user,
-		courses: state.courses.courses,
-		authors: state.authors.authors,
-	}));
+  const dispatch = useDispatch();
+  const { user, courses, authors } = useSelector((state) => ({
+    user: state.user,
+    courses: state.courses.courses,
+    authors: state.authors.authors,
+  }));
 
-	const defaultPath = user && user.isAuth ? '/courses' : '/login';
+  const defaultPath = user && user.isAuth ? '/courses' : '/login';
 
-	useEffect(() => {
-		dispatch(fetchCourses());
-		dispatch(fetchAuthors());
-	}, [dispatch]);
+  useEffect(() => {
+    dispatch(fetchCourses());
+    dispatch(fetchAuthors());
+  }, [dispatch]);
 
-	return (
-		<div className='App'>
-			<div className='Rectangle'>
-				<Header />
-			</div>
-			<Routes>
-				<Route path='/' element={<Navigate to={defaultPath} />} />
-				<Route path='/registration' element={<Registration />} />
-				<Route path='/login' element={<Login />} />
-				<Route
-					path='/courses'
-					element={user.isAuth ? <Courses /> : <Navigate to='/login' />}
-				/>
-				<Route
-					path='/courses/add'
-					element={
-						<PrivateRoute>
-							<CourseForm />
-						</PrivateRoute>
-					}
-				/>
-				<Route
-					path='/courses/:courseId'
-					element={
-						user.isAuth ? (
-							<CourseInfo courses={courses} authorsList={authors} />
-						) : (
-							<Navigate to='/login' />
-						)
-					}
-				/>
-				<Route
-					path='/courses/update/:courseId'
-					element={
-						<PrivateRoute>
-							<CourseForm />
-						</PrivateRoute>
-					}
-				/>
-			</Routes>
-		</div>
-	);
+  return (
+    <div className="App">
+      <div className="Rectangle">
+        <Header />
+      </div>
+      <Routes>
+        <Route path="/" element={<Navigate to={defaultPath} />} />
+        <Route path="/registration" element={<Registration />} />
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/courses"
+          element={user.isAuth ? <Courses /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/courses/add"
+          element={
+            <PrivateRoute>
+              <CourseForm />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/courses/:courseId"
+          element={
+            user.isAuth ? (
+              <CourseInfo courses={courses} authorsList={authors} />
+            ) : (
+              <Navigate to="/login" />
+            )
+          }
+        />
+        <Route
+          path="/courses/update/:courseId"
+          element={
+            <PrivateRoute>
+              <CourseForm />
+            </PrivateRoute>
+          }
+        />
+      </Routes>
+    </div>
+  );
 }
 
 export default App;
