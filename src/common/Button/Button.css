@@ -47,3 +47,20 @@
 .Button:focus:not(:focus-visible) {
   outline: none;
 }
+
+.Button--link {
+  background: transparent;
+  color: #007bff;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.Button--link:hover {
+  text-decoration: underline;
+  background: transparent;
+  box-shadow: none;
+}

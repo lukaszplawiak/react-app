@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Button from '../../common/Button/Button';
 import Input from '../../common/Input/Input';
+import { API_BASE_URL } from '../../config';
 
 function Registration() {
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ function Registration() {
       return;
     }
 
-    const response = await fetch('http://localhost:4000/register', {
+    const response = await fetch(`${API_BASE_URL}/register`, {
       method: 'POST',
       body: JSON.stringify(userData),
       headers: {

@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { API_BASE_URL } from './config';
 
-const baseURL = 'http://localhost:4000';
+const baseURL = API_BASE_URL;
 
 export const getCoursesService = () => axios.get(`${baseURL}/courses/all`);
 
