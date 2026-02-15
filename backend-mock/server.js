@@ -163,7 +163,7 @@ server.post('/authors/add', (req, res) => {
   });
 });
 
-// URUCHOMIENIE SERWERA
+// LOGI URUCHOMIENIA SERWERA
 
 server.use(router);
 
