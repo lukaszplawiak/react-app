@@ -19,8 +19,13 @@ const SearchBar = ({ onSearch }) => {
     setQuery(event.target.value);
   };
 
+    const handleSubmit = (event) => {
+    event.preventDefault();
+    handleSearch();
+  };
+
   return (
-    <div className="Search-bar">
+    <form className="Search-bar" onSubmit={handleSubmit}>
       <input
         type="text"
         value={query}
@@ -30,9 +35,9 @@ const SearchBar = ({ onSearch }) => {
       <Button
         label={SEARCH_BUTTON_LABEL}
         className="ButtonBar"
-        onClick={handleSearch}
+        type="submit"
       />
-    </div>
+    </form>
   );
 };
 

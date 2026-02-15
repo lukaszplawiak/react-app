@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import AuthorItem from './components/AuthorItem/AuthorItem';
+import Button from '../../common/Button/Button';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { createCourse, updateCourse } from '../../store/courses/thunk';
@@ -162,10 +163,10 @@ function CourseForm() {
           value={newAuthorName}
           onChange={(e) => setNewAuthorName(e.target.value)}
         />
-        <button onClick={handleCreateAuthor}>Create Author</button>
+        <Button onClick={handleCreateAuthor} label="Create Author" />
       </label>
-      <button onClick={handleCreateCourse}>Create Course</button>
-      <button onClick={handleUpdateCourse}>Update Course</button>
+      <Button onClick={handleCreateCourse} label="Create Course" />
+      <Button onClick={handleUpdateCourse} label="Update Course" />
     </div>
   );
 }

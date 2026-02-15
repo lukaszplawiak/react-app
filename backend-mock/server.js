@@ -66,14 +66,28 @@ server.post('/register', (req, res) => {
 });
 
 server.get('/users/me', (req, res) => {
-  res.json({
-    successful: true,
-    result: {
-      name: 'Admin User',
-      email: 'admin@test.com',
-      role: 'admin',
-    },
-  });
+  const db = router.db;
+  const token = req.headers.authorization || req.get('Authorization');
+
+  if (!token) {
+    res.status(401).json({ successful: false, errors: ['No token provided'] });
+    return;
+  }
+
+  const user = db.get('users').find({ token }).value();
+
+  if (user) {
+    res.json({
+      successful: true,
+      result: {
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } else {
+    res.status(401).json({ successful: false, errors: ['Invalid token'] });
+  }
 });
 
 server.delete('/logout', (req, res) => {

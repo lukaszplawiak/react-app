@@ -1,12 +1,12 @@
 .Courses {
-  position: absolute;
-  width: 1440px;
-  height: 1176px;
-  left: 0px;
-  top: 83px;
-  background: #f7f7f7;
+  width: 100%;
+  min-height: 100vh;
+  padding: 20px 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  width: 100%;
+  gap: 20px;
+}
+
+.Courses .Search-bar {
+  margin-bottom: 20px;
 }
