@@ -15,6 +15,14 @@
       "password": "user123",
       "role": "user",
       "token": "user-token-456"
+    },
+    {
+      "id": "1771165327669",
+      "name": "Luk",
+      "email": "luk@gmail.com",
+      "password": "luk",
+      "role": "user",
+      "token": "token-1771165327669"
     }
   ],
   "courses": [
@@ -42,12 +50,24 @@
     {
       "title": "123",
       "description": "123",
-      "duration": 1,
+      "duration": 2,
       "authors": [
-        "1771076299836"
+        "1771021481126"
       ],
-      "id": "1771076307471",
-      "creationDate": "2026-02-14T13:38:27.471Z"
+      "id": "1771079524336",
+      "creationDate": "2026-02-14T14:32:04.336Z"
+    },
+    {
+      "title": "13",
+      "description": "4534",
+      "duration": 3,
+      "authors": [
+        "3",
+        "1770992431261",
+        "1771021481126"
+      ],
+      "id": "1771079534125",
+      "creationDate": "2026-02-14T14:32:14.125Z"
     }
   ],
   "authors": [
