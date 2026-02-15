@@ -70,10 +70,10 @@ function CourseCard({ course, authors, onCourseSelect, _onDelete }) {
             }}
           />
           {user.role === 'admin' && (
-            <Button label="DELETE" onClick={() => handleDelete(course.id)} />
+            <Button label="DELETE" className="Course-button" onClick={() => handleDelete(course.id)} />
           )}
           {user.role === 'admin' && (
-            <Button label="UPDATE" onClick={() => handleUpdate(course.id)} />
+            <Button label="UPDATE" className="Course-button" onClick={() => handleUpdate(course.id)} />
           )}
         </div>
       </div>

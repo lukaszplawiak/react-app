@@ -30,44 +30,45 @@ function App() {
 
   return (
     <div className="App">
-      <div className="Rectangle">
-        <Header />
+      <Header />
+      
+      <div className="Content">
+        <Routes>
+          <Route path="/" element={<Navigate to={defaultPath} />} />
+          <Route path="/registration" element={<Registration />} />
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/courses"
+            element={user.isAuth ? <Courses /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/courses/add"
+            element={
+              <PrivateRoute>
+                <CourseForm />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/courses/:courseId"
+            element={
+              user.isAuth ? (
+                <CourseInfo courses={courses} authorsList={authors} />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/courses/update/:courseId"
+            element={
+              <PrivateRoute>
+                <CourseForm />
+              </PrivateRoute>
+            }
+          />
+        </Routes>
       </div>
-      <Routes>
-        <Route path="/" element={<Navigate to={defaultPath} />} />
-        <Route path="/registration" element={<Registration />} />
-        <Route path="/login" element={<Login />} />
-        <Route
-          path="/courses"
-          element={user.isAuth ? <Courses /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/courses/add"
-          element={
-            <PrivateRoute>
-              <CourseForm />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/courses/:courseId"
-          element={
-            user.isAuth ? (
-              <CourseInfo courses={courses} authorsList={authors} />
-            ) : (
-              <Navigate to="/login" />
-            )
-          }
-        />
-        <Route
-          path="/courses/update/:courseId"
-          element={
-            <PrivateRoute>
-              <CourseForm />
-            </PrivateRoute>
-          }
-        />
-      </Routes>
     </div>
   );
 }

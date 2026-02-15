@@ -1,10 +1,15 @@
 import PropTypes from 'prop-types';
+import Button from '../../../../common/Button/Button';
 
 function AuthorItem({ author, onAction, action }) {
   return (
     <div className="AuthorItem">
       <span>{author.name}</span>
-      <button onClick={onAction}>{action} Author</button>
+      <Button
+        className="Button--link"
+        onClick={onAction}
+        label={`${action} Author`}
+      />
     </div>
   );
 }
