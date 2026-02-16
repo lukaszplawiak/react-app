@@ -29,10 +29,11 @@
   height: 30px;
   height: 30px;
   color: #f7f7f7;
-  background: #007298;
+  background: #007bff;
   border-radius: 4px;
   cursor: pointer;
 }
+
 .Course-all2 {
   display: flex;
   flex-direction: column;
