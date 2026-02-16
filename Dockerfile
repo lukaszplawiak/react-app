@@ -23,10 +23,12 @@ RUN mkdir -p /usr/share/nginx/html
 RUN cp -r /app/build/* /usr/share/nginx/html/
 
 RUN echo '#!/bin/sh' > /app/start.sh && \
+    echo 'PORT=${PORT:-80}' >> /app/start.sh && \
     echo 'cd /app/backend && node server.js &' >> /app/start.sh && \
+    echo 'sed -i "s/listen 80;/listen $PORT;/" /etc/nginx/http.d/default.conf' >> /app/start.sh && \
     echo 'nginx -g "daemon off;"' >> /app/start.sh && \
     chmod +x /app/start.sh
 
-EXPOSE 80
+EXPOSE ${PORT:-80}
 
 CMD ["/app/start.sh"]
