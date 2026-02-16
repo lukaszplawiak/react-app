@@ -167,10 +167,11 @@ server.post('/authors/add', (req, res) => {
 
 server.use(router);
 
-server.listen(4000, () => {
-  console.log('🚀 Mock API Server running on http://localhost:4000');
-  console.log('📚 Courses: http://localhost:4000/courses/all');
-  console.log('👥 Authors: http://localhost:4000/authors/all');
+const PORT = process.env.BACKEND_PORT || 3001;
+server.listen(PORT, () => {
+  console.log('🚀 Mock API Server running on http://localhost:${PORT}');
+  console.log('📚 Courses: http://localhost:${PORT}/courses/all');
+  console.log('👥 Authors: http://localhost:${PORT}/authors/all');
   console.log('\nTest credentials:');
   console.log('Admin: admin@test.com / admin123');
   console.log('User:  user@test.com / user123');
