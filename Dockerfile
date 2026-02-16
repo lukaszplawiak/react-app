@@ -2,49 +2,79 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-RUN apk add --no-cache nginx
-
-COPY backend-mock/package*.json ./backend/
-WORKDIR /app/backend
+COPY backend-mock/package*.json ./
 RUN npm ci --only=production --silent
+RUN npm install express --save
+
 COPY backend-mock/ ./
 
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci --ignore-scripts
+RUN npm ci --ignore-scripts --silent
 COPY . ./
 ENV REACT_APP_API_URL=/api
 RUN npm run build
 
-COPY nginx.render.conf /etc/nginx/http.d/default.conf
-RUN mkdir -p /run/nginx
+WORKDIR /app
+COPY <<'SERVERJS' server.js
+const express = require('express');
+const jsonServer = require('json-server');
+const path = require('path');
 
-RUN mkdir -p /usr/share/nginx/html
-RUN cp -r /app/build/* /usr/share/nginx/html/
+const app = express();
+const router = jsonServer.router('db.json');
+const middlewares = jsonServer.defaults();
 
-RUN echo '#!/bin/sh' > /app/start.sh && \
-    echo 'set -e' >> /app/start.sh && \
-    echo '' >> /app/start.sh && \
-    echo '# Start backend in background' >> /app/start.sh && \
-    echo 'cd /app/backend' >> /app/start.sh && \
-    echo 'node server.js &' >> /app/start.sh && \
-    echo 'BACKEND_PID=$!' >> /app/start.sh && \
-    echo 'echo "Backend started with PID $BACKEND_PID"' >> /app/start.sh && \
-    echo '' >> /app/start.sh && \
-    echo '# Wait for backend to be ready' >> /app/start.sh && \
-    echo 'sleep 3' >> /app/start.sh && \
-    echo '' >> /app/start.sh && \
-    echo '# Use Railway PORT or default to 80' >> /app/start.sh && \
-    echo 'PORT=${PORT:-80}' >> /app/start.sh && \
-    echo 'echo "Starting nginx on port $PORT"' >> /app/start.sh && \
-    echo '' >> /app/start.sh && \
-    echo '# Update nginx config to use Railway PORT' >> /app/start.sh && \
-    echo 'sed -i "s/listen 80;/listen $PORT;/" /etc/nginx/http.d/default.conf' >> /app/start.sh && \
-    echo '' >> /app/start.sh && \
-    echo '# Start nginx in foreground' >> /app/start.sh && \
-    echo 'exec nginx -g "daemon off;"' >> /app/start.sh && \
-    chmod +x /app/start.sh
+app.use(middlewares);
+app.use(express.json());
 
-EXPOSE ${PORT:-80}
+const db = router.db;
 
-CMD ["/app/start.sh"]
+// Login endpoint
+app.post('/api/login', (req, res) => {
+  const { email, password } = req.body;
+  const user = db.get('users').find({ email, password }).value();
+  if (user) {
+    res.json({
+      successful: true,
+      result: user.token,
+      user: { name: user.name, email: user.email, role: user.role }
+    });
+  } else {
+    res.status(401).json({ successful: false, errors: ['Invalid credentials'] });
+  }
+});
+
+// Register endpoint
+app.post('/api/register', (req, res) => {
+  const { name, email, password } = req.body;
+  const newUser = {
+    id: String(Date.now()),
+    name, email, password, role: 'user',
+    token: 'token-' + Date.now()
+  };
+  db.get('users').push(newUser).write();
+  res.json({ successful: true, user: { name, email, role: 'user' } });
+});
+
+// All API routes
+app.use('/api', router);
+
+// Serve React build
+app.use(express.static(path.join(__dirname, 'build')));
+
+// React Router fallback
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build/index.html'));
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log('🚀 Server running on port ' + PORT);
+  console.log('📚 API: http://localhost:' + PORT + '/api');
+});
+SERVERJS
+
+EXPOSE ${PORT:-3000}
+
+CMD ["node", "server.js"]
