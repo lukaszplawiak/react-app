@@ -19,26 +19,31 @@ function Login() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const validate = () => {
+    const validationErrors = {};
+    if (!formData.email) validationErrors.email = 'Email is required';
+    if (!formData.password) validationErrors.password = 'Password is required';
+    return validationErrors;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    let validationErrors = {};
-    if (!formData.email) validationErrors.email = 'Email is required';
-    if (!formData.password) validationErrors.password = 'Password is required';
+    const validationErrors = validate();
     if (Object.keys(validationErrors).length) {
       setErrors(validationErrors);
       return;
     }
 
-    try {
-      const resultAction = await dispatch(loginUser(formData));
-      const { payload } = resultAction;
-      if (payload && payload.isAuth) {
-        setTimeout(() => navigate('/courses', { replace: true }), 0);
-      }
-    } catch (error) {
+    const resultAction = await dispatch(loginUser(formData));
+
+    if (loginUser.fulfilled.match(resultAction)) {
+      navigate('/courses', { replace: true });
+    } else {
       setErrors({
-        server: error.message || 'An error occurred while logging in.',
+        server:
+          resultAction.payload ||
+          'An error occurred while logging in. Please try again.',
       });
     }
   };
@@ -61,6 +66,7 @@ function Login() {
         error={errors.password}
         placeholder="Your Password"
       />
+      {errors.server && <p className="error-message">{errors.server}</p>}
       <Button label="Login" onClick={handleSubmit} />
       <Link to="/registration">{"Don't have an account? Register here"}</Link>
     </form>
