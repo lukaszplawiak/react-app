@@ -34,10 +34,8 @@ function Courses() {
   };
 
   const filteredCourses = useMemo(() => {
-    return courses.filter(
-      (course) =>
-        course.title.toLowerCase().includes(query.toLowerCase()) ||
-        course.id.toString().includes(query)
+    return courses.filter((course) =>
+      course.title.toLowerCase().includes(query.toLowerCase())
     );
   }, [courses, query]);
 
@@ -63,7 +61,7 @@ function Courses() {
           />
         ))
       ) : (
-        <EmptyCourseList isAdmin={user.isAdmin} />
+        <EmptyCourseList role={user.role} />
       )}
       {user.role === 'admin' && (
         <Button
