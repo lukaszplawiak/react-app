@@ -3,56 +3,45 @@ import { API_BASE_URL } from './config';
 
 const baseURL = API_BASE_URL;
 
-export const getCoursesService = () => axios.get(`${baseURL}/courses/all`);
+const authHeaders = () => ({
+  Authorization: localStorage.getItem('userToken'),
+  'Content-Type': 'application/json',
+});
+
+// --- Courses ---
+
+export const getCoursesService = () =>
+  axios.get(`${baseURL}/courses/all`);
 
 export const createCourseService = (course) =>
-  axios.post(`${baseURL}/courses/add`, course, {
-    headers: {
-      Authorization: localStorage.getItem('userToken'),
-      'Content-Type': 'application/json',
-    },
-  });
+  axios.post(`${baseURL}/courses/add`, course, { headers: authHeaders() });
 
 export const deleteCourseService = (courseId) =>
-  axios.delete(`${baseURL}/courses/${courseId}`, {
-    headers: {
-      Authorization: localStorage.getItem('userToken'),
-      'Content-Type': 'application/json',
-    },
-  });
+  axios.delete(`${baseURL}/courses/${courseId}`, { headers: authHeaders() });
 
 export const updateCourseService = (course) =>
   axios.put(`${baseURL}/courses/${course.id}`, course, {
-    headers: {
-      Authorization: localStorage.getItem('userToken'),
-      'Content-Type': 'application/json',
-    },
+    headers: authHeaders(),
   });
 
-export const getAuthorsService = () => axios.get(`${baseURL}/authors/all`);
+// --- Authors ---
+
+export const getAuthorsService = () =>
+  axios.get(`${baseURL}/authors/all`);
 
 export const createAuthorService = (author) =>
-  axios.post(`${baseURL}/authors/add`, author, {
-    headers: {
-      Authorization: localStorage.getItem('userToken'),
-      'Content-Type': 'application/json',
-    },
-  });
+  axios.post(`${baseURL}/authors/add`, author, { headers: authHeaders() });
 
-export const loginUserService = (user) => axios.post(`${baseURL}/login`, user);
+// --- User ---
+
+export const registerUserService = (userData) =>
+  axios.post(`${baseURL}/register`, userData);
+
+export const loginUserService = (credentials) =>
+  axios.post(`${baseURL}/login`, credentials);
 
 export const getUserService = () =>
-  axios.get(`${baseURL}/users/me`, {
-    headers: {
-      Authorization: localStorage.getItem('userToken'),
-      'Content-Type': 'application/json',
-    },
-  });
+  axios.get(`${baseURL}/users/me`, { headers: authHeaders() });
 
 export const logoutUserService = () =>
-  axios.delete(`${baseURL}/logout`, {
-    headers: {
-      Authorization: localStorage.getItem('userToken'),
-      'Content-Type': 'application/json',
-    },
-  });
+  axios.delete(`${baseURL}/logout`, { headers: authHeaders() });
