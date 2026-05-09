@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import AuthorItem from './components/AuthorItem/AuthorItem';
 import Button from '../../common/Button/Button';
-import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { createCourse, updateCourse } from '../../store/courses/thunk';
 import { createAuthor, fetchAuthors } from '../../store/authors/thunk';
@@ -23,10 +22,12 @@ function CourseForm() {
   useEffect(() => {
     if (courseId) {
       const courseToUpdate = courses.find((course) => course.id === courseId);
-      setTitle(courseToUpdate.title);
-      setDescription(courseToUpdate.description);
-      setDuration(courseToUpdate.duration);
-      setCourseAuthors(courseToUpdate.authors);
+      if (courseToUpdate) {
+        setTitle(courseToUpdate.title);
+        setDescription(courseToUpdate.description);
+        setDuration(courseToUpdate.duration);
+        setCourseAuthors(courseToUpdate.authors);
+      }
     }
   }, [courses, courseId]);
 
@@ -42,42 +43,23 @@ function CourseForm() {
 
   const handleCreateAuthor = async () => {
     if (newAuthorName.length < 2) {
-      setErrors({
-        ...errors,
+      setErrors((prev) => ({
+        ...prev,
         newAuthorName: 'Author name should be at least 2 characters',
-      });
+      }));
       return;
     }
-    const newAuthor = {
-      name: newAuthorName,
-    };
 
     try {
-      const result = await dispatch(createAuthor(newAuthor));
-      console.log('✅ Autor utworzony:', result.payload);
+      await dispatch(createAuthor({ name: newAuthorName }));
       await dispatch(fetchAuthors());
-      console.log('✅ Lista autorów odświeżona');
       setNewAuthorName('');
+      setErrors((prev) => ({ ...prev, newAuthorName: undefined }));
     } catch (error) {
-      console.error('❌ Błąd tworzenia autora:', error);
-      setErrors({
-        ...errors,
-        newAuthorName: 'Nie udało się dodać autora',
-      });
-    }
-  };
-
-  const handleUpdateCourse = async () => {
-    const updatedCourse = {
-      id: courseId,
-      title,
-      description,
-      duration: Number(duration),
-      authors: courseAuthors,
-    };
-    const result = await dispatch(updateCourse(updatedCourse));
-    if (result.payload) {
-      navigate('/courses');
+      setErrors((prev) => ({
+        ...prev,
+        newAuthorName: 'Failed to create author. Please try again.',
+      }));
     }
   };
 
@@ -95,13 +77,30 @@ function CourseForm() {
       setErrors(validationErrors);
       return;
     }
+
     const newCourse = {
       title,
       description,
       duration: Number(duration),
       authors: courseAuthors,
     };
+
     const result = await dispatch(createCourse(newCourse));
+    if (result.payload) {
+      navigate('/courses');
+    }
+  };
+
+  const handleUpdateCourse = async () => {
+    const updatedCourse = {
+      id: courseId,
+      title,
+      description,
+      duration: Number(duration),
+      authors: courseAuthors,
+    };
+
+    const result = await dispatch(updateCourse(updatedCourse));
     if (result.payload) {
       navigate('/courses');
     }
@@ -163,21 +162,16 @@ function CourseForm() {
           value={newAuthorName}
           onChange={(e) => setNewAuthorName(e.target.value)}
         />
+        <p className="error-message">{errors.newAuthorName || ' '}</p>
         <Button onClick={handleCreateAuthor} label="Create Author" />
       </label>
-      <Button onClick={handleCreateCourse} label="Create Course" />
-      <Button onClick={handleUpdateCourse} label="Update Course" />
+      {courseId ? (
+        <Button onClick={handleUpdateCourse} label="Update Course" />
+      ) : (
+        <Button onClick={handleCreateCourse} label="Create Course" />
+      )}
     </div>
   );
 }
-
-CourseForm.propTypes = {
-  authors: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-    })
-  ),
-};
 
 export default CourseForm;
