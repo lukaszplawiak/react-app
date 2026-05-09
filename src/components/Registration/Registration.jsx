@@ -77,7 +77,7 @@ function Registration() {
         placeholder="Your Password"
       />
       {errors.server && <p className="error-message">{errors.server}</p>}
-      <Button label="Registration" onClick={handleSubmit} />
+      <Button type="submit" label="Registration" />
       <Link to="/login">
         If you have an account you may <strong>Login</strong>
       </Link>
