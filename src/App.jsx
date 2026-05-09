@@ -15,13 +15,10 @@ import './App.css';
 
 function App() {
   const dispatch = useDispatch();
-  const { user, courses, authors } = useSelector((state) => ({
-    user: state.user,
-    courses: state.courses.courses,
-    authors: state.authors.authors,
-  }));
 
-  const defaultPath = user && user.isAuth ? '/courses' : '/login';
+  const user = useSelector((state) => state.user);
+
+  const defaultPath = user.isAuth ? '/courses' : '/login';
 
   useEffect(() => {
     dispatch(fetchCourses());
@@ -31,7 +28,6 @@ function App() {
   return (
     <div className="App">
       <Header />
-      
       <div className="Content">
         <Routes>
           <Route path="/" element={<Navigate to={defaultPath} />} />
@@ -52,11 +48,7 @@ function App() {
           <Route
             path="/courses/:courseId"
             element={
-              user.isAuth ? (
-                <CourseInfo courses={courses} authorsList={authors} />
-              ) : (
-                <Navigate to="/login" />
-              )
+              user.isAuth ? <CourseInfo /> : <Navigate to="/login" />
             }
           />
           <Route

@@ -1,11 +1,14 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import formatCreationDate from '../../helpers/formatCreationDate';
 import getCourseDuration from '../../helpers/getCourseDuration';
 import './CourseInfo.css';
 
-function CourseInfo({ courses, authorsList }) {
+function CourseInfo() {
   const { courseId } = useParams();
+  const courses = useSelector((state) => state.courses.courses);
+  const authors = useSelector((state) => state.authors.authors);
 
   const course = courses.find((c) => c.id === courseId);
 
@@ -15,8 +18,8 @@ function CourseInfo({ courses, authorsList }) {
 
   const authorNames = course.authors
     .map((authorId) => {
-      const author = authorsList.find((a) => a.id === authorId);
-      return author ? author.name : '';
+      const author = authors.find((a) => a.id === authorId);
+      return author ? author.name : null;
     })
     .filter(Boolean)
     .join(', ');
