@@ -1,6 +1,7 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-
+import formatCreationDate from '../../helpers/formatCreationDate';
+import getCourseDuration from '../../helpers/getCourseDuration';
 import './CourseInfo.css';
 
 function CourseInfo({ courses, authorsList }) {
@@ -17,6 +18,7 @@ function CourseInfo({ courses, authorsList }) {
       const author = authorsList.find((a) => a.id === authorId);
       return author ? author.name : '';
     })
+    .filter(Boolean)
     .join(', ');
 
   return (
@@ -37,7 +39,7 @@ function CourseInfo({ courses, authorsList }) {
             </p>
             <p>
               <strong>Duration: </strong>
-              {course.duration} minutes
+              {getCourseDuration(course.duration)}
             </p>
             <p>
               <strong>Authors: </strong>
@@ -45,7 +47,7 @@ function CourseInfo({ courses, authorsList }) {
             </p>
             <p>
               <strong>Creation Date: </strong>
-              {course.creationDate}
+              {formatCreationDate(course.creationDate)}
             </p>
           </div>
         </div>
