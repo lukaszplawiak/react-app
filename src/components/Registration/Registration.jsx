@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Button from '../../common/Button/Button';
 import Input from '../../common/Input/Input';
-import { API_BASE_URL } from '../../config';
+import { registerUserService } from '../../services';
 
 function Registration() {
   const navigate = useNavigate();
@@ -18,30 +18,36 @@ function Registration() {
     setUserData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    let validationErrors = {};
+  const validate = () => {
+    const validationErrors = {};
     if (!userData.name) validationErrors.name = 'Name is required';
     if (!userData.email) validationErrors.email = 'Email is required';
     if (!userData.password) validationErrors.password = 'Password is required';
+    return validationErrors;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const validationErrors = validate();
     if (Object.keys(validationErrors).length) {
       setErrors(validationErrors);
       return;
     }
 
-    const response = await fetch(`${API_BASE_URL}/register`, {
-      method: 'POST',
-      body: JSON.stringify(userData),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    const result = await response.json();
-    if (result.successful) {
-      navigate('/login');
-    } else {
-      setErrors({ server: result.message });
+    try {
+      const response = await registerUserService(userData);
+      if (response.data.successful) {
+        navigate('/login');
+      } else {
+        setErrors({ server: response.data.message });
+      }
+    } catch (error) {
+      setErrors({
+        server:
+          error.response?.data?.message ||
+          'Registration failed. Please try again.',
+      });
     }
   };
 
@@ -70,7 +76,8 @@ function Registration() {
         error={errors.password}
         placeholder="Your Password"
       />
-      <Button label="Registration" />
+      {errors.server && <p className="error-message">{errors.server}</p>}
+      <Button label="Registration" onClick={handleSubmit} />
       <Link to="/login">
         If you have an account you may <strong>Login</strong>
       </Link>
