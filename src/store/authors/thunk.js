@@ -3,23 +3,35 @@ import { getAuthorsService, createAuthorService } from '../../services';
 
 export const fetchAuthors = createAsyncThunk(
   'authors/fetchAuthors',
-  async () => {
-    const response = await getAuthorsService();
-    if (response.data.successful) {
-      return response.data.result;
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await getAuthorsService();
+      if (response.data.successful) {
+        return response.data.result;
+      }
+      throw new Error('Application level request failed');
+    } catch (error) {
+      return rejectWithValue(
+        error.message || 'An error occurred while fetching authors'
+      );
     }
-    throw new Error('Application level request failed');
   }
 );
 
 export const createAuthor = createAsyncThunk(
   'authors/createAuthor',
-  async (author, thunkAPI) => {
-    const user = thunkAPI.getState().user;
-    const response = await createAuthorService(author, user.token);
-    if (response.data.successful) {
-      return response.data.result;
+  async (author, { getState, rejectWithValue }) => {
+    try {
+      const { user } = getState();
+      const response = await createAuthorService(author, user.token);
+      if (response.data.successful) {
+        return response.data.result;
+      }
+      throw new Error('Application level request failed');
+    } catch (error) {
+      return rejectWithValue(
+        error.message || 'An error occurred while creating the author'
+      );
     }
-    throw new Error('Application level request failed');
   }
 );

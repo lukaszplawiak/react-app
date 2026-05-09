@@ -3,22 +3,32 @@ import { fetchAuthors, createAuthor } from './thunk';
 
 const authorsSlice = createSlice({
   name: 'authors',
-  initialState: { authors: [], error: null },
+  initialState: {
+    authors: [],
+    status: 'idle',
+    error: null,
+  },
   extraReducers: (builder) => {
     builder
+      .addCase(fetchAuthors.pending, (state) => {
+        state.status = 'loading';
+        state.error = null;
+      })
       .addCase(fetchAuthors.fulfilled, (state, action) => {
+        state.status = 'succeeded';
         state.authors = action.payload;
         state.error = null;
       })
       .addCase(fetchAuthors.rejected, (state, action) => {
-        state.error =
-          action.error.message || 'An error occurred while fetching authors';
+        state.status = 'failed';
+        state.error = action.payload;
       })
       .addCase(createAuthor.fulfilled, (state, action) => {
         state.authors.push(action.payload);
+        state.error = null;
       })
       .addCase(createAuthor.rejected, (state, action) => {
-        state.error = action.error.message || 'Failed to create author';
+        state.error = action.payload;
       });
   },
 });
