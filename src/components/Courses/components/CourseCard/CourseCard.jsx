@@ -3,46 +3,35 @@ import Button from '../../../../common/Button/Button';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteCourse } from '../../../../store/courses/thunk';
 import { useNavigate } from 'react-router-dom';
+import formatCreationDate from '../../../../helpers/formatCreationDate';
+import getCourseDuration from '../../../../helpers/getCourseDuration';
+import { MAX_AUTHORS_DISPLAY_LENGTH } from '../../../../constants';
 import './CourseCard.css';
 
-const formatDuration = (duration) => {
-  const hours = Math.floor(duration / 60);
-  const minutes = duration % 60;
-  const formattedHours = hours < 10 ? '0' + hours : hours;
-  const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
-  const label = hours === 1 ? 'hour' : 'hours';
+const getAuthorsString = (courseAuthors, authors) => {
+  if (!courseAuthors || !authors) return '';
 
-  return `${formattedHours}:${formattedMinutes} ${label}`;
+  const names = courseAuthors
+    .map((authorId) => {
+      const author = authors.find((a) => a.id === authorId);
+      return author ? author.name : null;
+    })
+    .filter(Boolean)
+    .join(', ');
+
+  return names.length > MAX_AUTHORS_DISPLAY_LENGTH
+    ? names.substr(0, MAX_AUTHORS_DISPLAY_LENGTH - 3) + '...'
+    : names;
 };
 
-const formatCreationDate = (date) => {
-  const d = new Date(date);
-  return `${d.getDate()}.${d.getMonth() + 1}.${d.getFullYear()}`;
-};
-
-function CourseCard({ course, authors, onCourseSelect, _onDelete }) {
+function CourseCard({ course, authors, onCourseSelect, onDelete }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
 
-  const getAuthors = (courseAuthors) => {
-    if (!courseAuthors || !authors) {
-      return '';
-    }
-
-    const names = courseAuthors
-      .map((authorId) => {
-        const author = authors.find((a) => a.id === authorId);
-        return author ? author.name : null;
-      })
-      .filter(Boolean)
-      .join(', ');
-
-    return names.length > 30 ? names.substr(0, 27) + '...' : names;
-  };
-
-  const handleDelete = async (courseId) => {
-    await dispatch(deleteCourse(courseId));
+  const handleDelete = (courseId) => {
+    dispatch(deleteCourse(courseId));
+    if (onDelete) onDelete(courseId);
   };
 
   const handleUpdate = (courseId) => {
@@ -58,22 +47,28 @@ function CourseCard({ course, authors, onCourseSelect, _onDelete }) {
         </div>
         <div className="Course-details">
           <div className="Course-details-info">
-            <p>Authors: {getAuthors(course.authors)}</p>
-            <p>Duration: {formatDuration(course.duration)}</p>
+            <p>Authors: {getAuthorsString(course.authors, authors)}</p>
+            <p>Duration: {getCourseDuration(course.duration)}</p>
             <p>Creation date: {formatCreationDate(course.creationDate)}</p>
           </div>
           <Button
             label="SHOW COURSE"
             className="Course-button"
-            onClick={() => {
-              onCourseSelect(course);
-            }}
+            onClick={() => onCourseSelect(course)}
           />
           {user.role === 'admin' && (
-            <Button label="DELETE" className="Course-button" onClick={() => handleDelete(course.id)} />
+            <Button
+              label="DELETE"
+              className="Course-button"
+              onClick={() => handleDelete(course.id)}
+            />
           )}
           {user.role === 'admin' && (
-            <Button label="UPDATE" className="Course-button" onClick={() => handleUpdate(course.id)} />
+            <Button
+              label="UPDATE"
+              className="Course-button"
+              onClick={() => handleUpdate(course.id)}
+            />
           )}
         </div>
       </div>
