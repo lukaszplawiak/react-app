@@ -17,6 +17,10 @@ function CourseForm() {
   const dispatch = useDispatch();
   const authors = useSelector((state) => state.authors.authors);
   const courses = useSelector((state) => state.courses.courses);
+
+  const coursesStatus = useSelector((state) => state.courses.status);
+  const isSaving = coursesStatus === 'loading';
+
   const { courseId } = useParams();
 
   useEffect(() => {
@@ -166,9 +170,15 @@ function CourseForm() {
         <Button onClick={handleCreateAuthor} label="Create Author" />
       </label>
       {courseId ? (
-        <Button onClick={handleUpdateCourse} label="Update Course" />
+        <Button
+          onClick={isSaving ? undefined : handleUpdateCourse}
+          label={isSaving ? 'Saving...' : 'Update Course'}
+        />
       ) : (
-        <Button onClick={handleCreateCourse} label="Create Course" />
+        <Button
+          onClick={isSaving ? undefined : handleCreateCourse}
+          label={isSaving ? 'Saving...' : 'Create Course'}
+        />
       )}
     </div>
   );

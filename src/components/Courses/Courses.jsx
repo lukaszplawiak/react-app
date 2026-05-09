@@ -6,7 +6,6 @@ import SearchBar from './components/SearchBar/SearchBar';
 import Button from '../../common/Button/Button';
 import EmptyCourseList from './components/EmptyCourseList';
 import { ADD_NEW_COURSE_LABEL } from '../../common/Constants/Constants';
-import { deleteCourse } from '../../store/courses/thunk';
 import { fetchUser } from '../../store/user/thunk';
 import './Courses.css';
 
@@ -16,6 +15,11 @@ function Courses() {
   const courses = useSelector((state) => state.courses.courses);
   const authors = useSelector((state) => state.authors.authors);
   const user = useSelector((state) => state.user);
+
+  const coursesStatus = useSelector((state) => state.courses.status);
+  const authorsStatus = useSelector((state) => state.authors.status);
+  const isLoading = coursesStatus === 'loading' || authorsStatus === 'loading';
+
   const [query, setQuery] = useState('');
 
   useEffect(() => {
@@ -27,10 +31,6 @@ function Courses() {
 
   const handleSearch = (inputQuery) => {
     setQuery(inputQuery);
-  };
-
-  const handleDeleteCourse = (courseId) => {
-    dispatch(deleteCourse(courseId));
   };
 
   const filteredCourses = useMemo(() => {
@@ -47,6 +47,14 @@ function Courses() {
     navigate(`/courses/${course.id}`);
   };
 
+  if (isLoading) {
+    return (
+      <div className="Courses">
+        <p className="loading-message">Loading courses...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="Courses">
       <SearchBar onSearch={handleSearch} />
@@ -57,7 +65,6 @@ function Courses() {
             course={course}
             authors={authors}
             onCourseSelect={handleCourseSelect}
-            onDelete={handleDeleteCourse}
           />
         ))
       ) : (
