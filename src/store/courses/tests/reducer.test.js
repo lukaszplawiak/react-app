@@ -1,16 +1,20 @@
 import coursesReducer from '../reducer';
 import { createCourse } from '../thunk';
 
-const initialState = { courses: [], error: null };
+const initialState = {
+  courses: [],
+  status: 'idle',
+  error: null,
+};
 
 describe('Courses Reducer', () => {
   test('should return the initial state', () => {
     expect(coursesReducer(undefined, {})).toEqual(initialState);
   });
 
-  it('should handle createCourse and return new state', () => {
+  it('should handle createCourse.fulfilled and add course to state', () => {
     const newCourse = {
-      id: 1,
+      id: '1',
       title: 'Test Course',
       description: 'Test Description',
     };
@@ -20,11 +24,51 @@ describe('Courses Reducer', () => {
       payload: newCourse,
     };
 
-    const newState = {
+    const expectedState = {
       courses: [newCourse],
+      status: 'idle',
       error: null,
     };
 
-    expect(coursesReducer(initialState, action)).toEqual(newState);
+    expect(coursesReducer(initialState, action)).toEqual(expectedState);
+  });
+
+  it('should handle fetchCourses.pending and set status to loading', () => {
+    const action = { type: 'courses/fetchCourses/pending' };
+
+    const result = coursesReducer(initialState, action);
+
+    expect(result.status).toBe('loading');
+    expect(result.error).toBeNull();
+  });
+
+  it('should handle fetchCourses.rejected and set error message', () => {
+    const action = {
+      type: 'courses/fetchCourses/rejected',
+      payload: 'Network error',
+    };
+
+    const result = coursesReducer(initialState, action);
+
+    expect(result.status).toBe('failed');
+    expect(result.error).toBe('Network error');
+  });
+
+  it('should handle deleteCourse.fulfilled and remove course from state', () => {
+    const stateWithCourse = {
+      courses: [{ id: '1', title: 'To Delete' }],
+      status: 'succeeded',
+      error: null,
+    };
+
+    const action = {
+      type: 'courses/deleteCourse/fulfilled',
+      payload: '1',
+    };
+
+    const result = coursesReducer(stateWithCourse, action);
+
+    expect(result.courses).toHaveLength(0);
+    expect(result.error).toBeNull();
   });
 });
