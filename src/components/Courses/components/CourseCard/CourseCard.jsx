@@ -20,22 +20,22 @@ const getAuthorsString = (courseAuthors, authors) => {
     .join(', ');
 
   return names.length > MAX_AUTHORS_DISPLAY_LENGTH
-    ? names.substr(0, MAX_AUTHORS_DISPLAY_LENGTH - 3) + '...'
+    ? names.substring(0, MAX_AUTHORS_DISPLAY_LENGTH - 3) + '...'
     : names;
 };
 
-function CourseCard({ course, authors, onCourseSelect, onDelete }) {
+function CourseCard({ course, authors, onCourseSelect }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
+  const isAdmin = user.role === 'admin';
 
-  const handleDelete = (courseId) => {
-    dispatch(deleteCourse(courseId));
-    if (onDelete) onDelete(courseId);
+  const handleDelete = () => {
+    dispatch(deleteCourse(course.id));
   };
 
-  const handleUpdate = (courseId) => {
-    navigate(`/courses/update/${courseId}`);
+  const handleUpdate = () => {
+    navigate(`/courses/update/${course.id}`);
   };
 
   return (
@@ -56,19 +56,19 @@ function CourseCard({ course, authors, onCourseSelect, onDelete }) {
             className="Course-button"
             onClick={() => onCourseSelect(course)}
           />
-          {user.role === 'admin' && (
-            <Button
-              label="DELETE"
-              className="Course-button"
-              onClick={() => handleDelete(course.id)}
-            />
-          )}
-          {user.role === 'admin' && (
-            <Button
-              label="UPDATE"
-              className="Course-button"
-              onClick={() => handleUpdate(course.id)}
-            />
+          {isAdmin && (
+            <>
+              <Button
+                label="DELETE"
+                className="Course-button"
+                onClick={handleDelete}
+              />
+              <Button
+                label="UPDATE"
+                className="Course-button"
+                onClick={handleUpdate}
+              />
+            </>
           )}
         </div>
       </div>
