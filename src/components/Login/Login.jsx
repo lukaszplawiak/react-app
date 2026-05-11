@@ -73,7 +73,7 @@ function Login() {
       <Button
         type="submit"
         label={isLoading ? 'Logging in...' : 'Login'}
-        onClick={isLoading ? undefined : handleSubmit}
+        disabled={isLoading}
       />
       <Link to="/registration">{"Don't have an account? Register here"}</Link>
     </form>
