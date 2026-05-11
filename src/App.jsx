@@ -10,17 +10,17 @@ import Login from './components/Login/Login';
 import CourseForm from './components/CourseForm/CourseForm';
 import { fetchCourses } from './store/courses/thunk';
 import { fetchAuthors } from './store/authors/thunk';
+import { fetchUser } from './store/user/thunk';
 
 import './App.css';
 
 function App() {
   const dispatch = useDispatch();
-
   const user = useSelector((state) => state.user);
-
   const defaultPath = user.isAuth ? '/courses' : '/login';
 
   useEffect(() => {
+    dispatch(fetchUser());
     dispatch(fetchCourses());
     dispatch(fetchAuthors());
   }, [dispatch]);
