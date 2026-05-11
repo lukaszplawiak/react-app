@@ -3,8 +3,10 @@ import { render, screen } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { MemoryRouter as Router } from 'react-router-dom';
 import { configureStore } from '@reduxjs/toolkit';
+import userReducer from '../../../../../store/user/reducer';
+import coursesReducer from '../../../../../store/courses/reducer';
+import authorsReducer from '../../../../../store/authors/reducer';
 import CourseCard from '../CourseCard';
-import rootReducer from '../../../../../store/rootReducer';
 
 const initialState = {
   user: {
@@ -29,11 +31,6 @@ const initialState = {
   },
 };
 
-const store = configureStore({
-  reducer: rootReducer,
-  preloadedState: initialState,
-});
-
 const sampleCourse = {
   id: 'sampleId',
   title: 'Sample Course',
@@ -43,10 +40,20 @@ const sampleCourse = {
   authors: ['1', '2'],
 };
 
+const buildStore = (state = initialState) =>
+  configureStore({
+    reducer: {
+      user: userReducer,
+      courses: coursesReducer,
+      authors: authorsReducer,
+    },
+    preloadedState: state,
+  });
+
 describe('CourseCard Component', () => {
   beforeEach(() => {
     render(
-      <Provider store={store}>
+      <Provider store={buildStore()}>
         <Router>
           <CourseCard
             course={sampleCourse}

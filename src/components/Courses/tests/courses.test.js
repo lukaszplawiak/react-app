@@ -3,7 +3,9 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { MemoryRouter as Router } from 'react-router-dom';
-import rootReducer from '../../../store/rootReducer';
+import userReducer from '../../../store/user/reducer';
+import coursesReducer from '../../../store/courses/reducer';
+import authorsReducer from '../../../store/authors/reducer';
 import Courses from '../Courses';
 
 const initialState = {
@@ -41,6 +43,16 @@ const initialState = {
   },
 };
 
+const buildStore = (state = initialState) =>
+  configureStore({
+    reducer: {
+      user: userReducer,
+      courses: coursesReducer,
+      authors: authorsReducer,
+    },
+    preloadedState: state,
+  });
+
 const mockNavigate = jest.fn();
 
 jest.mock('react-router-dom', () => ({
@@ -50,13 +62,8 @@ jest.mock('react-router-dom', () => ({
 
 describe('Courses Component', () => {
   beforeEach(() => {
-    const store = configureStore({
-      reducer: rootReducer,
-      preloadedState: initialState,
-    });
-
     render(
-      <Provider store={store}>
+      <Provider store={buildStore()}>
         <Router>
           <Courses />
         </Router>
