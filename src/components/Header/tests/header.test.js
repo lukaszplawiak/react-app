@@ -10,9 +10,20 @@ const initialState = {
   user: {
     isAuth: true,
     name: 'username',
+    role: 'user',
+    status: 'succeeded',
+    error: null,
   },
-  courses: [],
-  authors: [],
+  courses: {
+    courses: [],
+    status: 'idle',
+    error: null,
+  },
+  authors: {
+    authors: [],
+    status: 'idle',
+    error: null,
+  },
 };
 
 const store = configureStore({
@@ -35,7 +46,11 @@ describe('Header Component', () => {
     expect(screen.getByAltText(/logo/i)).toBeInTheDocument();
   });
 
-  it('should display the username', () => {
+  it('should display the username when user is logged in', () => {
     expect(screen.getByText('Hello, username')).toBeInTheDocument();
+  });
+
+  it('should display Logout button when user is authenticated', () => {
+    expect(screen.getByText('Logout')).toBeInTheDocument();
   });
 });

@@ -11,12 +11,22 @@ const initialState = {
     isAuth: true,
     name: 'username',
     role: 'admin',
+    status: 'succeeded',
+    error: null,
   },
-  courses: [],
-  authors: [
-    { id: '1', name: 'Author One' },
-    { id: '2', name: 'Author Two' },
-  ],
+  courses: {
+    courses: [],
+    status: 'idle',
+    error: null,
+  },
+  authors: {
+    authors: [
+      { id: '1', name: 'Author One' },
+      { id: '2', name: 'Author Two' },
+    ],
+    status: 'succeeded',
+    error: null,
+  },
 };
 
 const store = configureStore({
@@ -25,12 +35,12 @@ const store = configureStore({
 });
 
 const sampleCourse = {
+  id: 'sampleId',
   title: 'Sample Course',
   description: 'Sample Description',
   duration: 125,
   creationDate: new Date('2021-07-20T10:00:00Z'),
   authors: ['1', '2'],
-  id: 'sampleId',
 };
 
 describe('CourseCard Component', () => {
@@ -38,33 +48,40 @@ describe('CourseCard Component', () => {
     render(
       <Provider store={store}>
         <Router>
-          <CourseCard course={sampleCourse} authors={initialState.authors} />
+          <CourseCard
+            course={sampleCourse}
+            authors={initialState.authors.authors}
+            onCourseSelect={jest.fn()}
+          />
         </Router>
       </Provider>
     );
   });
 
-  test('CourseCard should display title', () => {
+  test('should display course title', () => {
     expect(screen.getByText('Sample Course')).toBeInTheDocument();
   });
 
-  test('CourseCard should display description', () => {
+  test('should display course description', () => {
     expect(screen.getByText('Sample Description')).toBeInTheDocument();
   });
 
-  test('CourseCard should display duration in the correct format', () => {
-    const regex = new RegExp('02:05 hours', 'i');
-    const durationElement = screen.getByText(regex);
-    expect(durationElement).toBeInTheDocument();
+  test('should display duration in HH:MM hours format', () => {
+    expect(screen.getByText(/02:05 hours/i)).toBeInTheDocument();
   });
 
-  test('CourseCard should display authors list', () => {
+  test('should display all course authors', () => {
     expect(
       screen.getByText('Authors: Author One, Author Two')
     ).toBeInTheDocument();
   });
 
-  test('CourseCard should display created date in the correct format', () => {
+  test('should display creation date in DD.MM.YYYY format', () => {
     expect(screen.getByText('Creation date: 20.7.2021')).toBeInTheDocument();
+  });
+
+  test('should display DELETE and UPDATE buttons for admin role', () => {
+    expect(screen.getByText('DELETE')).toBeInTheDocument();
+    expect(screen.getByText('UPDATE')).toBeInTheDocument();
   });
 });

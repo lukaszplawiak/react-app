@@ -11,6 +11,8 @@ const initialState = {
     isAuth: true,
     name: 'Test Name',
     role: 'admin',
+    status: 'succeeded',
+    error: null,
   },
   courses: {
     courses: [
@@ -29,9 +31,13 @@ const initialState = {
         authors: ['11', '22'],
       },
     ],
+    status: 'succeeded',
+    error: null,
   },
   authors: {
     authors: [],
+    status: 'succeeded',
+    error: null,
   },
 };
 
@@ -58,12 +64,12 @@ describe('Courses Component', () => {
     );
   });
 
-  test('Courses should display amount of CourseCard equal length of courses array', async () => {
+  test('should display CourseCard for each course in the store', async () => {
     const courseCards = await screen.getAllByText(/Course /i);
     expect(courseCards.length).toBe(initialState.courses.courses.length);
   });
 
-  test('CourseForm should be shown after a click on the "Add new course" button', async () => {
+  test('should navigate to /courses/add after clicking "Add new course"', async () => {
     const addButton = screen.getByText(/ADD NEW COURSE/i);
     fireEvent.click(addButton);
 
