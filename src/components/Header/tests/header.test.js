@@ -2,9 +2,11 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
-import Header from '../Header';
 import { MemoryRouter as Router } from 'react-router-dom';
-import rootReducer from '../../../store/rootReducer';
+import userReducer from '../../../store/user/reducer';
+import coursesReducer from '../../../store/courses/reducer';
+import authorsReducer from '../../../store/authors/reducer';
+import Header from '../Header';
 
 const initialState = {
   user: {
@@ -26,15 +28,20 @@ const initialState = {
   },
 };
 
-const store = configureStore({
-  reducer: rootReducer,
-  preloadedState: initialState,
-});
+const buildStore = (state = initialState) =>
+  configureStore({
+    reducer: {
+      user: userReducer,
+      courses: coursesReducer,
+      authors: authorsReducer,
+    },
+    preloadedState: state,
+  });
 
 describe('Header Component', () => {
   beforeEach(() => {
     render(
-      <Provider store={store}>
+      <Provider store={buildStore()}>
         <Router>
           <Header />
         </Router>
