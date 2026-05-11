@@ -1,27 +1,18 @@
-import {
-  INPUT_PLACEHOLDER,
-  SEARCH_BUTTON_LABEL,
-} from '../../../../common/Constants/Constants';
-
 import React, { useState } from 'react';
-
+import { INPUT_PLACEHOLDER, SEARCH_BUTTON_LABEL } from '../../../../constants';
 import Button from '../../../../common/Button/Button';
 import './SearchBar.css';
 
 const SearchBar = ({ onSearch }) => {
   const [query, setQuery] = useState('');
 
-  const handleSearch = () => {
-    onSearch(query);
-  };
-
   const handleChange = (event) => {
     setQuery(event.target.value);
   };
 
-    const handleSubmit = (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
-    handleSearch();
+    onSearch(query);
   };
 
   return (
@@ -32,11 +23,7 @@ const SearchBar = ({ onSearch }) => {
         onChange={handleChange}
         placeholder={INPUT_PLACEHOLDER}
       />
-      <Button
-        label={SEARCH_BUTTON_LABEL}
-        className="ButtonBar"
-        type="submit"
-      />
+      <Button label={SEARCH_BUTTON_LABEL} className="ButtonBar" type="submit" />
     </form>
   );
 };
