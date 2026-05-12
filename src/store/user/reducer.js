@@ -1,21 +1,18 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { fetchUser, loginUser, logoutUser } from './thunk';
 
-const userName = localStorage.getItem('userName');
-const userEmail = localStorage.getItem('userEmail');
-const userIsAuth = localStorage.getItem('isAuth') === 'true';
-const userRole = localStorage.getItem('userRole');
+const loadUserFromStorage = () => ({
+  name: localStorage.getItem('userName') || null,
+  email: localStorage.getItem('userEmail') || null,
+  isAuth: localStorage.getItem('isAuth') === 'true',
+  role: localStorage.getItem('userRole') || null,
+  status: 'idle',
+  error: null,
+});
 
 const userSlice = createSlice({
   name: 'user',
-  initialState: {
-    name: userName || null,
-    email: userEmail || null,
-    isAuth: userIsAuth || false,
-    role: userRole || null,
-    status: 'idle',
-    error: null,
-  },
+  initialState: loadUserFromStorage,
   reducers: {
     setUser: (state, action) => {
       state.name = action.payload.name;
