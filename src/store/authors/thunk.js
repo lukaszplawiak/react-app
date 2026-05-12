@@ -20,10 +20,9 @@ export const fetchAuthors = createAsyncThunk(
 
 export const createAuthor = createAsyncThunk(
   'authors/createAuthor',
-  async (author, { getState, rejectWithValue }) => {
+  async (author, { rejectWithValue }) => {
     try {
-      const { user } = getState();
-      const response = await createAuthorService(author, user.token);
+      const response = await createAuthorService(author);
       if (response.data.successful) {
         return response.data.result;
       }
