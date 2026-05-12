@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { MemoryRouter as Router } from 'react-router-dom';
 import { configureStore } from '@reduxjs/toolkit';
@@ -7,6 +7,9 @@ import userReducer from '../../../../../store/user/reducer';
 import coursesReducer from '../../../../../store/courses/reducer';
 import authorsReducer from '../../../../../store/authors/reducer';
 import CourseCard from '../CourseCard';
+import { deleteCourseService } from '../../../../../services';
+
+jest.mock('../../../../../services');
 
 const initialState = {
   user: {
@@ -64,6 +67,13 @@ const renderCourseCard = (state = initialState) =>
   );
 
 describe('CourseCard Component', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    deleteCourseService.mockResolvedValue({
+      data: { successful: true },
+    });
+  });
+
   it('should display course title', () => {
     renderCourseCard();
     expect(screen.getByText('Sample Course')).toBeInTheDocument();
@@ -107,5 +117,15 @@ describe('CourseCard Component', () => {
 
     expect(screen.queryByText('DELETE')).not.toBeInTheDocument();
     expect(screen.queryByText('UPDATE')).not.toBeInTheDocument();
+  });
+
+  it('should call deleteCourseService when DELETE button is clicked', async () => {
+    renderCourseCard();
+
+    fireEvent.click(screen.getByText('DELETE'));
+
+    await waitFor(() => {
+      expect(deleteCourseService).toHaveBeenCalledWith(sampleCourse.id);
+    });
   });
 });
