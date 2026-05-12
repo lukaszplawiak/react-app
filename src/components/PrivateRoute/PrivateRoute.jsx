@@ -2,14 +2,18 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 const PrivateRoute = ({ children }) => {
-  const user = useSelector((state) => state.user);
+  const { isAuth, role } = useSelector((state) => state.user);
   const location = useLocation();
 
-  if (user.isAuth && user.role === 'admin') {
-    return children;
+  if (!isAuth) {
+    return <Navigate to={`/login?redirect=${location.pathname}`} replace />;
   }
 
-  return <Navigate to={`/login?redirect=${location.pathname}`} />;
+  if (role !== 'admin') {
+    return <Navigate to="/courses" replace />;
+  }
+
+  return children;
 };
 
 export default PrivateRoute;
