@@ -1,4 +1,4 @@
-import formatCreationDate from '../formatCreationDate';
+import formatCreationDate from './formatCreationDate';
 
 describe('formatCreationDate', () => {
   it('should format date with zero-padded day and month', () => {
