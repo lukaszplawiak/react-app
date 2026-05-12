@@ -1,13 +1,16 @@
 import React from 'react';
-import { HAS_ERROR_CLASS, ERROR_TEXT_CLASS } from '../../constants';
 import PropTypes from 'prop-types';
+import { HAS_ERROR_CLASS, ERROR_TEXT_CLASS } from '../../constants';
 
-function Input({ name, value, onChange, error, placeholder, type = 'text' }) {
-  let inputClasses = 'input-class';
-
-  if (error) {
-    inputClasses += ` ${HAS_ERROR_CLASS}`;
-  }
+function Input({
+  name,
+  value,
+  onChange,
+  error = null,
+  placeholder = '',
+  type = 'text',
+}) {
+  const inputClassName = `input-class${error ? ` ${HAS_ERROR_CLASS}` : ''}`;
 
   return (
     <div className="input-wrapper">
@@ -17,7 +20,7 @@ function Input({ name, value, onChange, error, placeholder, type = 'text' }) {
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className={inputClasses}
+        className={inputClassName}
       />
       {error && <small className={ERROR_TEXT_CLASS}>{error}</small>}
     </div>
@@ -31,12 +34,6 @@ Input.propTypes = {
   error: PropTypes.string,
   placeholder: PropTypes.string,
   type: PropTypes.string,
-};
-
-Input.defaultProps = {
-  type: 'text',
-  error: null,
-  placeholder: '',
 };
 
 export default Input;
