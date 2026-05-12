@@ -1,6 +1,18 @@
+const DATE_FORMAT_OPTIONS = {
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+  timeZone: 'UTC',
+};
+
 const formatCreationDate = (date) => {
-  const d = new Date(date);
-  return `${d.getDate()}.${d.getMonth() + 1}.${d.getFullYear()}`;
+  const parsed = new Date(date);
+
+  if (isNaN(parsed.getTime())) {
+    return 'Invalid date';
+  }
+
+  return new Intl.DateTimeFormat('en-GB', DATE_FORMAT_OPTIONS).format(parsed);
 };
 
 export default formatCreationDate;

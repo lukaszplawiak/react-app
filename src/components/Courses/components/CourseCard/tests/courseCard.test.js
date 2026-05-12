@@ -84,7 +84,7 @@ describe('CourseCard Component', () => {
   });
 
   test('should display creation date in DD.MM.YYYY format', () => {
-    expect(screen.getByText('Creation date: 20.7.2021')).toBeInTheDocument();
+    expect(screen.getByText('Creation date: 20.07.2021')).toBeInTheDocument();
   });
 
   test('should display DELETE and UPDATE buttons for admin role', () => {
