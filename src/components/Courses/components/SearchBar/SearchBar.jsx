@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { INPUT_PLACEHOLDER } from '../../../../constants';
+import { INPUT_PLACEHOLDER } from '../../../../constants/ui';
 import './SearchBar.css';
 
 const SearchBar = ({ onSearch }) => {

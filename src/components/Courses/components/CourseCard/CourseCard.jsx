@@ -1,11 +1,11 @@
 import React from 'react';
-import Button from '../../../../common/Button/Button';
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteCourse } from '../../../../store/courses/thunk';
 import { useNavigate } from 'react-router-dom';
+import Button from '../../../../common/Button/Button';
+import { deleteCourse } from '../../../../store/courses/thunk';
 import formatCreationDate from '../../../../helpers/formatCreationDate';
 import getCourseDuration from '../../../../helpers/getCourseDuration';
-import { MAX_AUTHORS_DISPLAY_LENGTH } from '../../../../constants';
+import { MAX_AUTHORS_DISPLAY_LENGTH } from '../../../../constants/validation';
 import './CourseCard.css';
 
 const getAuthorsString = (courseAuthors, authors) => {
@@ -20,7 +20,7 @@ const getAuthorsString = (courseAuthors, authors) => {
     .join(', ');
 
   return names.length > MAX_AUTHORS_DISPLAY_LENGTH
-    ? names.substring(0, MAX_AUTHORS_DISPLAY_LENGTH - 3) + '...'
+    ? `${names.substring(0, MAX_AUTHORS_DISPLAY_LENGTH - 3)}...`
     : names;
 };
 
