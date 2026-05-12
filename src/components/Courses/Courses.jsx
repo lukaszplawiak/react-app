@@ -5,7 +5,7 @@ import CourseCard from './components/CourseCard/CourseCard';
 import SearchBar from './components/SearchBar/SearchBar';
 import Button from '../../common/Button/Button';
 import EmptyCourseList from './components/EmptyCourseList';
-import { ADD_NEW_COURSE_LABEL } from '../../constants';
+import { ADD_NEW_COURSE_LABEL } from '../../constants/ui';
 import './Courses.css';
 
 function Courses() {
