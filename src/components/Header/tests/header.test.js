@@ -38,26 +38,39 @@ const buildStore = (state = initialState) =>
     preloadedState: state,
   });
 
-describe('Header Component', () => {
-  beforeEach(() => {
-    render(
-      <Provider store={buildStore()}>
-        <Router>
-          <Header />
-        </Router>
-      </Provider>
-    );
-  });
+const renderHeader = (state = initialState) =>
+  render(
+    <Provider store={buildStore(state)}>
+      <Router>
+        <Header />
+      </Router>
+    </Provider>
+  );
 
+describe('Header Component', () => {
   it('should contain a logo', () => {
+    renderHeader();
     expect(screen.getByAltText(/logo/i)).toBeInTheDocument();
   });
 
   it('should display the username when user is logged in', () => {
+    renderHeader();
     expect(screen.getByText('Hello, username')).toBeInTheDocument();
   });
 
   it('should display Logout button when user is authenticated', () => {
+    renderHeader();
     expect(screen.getByText('Logout')).toBeInTheDocument();
+  });
+
+  it('should display Login button when user is not authenticated', () => {
+    const guestState = {
+      ...initialState,
+      user: { ...initialState.user, isAuth: false, name: null },
+    };
+
+    renderHeader(guestState);
+
+    expect(screen.getByText('LOGIN')).toBeInTheDocument();
   });
 });
