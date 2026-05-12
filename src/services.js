@@ -1,47 +1,60 @@
 import axios from 'axios';
 import { API_BASE_URL } from './config';
 
-const baseURL = API_BASE_URL;
-
-const authHeaders = () => ({
-  Authorization: localStorage.getItem('userToken'),
-  'Content-Type': 'application/json',
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
 });
+
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem('userToken');
+  if (token) {
+    config.headers.Authorization = token;
+  }
+  return config;
+});
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('userToken');
+    }
+    return Promise.reject(error);
+  }
+);
 
 // --- Courses ---
 
 export const getCoursesService = () =>
-  axios.get(`${baseURL}/courses/all`);
+  apiClient.get('/courses/all');
 
 export const createCourseService = (course) =>
-  axios.post(`${baseURL}/courses/add`, course, { headers: authHeaders() });
+  apiClient.post('/courses/add', course);
 
 export const deleteCourseService = (courseId) =>
-  axios.delete(`${baseURL}/courses/${courseId}`, { headers: authHeaders() });
+  apiClient.delete(`/courses/${courseId}`);
 
 export const updateCourseService = (course) =>
-  axios.put(`${baseURL}/courses/${course.id}`, course, {
-    headers: authHeaders(),
-  });
+  apiClient.put(`/courses/${course.id}`, course);
 
 // --- Authors ---
 
 export const getAuthorsService = () =>
-  axios.get(`${baseURL}/authors/all`);
+  apiClient.get('/authors/all');
 
 export const createAuthorService = (author) =>
-  axios.post(`${baseURL}/authors/add`, author, { headers: authHeaders() });
+  apiClient.post('/authors/add', author);
 
 // --- User ---
 
 export const registerUserService = (userData) =>
-  axios.post(`${baseURL}/register`, userData);
+  apiClient.post('/register', userData);
 
 export const loginUserService = (credentials) =>
-  axios.post(`${baseURL}/login`, credentials);
+  apiClient.post('/login', credentials);
 
 export const getUserService = () =>
-  axios.get(`${baseURL}/users/me`, { headers: authHeaders() });
+  apiClient.get('/users/me');
 
 export const logoutUserService = () =>
-  axios.delete(`${baseURL}/logout`, { headers: authHeaders() });
+  apiClient.delete('/logout');
