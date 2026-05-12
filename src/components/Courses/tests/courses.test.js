@@ -7,6 +7,13 @@ import userReducer from '../../../store/user/reducer';
 import coursesReducer from '../../../store/courses/reducer';
 import authorsReducer from '../../../store/authors/reducer';
 import Courses from '../Courses';
+import {
+  getCoursesService,
+  getAuthorsService,
+  getUserService,
+} from '../../../services';
+
+jest.mock('../../../services');
 
 const initialState = {
   user: {
@@ -72,6 +79,15 @@ const renderCourses = (state = initialState) =>
 describe('Courses Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    getCoursesService.mockResolvedValue({
+      data: { successful: true, result: [] },
+    });
+    getAuthorsService.mockResolvedValue({
+      data: { successful: true, result: [] },
+    });
+    getUserService.mockResolvedValue({
+      data: { successful: true, result: { name: 'Test Name', role: 'admin' } },
+    });
   });
 
   it('should display a CourseCard for each course in the store', () => {

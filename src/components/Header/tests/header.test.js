@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { MemoryRouter as Router } from 'react-router-dom';
@@ -7,6 +7,9 @@ import userReducer from '../../../store/user/reducer';
 import coursesReducer from '../../../store/courses/reducer';
 import authorsReducer from '../../../store/authors/reducer';
 import Header from '../Header';
+import { logoutUserService } from '../../../services';
+
+jest.mock('../../../services');
 
 const initialState = {
   user: {
@@ -38,6 +41,13 @@ const buildStore = (state = initialState) =>
     preloadedState: state,
   });
 
+const mockNavigate = jest.fn();
+
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useNavigate: () => mockNavigate,
+}));
+
 const renderHeader = (state = initialState) =>
   render(
     <Provider store={buildStore(state)}>
@@ -48,6 +58,11 @@ const renderHeader = (state = initialState) =>
   );
 
 describe('Header Component', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    logoutUserService.mockResolvedValue({ data: { successful: true } });
+  });
+
   it('should contain a logo', () => {
     renderHeader();
     expect(screen.getByAltText(/logo/i)).toBeInTheDocument();
@@ -72,5 +87,16 @@ describe('Header Component', () => {
     renderHeader(guestState);
 
     expect(screen.getByText('LOGIN')).toBeInTheDocument();
+  });
+
+  it('should call logoutUserService and navigate to /login on logout', async () => {
+    renderHeader();
+
+    fireEvent.click(screen.getByText('Logout'));
+
+    await waitFor(() => {
+      expect(logoutUserService).toHaveBeenCalledTimes(1);
+      expect(mockNavigate).toHaveBeenCalledWith('/login');
+    });
   });
 });
