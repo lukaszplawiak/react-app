@@ -1,5 +1,5 @@
 import coursesReducer from '../reducer';
-import { createCourse } from '../thunk';
+import { createCourse, fetchCourses, deleteCourse } from '../thunk';
 
 const initialState = {
   courses: [],
@@ -8,7 +8,7 @@ const initialState = {
 };
 
 describe('Courses Reducer', () => {
-  test('should return the initial state', () => {
+  it('should return the initial state', () => {
     expect(coursesReducer(undefined, {})).toEqual(initialState);
   });
 
@@ -34,7 +34,7 @@ describe('Courses Reducer', () => {
   });
 
   it('should handle fetchCourses.pending and set status to loading', () => {
-    const action = { type: 'courses/fetchCourses/pending' };
+    const action = { type: fetchCourses.pending };
 
     const result = coursesReducer(initialState, action);
 
@@ -44,7 +44,7 @@ describe('Courses Reducer', () => {
 
   it('should handle fetchCourses.rejected and set error message', () => {
     const action = {
-      type: 'courses/fetchCourses/rejected',
+      type: fetchCourses.rejected,
       payload: 'Network error',
     };
 
@@ -62,7 +62,7 @@ describe('Courses Reducer', () => {
     };
 
     const action = {
-      type: 'courses/deleteCourse/fulfilled',
+      type: deleteCourse.fulfilled,
       payload: '1',
     };
 

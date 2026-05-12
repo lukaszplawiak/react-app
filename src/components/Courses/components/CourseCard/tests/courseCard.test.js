@@ -50,45 +50,62 @@ const buildStore = (state = initialState) =>
     preloadedState: state,
   });
 
-describe('CourseCard Component', () => {
-  beforeEach(() => {
-    render(
-      <Provider store={buildStore()}>
-        <Router>
-          <CourseCard
-            course={sampleCourse}
-            authors={initialState.authors.authors}
-            onCourseSelect={jest.fn()}
-          />
-        </Router>
-      </Provider>
-    );
-  });
+const renderCourseCard = (state = initialState) =>
+  render(
+    <Provider store={buildStore(state)}>
+      <Router>
+        <CourseCard
+          course={sampleCourse}
+          authors={initialState.authors.authors}
+          onCourseSelect={jest.fn()}
+        />
+      </Router>
+    </Provider>
+  );
 
-  test('should display course title', () => {
+describe('CourseCard Component', () => {
+  it('should display course title', () => {
+    renderCourseCard();
     expect(screen.getByText('Sample Course')).toBeInTheDocument();
   });
 
-  test('should display course description', () => {
+  it('should display course description', () => {
+    renderCourseCard();
     expect(screen.getByText('Sample Description')).toBeInTheDocument();
   });
 
-  test('should display duration in HH:MM hours format', () => {
+  it('should display duration in HH:MM hours format', () => {
+    renderCourseCard();
     expect(screen.getByText(/02:05 hours/i)).toBeInTheDocument();
   });
 
-  test('should display all course authors', () => {
+  it('should display all course authors', () => {
+    renderCourseCard();
     expect(
       screen.getByText('Authors: Author One, Author Two')
     ).toBeInTheDocument();
   });
 
-  test('should display creation date in DD.MM.YYYY format', () => {
+  it('should display creation date in DD.MM.YYYY format', () => {
+    renderCourseCard();
     expect(screen.getByText('Creation date: 20.07.2021')).toBeInTheDocument();
   });
 
-  test('should display DELETE and UPDATE buttons for admin role', () => {
+  it('should display DELETE and UPDATE buttons for admin role', () => {
+    renderCourseCard();
     expect(screen.getByText('DELETE')).toBeInTheDocument();
     expect(screen.getByText('UPDATE')).toBeInTheDocument();
+  });
+
+  it('should not display DELETE and UPDATE buttons for non-admin role', () => {
+    const userState = {
+      ...initialState,
+      user: { ...initialState.user, role: 'user' },
+    };
+
+    renderCourseCard(userState);
+
+    expect(screen.queryByText('DELETE')).not.toBeInTheDocument();
+    expect(screen.queryByText('UPDATE')).not.toBeInTheDocument();
   });
 });

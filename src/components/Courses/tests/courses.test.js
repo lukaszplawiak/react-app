@@ -60,28 +60,57 @@ jest.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
 }));
 
+const renderCourses = (state = initialState) =>
+  render(
+    <Provider store={buildStore(state)}>
+      <Router>
+        <Courses />
+      </Router>
+    </Provider>
+  );
+
 describe('Courses Component', () => {
   beforeEach(() => {
-    render(
-      <Provider store={buildStore()}>
-        <Router>
-          <Courses />
-        </Router>
-      </Provider>
-    );
+    jest.clearAllMocks();
   });
 
-  test('should display CourseCard for each course in the store', async () => {
-    const courseCards = await screen.getAllByText(/Course /i);
-    expect(courseCards.length).toBe(initialState.courses.courses.length);
+  it('should display a CourseCard for each course in the store', () => {
+    renderCourses();
+
+    expect(screen.getByText('Course 1')).toBeInTheDocument();
+    expect(screen.getByText('Course 2')).toBeInTheDocument();
   });
 
-  test('should navigate to /courses/add after clicking "Add new course"', async () => {
+  it('should display loading message when courses are loading', () => {
+    const loadingState = {
+      ...initialState,
+      courses: { ...initialState.courses, status: 'loading' },
+    };
+
+    renderCourses(loadingState);
+
+    expect(screen.getByText('Loading courses...')).toBeInTheDocument();
+  });
+
+  it('should navigate to /courses/add after clicking "Add new course"', async () => {
+    renderCourses();
+
     const addButton = screen.getByText(/ADD NEW COURSE/i);
     fireEvent.click(addButton);
 
     await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith('/courses/add');
     });
+  });
+
+  it('should not display "Add new course" button for non-admin user', () => {
+    const userState = {
+      ...initialState,
+      user: { ...initialState.user, role: 'user' },
+    };
+
+    renderCourses(userState);
+
+    expect(screen.queryByText(/ADD NEW COURSE/i)).not.toBeInTheDocument();
   });
 });
