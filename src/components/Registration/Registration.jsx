@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import Button from '../../common/Button/Button';
 import Input from '../../common/Input/Input';
-import { registerUserService } from '../../services';
+import { registerUser } from '../../store/user/thunk';
 
 function Registration() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const status = useSelector((state) => state.user.status);
+  const isLoading = status === 'loading';
+
   const [userData, setUserData] = useState({
     name: '',
     email: '',
@@ -35,17 +40,14 @@ function Registration() {
       return;
     }
 
-    try {
-      const response = await registerUserService(userData);
-      if (response.data.successful) {
-        navigate('/login');
-      } else {
-        setErrors({ server: response.data.message });
-      }
-    } catch (error) {
+    const resultAction = await dispatch(registerUser(userData));
+
+    if (registerUser.fulfilled.match(resultAction)) {
+      navigate('/login');
+    } else {
       setErrors({
         server:
-          error.response?.data?.message ||
+          resultAction.payload ||
           'Registration failed. Please try again.',
       });
     }
@@ -77,7 +79,11 @@ function Registration() {
         placeholder="Your Password"
       />
       {errors.server && <p className="error-message">{errors.server}</p>}
-      <Button type="submit" label="Registration" />
+      <Button
+        type="submit"
+        label={isLoading ? 'Registering...' : 'Register'}
+        disabled={isLoading}
+      />
       <Link to="/login">
         If you have an account you may <strong>Login</strong>
       </Link>
