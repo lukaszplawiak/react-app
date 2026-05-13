@@ -5,6 +5,12 @@ import formatCreationDate from '../../helpers/formatCreationDate';
 import getCourseDuration from '../../helpers/getCourseDuration';
 import getAuthorNames from '../../helpers/getAuthorNames';
 import ErrorMessage from '../../common/ErrorMessage/ErrorMessage';
+import {
+  selectCourses,
+  selectCoursesStatus,
+  selectCoursesError,
+} from '../../store/courses/selectors';
+import { selectAuthors, selectAuthorsStatus } from '../../store/authors/selectors';
 import { fetchCourses } from '../../store/courses/thunk';
 import {
   COURSE_INFO_LOADING_MESSAGE,
@@ -16,11 +22,11 @@ function CourseInfo() {
   const { courseId } = useParams();
   const dispatch = useDispatch();
 
-  const coursesStatus = useSelector((state) => state.courses.status);
-  const coursesError = useSelector((state) => state.courses.error);
-  const authorsStatus = useSelector((state) => state.authors.status);
-  const courses = useSelector((state) => state.courses.courses);
-  const authors = useSelector((state) => state.authors.authors);
+  const coursesStatus = useSelector(selectCoursesStatus);
+  const coursesError = useSelector(selectCoursesError);
+  const authorsStatus = useSelector(selectAuthorsStatus);
+  const courses = useSelector(selectCourses);
+  const authors = useSelector(selectAuthors);
 
   const isLoading = coursesStatus === 'loading' || authorsStatus === 'loading';
   const hasFailed = coursesStatus === 'failed';
