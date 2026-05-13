@@ -31,10 +31,6 @@ function Courses() {
     );
   }, [courses, query]);
 
-  const handleSearch = (inputQuery) => {
-    setQuery(inputQuery);
-  };
-
   const handleAddNewCourse = () => {
     navigate('/courses/add');
   };
@@ -65,7 +61,7 @@ function Courses() {
 
   return (
     <div className="Courses">
-      <SearchBar onSearch={handleSearch} />
+      <SearchBar value={query} onSearch={setQuery} />
       {filteredCourses.length > 0 ? (
         filteredCourses.map((course) => (
           <CourseCard

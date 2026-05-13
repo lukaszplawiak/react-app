@@ -1,15 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { INPUT_PLACEHOLDER } from '../../../../constants/ui';
 import './SearchBar.css';
 
-const SearchBar = ({ onSearch }) => {
-  const [query, setQuery] = useState('');
-
+const SearchBar = ({ value, onSearch }) => {
   const handleChange = (event) => {
-    const { value } = event.target;
-    setQuery(value);
-    onSearch(value);
+    onSearch(event.target.value);
   };
 
   const handleSubmit = (event) => {
@@ -20,7 +16,7 @@ const SearchBar = ({ onSearch }) => {
     <form className="Search-bar" onSubmit={handleSubmit}>
       <input
         type="search"
-        value={query}
+        value={value}
         onChange={handleChange}
         placeholder={INPUT_PLACEHOLDER}
       />
@@ -29,6 +25,7 @@ const SearchBar = ({ onSearch }) => {
 };
 
 SearchBar.propTypes = {
+  value: PropTypes.string.isRequired,
   onSearch: PropTypes.func.isRequired,
 };
 
