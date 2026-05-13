@@ -2,6 +2,7 @@ import React from 'react';
 import AuthorItem from './components/AuthorItem/AuthorItem';
 import Button from '../../common/Button/Button';
 import useCourseForm from './hooks/useCourseForm';
+import './CourseForm.css';
 
 function CourseForm() {
   const {
@@ -34,7 +35,8 @@ function CourseForm() {
         <input type="number" {...register('duration')} />
         <p className="error-message">{errors.duration || ' '}</p>
       </label>
-      <div>
+      <div className="authors-section">
+        <p className="authors-section__title">Available authors:</p>
         {availableAuthors.map((author) => (
           <AuthorItem
             key={author.id}
@@ -44,7 +46,8 @@ function CourseForm() {
           />
         ))}
       </div>
-      <div>
+      <div className="authors-section">
+        <p className="authors-section__title">Course authors:</p>
         {courseAuthors.map((authorId) => {
           const author = availableAuthors.find((a) => a.id === authorId);
           if (!author) return null;
