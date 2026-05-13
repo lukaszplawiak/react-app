@@ -5,7 +5,9 @@ import CourseCard from './components/CourseCard/CourseCard';
 import SearchBar from './components/SearchBar/SearchBar';
 import Button from '../../common/Button/Button';
 import EmptyCourseList from './components/EmptyCourseList';
+import ErrorMessage from '../../common/ErrorMessage/ErrorMessage';
 import { selectIsAdmin } from '../../store/user/selectors';
+import { fetchCourses } from '../../store/courses/thunk';
 import { ADD_NEW_COURSE_LABEL } from '../../constants/ui';
 import './Courses.css';
 
@@ -16,8 +18,10 @@ function Courses() {
   const courses = useSelector((state) => state.courses.courses);
   const authors = useSelector((state) => state.authors.authors);
   const coursesStatus = useSelector((state) => state.courses.status);
+  const coursesError = useSelector((state) => state.courses.error);
   const authorsStatus = useSelector((state) => state.authors.status);
   const isLoading = coursesStatus === 'loading' || authorsStatus === 'loading';
+  const hasFailed = coursesStatus === 'failed';
 
   const [query, setQuery] = useState('');
 
@@ -39,10 +43,22 @@ function Courses() {
     navigate(`/courses/${course.id}`);
   };
 
+  const handleRetry = () => {
+    dispatch(fetchCourses());
+  };
+
   if (isLoading) {
     return (
       <div className="Courses">
         <p className="loading-message">Loading courses...</p>
+      </div>
+    );
+  }
+
+  if (hasFailed) {
+    return (
+      <div className="Courses">
+        <ErrorMessage message={coursesError} onRetry={handleRetry} />
       </div>
     );
   }
