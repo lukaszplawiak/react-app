@@ -63,9 +63,6 @@ const useCourseForm = () => {
     setCourseAuthors(courseToUpdate.authors);
   }, [courses, courseId]);
 
-  // register() zwraca props gotowe do spread'owania na element formularza.
-  // Komponent nie obsługuje e.target.value — hook robi to wewnętrznie.
-  // Wzorzec popularyzowany przez react-hook-form.
   const register = (fieldName) => ({
     value: fields[fieldName],
     onChange: (e) =>
