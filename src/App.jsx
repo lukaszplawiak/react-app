@@ -17,6 +17,7 @@ import './App.css';
 function App() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
+  const isBootstrapping = user.status === 'bootstrapping';
   const defaultPath = user.isAuth ? '/courses' : '/login';
 
   useEffect(() => {
@@ -24,6 +25,17 @@ function App() {
     dispatch(fetchCourses());
     dispatch(fetchAuthors());
   }, [dispatch]);
+
+  if (isBootstrapping) {
+    return (
+      <div className="App">
+        <Header />
+        <div className="Content">
+          <p className="loading-message">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="App">

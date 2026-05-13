@@ -1,27 +1,35 @@
 const jsonServer = require('json-server');
+const cookieParser = require('cookie-parser');
 
 const server = jsonServer.create();
-
 const router = jsonServer.router('db.json');
-
 const middlewares = jsonServer.defaults();
 
-// KONFIGURACJA SERWERA
+// SERVER CONFIGURATION
 
 server.use(middlewares);
-
 server.use(jsonServer.bodyParser);
+server.use(cookieParser());
+
+const COOKIE_OPTIONS = {
+  httpOnly: true,
+  sameSite: 'lax',
+  maxAge: 24 * 60 * 60 * 1000, // 24 godziny
+  // secure: true — when HTTPS
+};
+
+const AUTH_COOKIE_NAME = 'authToken';
 
 // CUSTOM ENDPOINTS (Mock Authentication)
 
 server.post('/login', (req, res) => {
   const { email, password } = req.body;
-
   const db = router.db;
-
   const user = db.get('users').find({ email, password }).value();
 
   if (user) {
+    res.cookie(AUTH_COOKIE_NAME, user.token, COOKIE_OPTIONS);
+
     res.json({
       successful: true,
       result: user.token,
@@ -41,7 +49,6 @@ server.post('/login', (req, res) => {
 
 server.post('/register', (req, res) => {
   const { name, email, password } = req.body;
-
   const db = router.db;
 
   const newUser = {
@@ -67,7 +74,8 @@ server.post('/register', (req, res) => {
 
 server.get('/users/me', (req, res) => {
   const db = router.db;
-  const token = req.headers.authorization || req.get('Authorization');
+
+  const token = req.cookies[AUTH_COOKIE_NAME];
 
   if (!token) {
     res.status(401).json({ successful: false, errors: ['No token provided'] });
@@ -91,6 +99,7 @@ server.get('/users/me', (req, res) => {
 });
 
 server.delete('/logout', (req, res) => {
+  res.clearCookie(AUTH_COOKIE_NAME);
   res.json({ successful: true });
 });
 
@@ -98,7 +107,6 @@ server.delete('/logout', (req, res) => {
 
 server.get('/courses/all', (req, res) => {
   const courses = router.db.get('courses').value();
-
   res.json({
     successful: true,
     result: courses,
@@ -122,7 +130,6 @@ server.post('/courses/add', (req, res) => {
 
 server.delete('/courses/:id', (req, res) => {
   router.db.get('courses').remove({ id: req.params.id }).write();
-
   res.json({ successful: true });
 });
 
@@ -162,8 +169,6 @@ server.post('/authors/add', (req, res) => {
     result: newAuthor,
   });
 });
-
-// LOGI URUCHOMIENIA SERWERA
 
 server.use(router);
 
