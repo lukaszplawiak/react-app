@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import Input from '../../common/Input/Input';
 import Button from '../../common/Button/Button';
-import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from '../../store/user/thunk';
+import { selectUserStatus } from '../../store/user/selectors';
 
 function Login() {
   const [formData, setFormData] = useState({
@@ -14,7 +15,7 @@ function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const status = useSelector((state) => state.user.status);
+  const status = useSelector(selectUserStatus);
   const isLoading = status === 'loading';
 
   const handleChange = (e) => {
