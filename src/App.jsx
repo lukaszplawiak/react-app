@@ -11,14 +11,16 @@ import CourseForm from './components/CourseForm/CourseForm';
 import { fetchCourses } from './store/courses/thunk';
 import { fetchAuthors } from './store/authors/thunk';
 import { fetchUser } from './store/user/thunk';
+import { selectIsAuth, selectUserStatus } from './store/user/selectors';
 
 import './App.css';
 
 function App() {
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.user);
-  const isBootstrapping = user.status === 'bootstrapping';
-  const defaultPath = user.isAuth ? '/courses' : '/login';
+  const isAuth = useSelector(selectIsAuth);
+  const userStatus = useSelector(selectUserStatus);
+  const isBootstrapping = userStatus === 'bootstrapping';
+  const defaultPath = isAuth ? '/courses' : '/login';
 
   useEffect(() => {
     dispatch(fetchUser());
@@ -47,7 +49,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route
             path="/courses"
-            element={user.isAuth ? <Courses /> : <Navigate to="/login" />}
+            element={isAuth ? <Courses /> : <Navigate to="/login" />}
           />
           <Route
             path="/courses/add"
@@ -59,9 +61,7 @@ function App() {
           />
           <Route
             path="/courses/:courseId"
-            element={
-              user.isAuth ? <CourseInfo /> : <Navigate to="/login" />
-            }
+            element={isAuth ? <CourseInfo /> : <Navigate to="/login" />}
           />
           <Route
             path="/courses/update/:courseId"

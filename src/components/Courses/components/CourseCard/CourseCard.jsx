@@ -5,6 +5,7 @@ import Button from '../../../../common/Button/Button';
 import { deleteCourse } from '../../../../store/courses/thunk';
 import formatCreationDate from '../../../../helpers/formatCreationDate';
 import getCourseDuration from '../../../../helpers/getCourseDuration';
+import { selectIsAdmin } from '../../../../store/user/selectors';
 import { MAX_AUTHORS_DISPLAY_LENGTH } from '../../../../constants/validation';
 import './CourseCard.css';
 
@@ -27,8 +28,7 @@ const getAuthorsString = (courseAuthors, authors) => {
 function CourseCard({ course, authors, onCourseSelect }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const user = useSelector((state) => state.user);
-  const isAdmin = user.role === 'admin';
+  const isAdmin = useSelector(selectIsAdmin);
 
   const handleDelete = () => {
     dispatch(deleteCourse(course.id));
