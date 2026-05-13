@@ -15,7 +15,7 @@ apiClient.interceptors.response.use(
       window.location.href = '/login';
     }
 
-    if (process.env.NODE_ENV !== 'test') {
+    if (import.meta.env.MODE !== 'test') {
       console.error(
         `[API Error] ${error.config?.method?.toUpperCase()} ${error.config?.url} — ${status ?? 'network error'}`,
         error.message
