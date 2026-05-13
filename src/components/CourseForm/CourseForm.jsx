@@ -9,7 +9,7 @@ function CourseForm() {
     register,
     errors,
     isSaving,
-    courseAuthors,
+    courseAuthorObjects,
     availableAuthors,
     submitLabel,
     handleSubmit,
@@ -48,18 +48,14 @@ function CourseForm() {
       </div>
       <div className="authors-section">
         <p className="authors-section__title">Course authors:</p>
-        {courseAuthors.map((authorId) => {
-          const author = availableAuthors.find((a) => a.id === authorId);
-          if (!author) return null;
-          return (
-            <AuthorItem
-              key={authorId}
-              author={author}
-              onAction={() => handleRemoveAuthorFromCourse(authorId)}
-              action="Delete"
-            />
-          );
-        })}
+        {courseAuthorObjects.map((author) => (
+          <AuthorItem
+            key={author.id}
+            author={author}
+            onAction={() => handleRemoveAuthorFromCourse(author.id)}
+            action="Delete"
+          />
+        ))}
       </div>
       <label>
         New Author:
