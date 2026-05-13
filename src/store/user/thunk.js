@@ -3,6 +3,7 @@ import {
   loginUserService,
   getUserService,
   logoutUserService,
+  registerUserService,
 } from '../../services';
 
 export const fetchUser = createAsyncThunk(
@@ -22,6 +23,28 @@ export const fetchUser = createAsyncThunk(
   }
 );
 
+export const registerUser = createAsyncThunk(
+  'user/registerUser',
+  async (userData, { rejectWithValue }) => {
+    try {
+      const response = await registerUserService(userData);
+      const result = response.data;
+
+      if (result.successful) {
+        return result.user;
+      }
+
+      throw new Error(result.message || 'An error occurred while registering.');
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message ||
+          error.message ||
+          'Registration failed. Please try again.'
+      );
+    }
+  }
+);
+
 export const loginUser = createAsyncThunk(
   'user/loginUser',
   async (credentials, { rejectWithValue }) => {
@@ -30,11 +53,10 @@ export const loginUser = createAsyncThunk(
       const result = response.data;
 
       if (result.successful && result.result) {
-
         return {
           name: result.user.name,
           email: result.user.email,
-          role: result.user.role
+          role: result.user.role,
         };
       }
 
@@ -51,12 +73,9 @@ export const logoutUser = createAsyncThunk(
   'user/logoutUser',
   async (_, { rejectWithValue }) => {
     try {
-      // Backend czyści httpOnly cookie przez Set-Cookie z maxAge: 0
       await logoutUserService();
       return null;
     } catch (error) {
-      // Nawet jeśli request się nie powiedzie, czyścimy stan Redux.
-      // Cookie po stronie serwera wygaśnie samoistnie po maxAge.
       return rejectWithValue(
         error.message || 'An error occurred while logging out.'
       );
