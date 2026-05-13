@@ -5,6 +5,10 @@ import formatCreationDate from '../../helpers/formatCreationDate';
 import getCourseDuration from '../../helpers/getCourseDuration';
 import ErrorMessage from '../../common/ErrorMessage/ErrorMessage';
 import { fetchCourses } from '../../store/courses/thunk';
+import {
+  COURSE_INFO_LOADING_MESSAGE,
+  COURSE_INFO_NOT_FOUND_MESSAGE,
+} from '../../constants/ui';
 import './CourseInfo.css';
 
 function CourseInfo() {
@@ -27,7 +31,7 @@ function CourseInfo() {
   if (isLoading) {
     return (
       <div className="Course-all">
-        <p>Loading course...</p>
+        <p>{COURSE_INFO_LOADING_MESSAGE}</p>
       </div>
     );
   }
@@ -45,7 +49,7 @@ function CourseInfo() {
   if (!course) {
     return (
       <div className="Course-all">
-        <p>Course not found.</p>
+        <p>{COURSE_INFO_NOT_FOUND_MESSAGE}</p>
         <Link to="/courses" className="back-button">
           Back to Courses
         </Link>
@@ -63,7 +67,7 @@ function CourseInfo() {
 
   return (
     <div className="Course-all">
-      <div className="Course-all2">
+      <div className="course-detail-panel">
         <h2>{course.title}</h2>
         <div className="Course-info">
           <div className="Course-des">
