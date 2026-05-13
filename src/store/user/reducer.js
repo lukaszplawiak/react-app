@@ -13,17 +13,7 @@ const initialState = {
 const userSlice = createSlice({
   name: 'user',
   initialState,
-  reducers: {
-    setUser: (state, action) => {
-      state.name = action.payload.name;
-      state.email = action.payload.email;
-      state.isAuth = action.payload.isAuth;
-      state.role = action.payload.role;
-    },
-    setError: (state, action) => {
-      state.error = action.payload;
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchUser.pending, (state) => {
@@ -78,5 +68,4 @@ const userSlice = createSlice({
   },
 });
 
-export const { setUser, setError } = userSlice.actions;
 export default userSlice.reducer;
