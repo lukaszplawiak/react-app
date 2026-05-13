@@ -9,7 +9,7 @@ import authorsReducer from '../../../store/authors/reducer';
 import Header from '../Header';
 import { logoutUserService } from '../../../services';
 
-jest.mock('../../../services');
+vi.mock('../../../services');
 
 const initialState = {
   user: {
@@ -41,12 +41,15 @@ const buildStore = (state = initialState) =>
     preloadedState: state,
   });
 
-const mockNavigate = jest.fn();
+const mockNavigate = vi.fn();
 
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useNavigate: () => mockNavigate,
-}));
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  };
+});
 
 const renderHeader = (state = initialState) =>
   render(
@@ -59,7 +62,7 @@ const renderHeader = (state = initialState) =>
 
 describe('Header Component', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     logoutUserService.mockResolvedValue({ data: { successful: true } });
   });
 
