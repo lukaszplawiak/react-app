@@ -5,16 +5,16 @@ import CourseCard from './components/CourseCard/CourseCard';
 import SearchBar from './components/SearchBar/SearchBar';
 import Button from '../../common/Button/Button';
 import EmptyCourseList from './components/EmptyCourseList';
+import { selectIsAdmin } from '../../store/user/selectors';
 import { ADD_NEW_COURSE_LABEL } from '../../constants/ui';
 import './Courses.css';
 
 function Courses() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const isAdmin = useSelector(selectIsAdmin);
   const courses = useSelector((state) => state.courses.courses);
   const authors = useSelector((state) => state.authors.authors);
-  const user = useSelector((state) => state.user);
-
   const coursesStatus = useSelector((state) => state.courses.status);
   const authorsStatus = useSelector((state) => state.authors.status);
   const isLoading = coursesStatus === 'loading' || authorsStatus === 'loading';
@@ -60,9 +60,9 @@ function Courses() {
           />
         ))
       ) : (
-        <EmptyCourseList role={user.role} />
+        <EmptyCourseList isAdmin={isAdmin} />
       )}
-      {user.role === 'admin' && (
+      {isAdmin && (
         <Button
           label={ADD_NEW_COURSE_LABEL}
           className="ButtonAdd"
