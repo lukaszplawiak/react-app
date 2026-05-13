@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { MemoryRouter as Router } from 'react-router-dom';
 import { configureStore } from '@reduxjs/toolkit';
@@ -7,9 +7,8 @@ import userReducer from '../../../../../store/user/reducer';
 import coursesReducer from '../../../../../store/courses/reducer';
 import authorsReducer from '../../../../../store/authors/reducer';
 import CourseCard from '../CourseCard';
-import { deleteCourseService } from '../../../../../services';
 
-jest.mock('../../../../../services');
+vi.mock('../../../../../services');
 
 const initialState = {
   user: {
@@ -39,7 +38,7 @@ const sampleCourse = {
   title: 'Sample Course',
   description: 'Sample Description',
   duration: 125,
-  creationDate: new Date('2021-07-20T10:00:00Z'),
+  creationDate: '2021-07-20T10:00:00Z',
   authors: ['1', '2'],
 };
 
@@ -53,14 +52,22 @@ const buildStore = (state = initialState) =>
     preloadedState: state,
   });
 
-const renderCourseCard = (state = initialState) =>
+const renderCourseCard = ({
+  isAdmin = true,
+  onDelete = vi.fn(),
+  onUpdate = vi.fn(),
+  state = initialState,
+} = {}) =>
   render(
     <Provider store={buildStore(state)}>
       <Router>
         <CourseCard
           course={sampleCourse}
           authors={initialState.authors.authors}
-          onCourseSelect={jest.fn()}
+          isAdmin={isAdmin}
+          onCourseSelect={vi.fn()}
+          onDelete={onDelete}
+          onUpdate={onUpdate}
         />
       </Router>
     </Provider>
@@ -68,10 +75,7 @@ const renderCourseCard = (state = initialState) =>
 
 describe('CourseCard Component', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    deleteCourseService.mockResolvedValue({
-      data: { successful: true },
-    });
+    vi.clearAllMocks();
   });
 
   it('should display course title', () => {
@@ -102,30 +106,21 @@ describe('CourseCard Component', () => {
   });
 
   it('should display DELETE and UPDATE buttons for admin role', () => {
-    renderCourseCard();
+    renderCourseCard({ isAdmin: true });
     expect(screen.getByText('DELETE')).toBeInTheDocument();
     expect(screen.getByText('UPDATE')).toBeInTheDocument();
   });
 
   it('should not display DELETE and UPDATE buttons for non-admin role', () => {
-    const userState = {
-      ...initialState,
-      user: { ...initialState.user, role: 'user' },
-    };
-
-    renderCourseCard(userState);
-
+    renderCourseCard({ isAdmin: false });
     expect(screen.queryByText('DELETE')).not.toBeInTheDocument();
     expect(screen.queryByText('UPDATE')).not.toBeInTheDocument();
   });
 
-  it('should call deleteCourseService when DELETE button is clicked', async () => {
-    renderCourseCard();
-
+  it('should call onDelete with course id when DELETE button is clicked', () => {
+    const onDelete = vi.fn();
+    renderCourseCard({ onDelete });
     fireEvent.click(screen.getByText('DELETE'));
-
-    await waitFor(() => {
-      expect(deleteCourseService).toHaveBeenCalledWith(sampleCourse.id);
-    });
+    expect(onDelete).toHaveBeenCalledWith(sampleCourse.id);
   });
 });
