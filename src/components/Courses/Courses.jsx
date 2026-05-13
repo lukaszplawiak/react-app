@@ -13,7 +13,7 @@ import {
   selectCoursesError,
 } from '../../store/courses/selectors';
 import { selectAuthors, selectAuthorsStatus } from '../../store/authors/selectors';
-import { fetchCourses } from '../../store/courses/thunk';
+import { fetchCourses, deleteCourse } from '../../store/courses/thunk';
 import { ADD_NEW_COURSE_LABEL } from '../../constants/ui';
 import './Courses.css';
 
@@ -47,6 +47,14 @@ function Courses() {
     navigate(`/courses/${course.id}`);
   };
 
+  const handleDelete = (courseId) => {
+    dispatch(deleteCourse(courseId));
+  };
+
+  const handleUpdate = (courseId) => {
+    navigate(`/courses/update/${courseId}`);
+  };
+
   const handleRetry = () => {
     dispatch(fetchCourses());
   };
@@ -76,7 +84,10 @@ function Courses() {
             key={course.id}
             course={course}
             authors={authors}
+            isAdmin={isAdmin}
             onCourseSelect={handleCourseSelect}
+            onDelete={handleDelete}
+            onUpdate={handleUpdate}
           />
         ))
       ) : (

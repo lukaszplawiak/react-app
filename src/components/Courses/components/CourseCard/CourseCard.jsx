@@ -1,28 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import Button from '../../../../common/Button/Button';
-import { deleteCourse } from '../../../../store/courses/thunk';
 import formatCreationDate from '../../../../helpers/formatCreationDate';
 import getCourseDuration from '../../../../helpers/getCourseDuration';
 import getAuthorNames from '../../../../helpers/getAuthorNames';
-import { selectIsAdmin } from '../../../../store/user/selectors';
 import './CourseCard.css';
 
-function CourseCard({ course, authors, onCourseSelect }) {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const isAdmin = useSelector(selectIsAdmin);
-
-  const handleDelete = () => {
-    dispatch(deleteCourse(course.id));
-  };
-
-  const handleUpdate = () => {
-    navigate(`/courses/update/${course.id}`);
-  };
-
+function CourseCard({ course, authors, onCourseSelect, onDelete, onUpdate, isAdmin }) {
   return (
     <div className="Course-card">
       <div className="Course-rect">
@@ -46,12 +30,12 @@ function CourseCard({ course, authors, onCourseSelect }) {
               <Button
                 label="DELETE"
                 className="Course-button"
-                onClick={handleDelete}
+                onClick={() => onDelete(course.id)}
               />
               <Button
                 label="UPDATE"
                 className="Course-button"
-                onClick={handleUpdate}
+                onClick={() => onUpdate(course.id)}
               />
             </>
           )}
@@ -76,7 +60,10 @@ CourseCard.propTypes = {
       name: PropTypes.string.isRequired,
     })
   ).isRequired,
+  isAdmin: PropTypes.bool.isRequired,
   onCourseSelect: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
+  onUpdate: PropTypes.func.isRequired,
 };
 
 export default CourseCard;
