@@ -8,7 +8,7 @@ import {
   updateCourseService,
 } from '../../../services';
 
-jest.mock('../../../services');
+vi.mock('../../../services');
 
 const buildStore = (preloadedState) =>
   configureStore({
@@ -18,7 +18,7 @@ const buildStore = (preloadedState) =>
 
 describe('Courses Thunks', () => {
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('fetchCourses', () => {

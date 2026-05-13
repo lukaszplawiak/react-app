@@ -13,7 +13,7 @@ import {
   getUserService,
 } from '../../../services';
 
-jest.mock('../../../services');
+vi.mock('../../../services');
 
 const initialState = {
   user: {
@@ -60,12 +60,15 @@ const buildStore = (state = initialState) =>
     preloadedState: state,
   });
 
-const mockNavigate = jest.fn();
+const mockNavigate = vi.fn();
 
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useNavigate: () => mockNavigate,
-}));
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  };
+});
 
 const renderCourses = (state = initialState) =>
   render(
@@ -78,7 +81,7 @@ const renderCourses = (state = initialState) =>
 
 describe('Courses Component', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     getCoursesService.mockResolvedValue({
       data: { successful: true, result: [] },
     });
