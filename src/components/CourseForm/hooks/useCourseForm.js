@@ -2,21 +2,22 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { createCourse, updateCourse } from '../../../store/courses/thunk';
-import { createAuthor, fetchAuthors } from '../../../store/authors/thunk';
-
-const AUTHOR_NAME_MIN_LENGTH = 2;
-const COURSE_TITLE_MIN_LENGTH = 2;
-const COURSE_DESCRIPTION_MIN_LENGTH = 2;
+import { createAuthor } from '../../../store/authors/thunk';
+import {
+  MIN_AUTHOR_NAME_LENGTH,
+  MIN_COURSE_TITLE_LENGTH,
+  MIN_COURSE_DESCRIPTION_LENGTH,
+} from '../../../constants/validation';
 
 const validateCourseFields = ({ title, description, duration }) => {
   const errors = {};
 
-  if (title.length < COURSE_TITLE_MIN_LENGTH) {
-    errors.title = 'Title should be at least 2 characters';
+  if (title.length < MIN_COURSE_TITLE_LENGTH) {
+    errors.title = `Title should be at least ${MIN_COURSE_TITLE_LENGTH} characters`;
   }
 
-  if (description.length < COURSE_DESCRIPTION_MIN_LENGTH) {
-    errors.description = 'Description should be at least 2 characters';
+  if (description.length < MIN_COURSE_DESCRIPTION_LENGTH) {
+    errors.description = `Description should be at least ${MIN_COURSE_DESCRIPTION_LENGTH} characters`;
   }
 
   if (isNaN(duration) || Number(duration) <= 0) {
@@ -66,10 +67,10 @@ const useCourseForm = () => {
   };
 
   const handleCreateAuthor = async () => {
-    if (newAuthorName.length < AUTHOR_NAME_MIN_LENGTH) {
+    if (newAuthorName.length < MIN_AUTHOR_NAME_LENGTH) {
       setErrors((prev) => ({
         ...prev,
-        newAuthorName: 'Author name should be at least 2 characters',
+        newAuthorName: `Author name should be at least ${MIN_AUTHOR_NAME_LENGTH} characters`,
       }));
       return;
     }
@@ -77,7 +78,6 @@ const useCourseForm = () => {
     const result = await dispatch(createAuthor({ name: newAuthorName }));
 
     if (createAuthor.fulfilled.match(result)) {
-      await dispatch(fetchAuthors());
       setNewAuthorName('');
       setErrors((prev) => ({ ...prev, newAuthorName: null }));
     } else {

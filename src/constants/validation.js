@@ -1,4 +1,5 @@
 export const MIN_PASSWORD_LENGTH = 6;
 export const MIN_COURSE_TITLE_LENGTH = 2;
 export const MIN_COURSE_DESCRIPTION_LENGTH = 2;
+export const MIN_AUTHOR_NAME_LENGTH = 2;
 export const MAX_AUTHORS_DISPLAY_LENGTH = 30;
