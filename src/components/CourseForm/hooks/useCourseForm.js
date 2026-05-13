@@ -4,6 +4,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { createCourse, updateCourse } from '../../../store/courses/thunk';
 import { createAuthor } from '../../../store/authors/thunk';
 import {
+  selectCourses,
+  selectCoursesStatus,
+} from '../../../store/courses/selectors';
+import { selectAuthors } from '../../../store/authors/selectors';
+import {
   MIN_AUTHOR_NAME_LENGTH,
   MIN_COURSE_TITLE_LENGTH,
   MIN_COURSE_DESCRIPTION_LENGTH,
@@ -40,9 +45,9 @@ const useCourseForm = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const authors = useSelector((state) => state.authors.authors);
-  const courses = useSelector((state) => state.courses.courses);
-  const coursesStatus = useSelector((state) => state.courses.status);
+  const authors = useSelector(selectAuthors);
+  const courses = useSelector(selectCourses);
+  const coursesStatus = useSelector(selectCoursesStatus);
 
   const { courseId } = useParams();
   const isEditMode = Boolean(courseId);
