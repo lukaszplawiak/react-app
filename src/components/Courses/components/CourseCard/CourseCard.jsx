@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Button from '../../../../common/Button/Button';
@@ -75,5 +76,23 @@ function CourseCard({ course, authors, onCourseSelect }) {
     </div>
   );
 }
+
+CourseCard.propTypes = {
+  course: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    duration: PropTypes.number.isRequired,
+    creationDate: PropTypes.string,
+    authors: PropTypes.arrayOf(PropTypes.string).isRequired,
+  }).isRequired,
+  authors: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+    })
+  ).isRequired,
+  onCourseSelect: PropTypes.func.isRequired,
+};
 
 export default CourseCard;

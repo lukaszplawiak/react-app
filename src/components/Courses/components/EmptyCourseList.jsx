@@ -1,8 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
-function EmptyCourseList({ role }) {
-  const isAdmin = role === 'admin';
-
+function EmptyCourseList({ isAdmin }) {
   return (
     <div className="empty-course-list">
       <h2>Course List is Empty</h2>
@@ -16,5 +15,9 @@ function EmptyCourseList({ role }) {
     </div>
   );
 }
+
+EmptyCourseList.propTypes = {
+  isAdmin: PropTypes.bool.isRequired,
+};
 
 export default EmptyCourseList;
