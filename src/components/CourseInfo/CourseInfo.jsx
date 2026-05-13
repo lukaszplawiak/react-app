@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import formatCreationDate from '../../helpers/formatCreationDate';
 import getCourseDuration from '../../helpers/getCourseDuration';
+import getAuthorNames from '../../helpers/getAuthorNames';
 import ErrorMessage from '../../common/ErrorMessage/ErrorMessage';
 import { fetchCourses } from '../../store/courses/thunk';
 import {
@@ -57,13 +58,7 @@ function CourseInfo() {
     );
   }
 
-  const authorNames = course.authors
-    .map((authorId) => {
-      const author = authors.find((a) => a.id === authorId);
-      return author ? author.name : null;
-    })
-    .filter(Boolean)
-    .join(', ');
+  const authorNames = getAuthorNames(course.authors, authors) || 'No authors assigned';
 
   return (
     <div className="Course-all">
@@ -87,7 +82,7 @@ function CourseInfo() {
             </p>
             <p>
               <strong>Authors: </strong>
-              {authorNames || 'No authors assigned'}
+              {authorNames}
             </p>
             <p>
               <strong>Creation Date: </strong>

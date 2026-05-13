@@ -6,25 +6,9 @@ import Button from '../../../../common/Button/Button';
 import { deleteCourse } from '../../../../store/courses/thunk';
 import formatCreationDate from '../../../../helpers/formatCreationDate';
 import getCourseDuration from '../../../../helpers/getCourseDuration';
+import getAuthorNames from '../../../../helpers/getAuthorNames';
 import { selectIsAdmin } from '../../../../store/user/selectors';
-import { MAX_AUTHORS_DISPLAY_LENGTH } from '../../../../constants/validation';
 import './CourseCard.css';
-
-const getAuthorsString = (courseAuthors, authors) => {
-  if (!courseAuthors || !authors) return '';
-
-  const names = courseAuthors
-    .map((authorId) => {
-      const author = authors.find((a) => a.id === authorId);
-      return author ? author.name : null;
-    })
-    .filter(Boolean)
-    .join(', ');
-
-  return names.length > MAX_AUTHORS_DISPLAY_LENGTH
-    ? `${names.substring(0, MAX_AUTHORS_DISPLAY_LENGTH - 3)}...`
-    : names;
-};
 
 function CourseCard({ course, authors, onCourseSelect }) {
   const dispatch = useDispatch();
@@ -48,7 +32,7 @@ function CourseCard({ course, authors, onCourseSelect }) {
         </div>
         <div className="Course-details">
           <div className="Course-details-info">
-            <p>Authors: {getAuthorsString(course.authors, authors)}</p>
+            <p>Authors: {getAuthorNames(course.authors, authors, { truncate: true })}</p>
             <p>Duration: {getCourseDuration(course.duration)}</p>
             <p>Creation date: {formatCreationDate(course.creationDate)}</p>
           </div>
