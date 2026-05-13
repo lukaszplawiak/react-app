@@ -1,28 +1,41 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import formatCreationDate from '../../helpers/formatCreationDate';
 import getCourseDuration from '../../helpers/getCourseDuration';
+import ErrorMessage from '../../common/ErrorMessage/ErrorMessage';
+import { fetchCourses } from '../../store/courses/thunk';
 import './CourseInfo.css';
-
-const COURSE_INFO_LOADING_MESSAGE = 'Loading course...';
-const COURSE_INFO_NOT_FOUND_MESSAGE = 'Course not found.';
 
 function CourseInfo() {
   const { courseId } = useParams();
+  const dispatch = useDispatch();
 
   const coursesStatus = useSelector((state) => state.courses.status);
+  const coursesError = useSelector((state) => state.courses.error);
   const authorsStatus = useSelector((state) => state.authors.status);
   const courses = useSelector((state) => state.courses.courses);
   const authors = useSelector((state) => state.authors.authors);
 
-  const isLoading =
-    coursesStatus === 'loading' || authorsStatus === 'loading';
+  const isLoading = coursesStatus === 'loading' || authorsStatus === 'loading';
+  const hasFailed = coursesStatus === 'failed';
+
+  const handleRetry = () => {
+    dispatch(fetchCourses());
+  };
 
   if (isLoading) {
     return (
       <div className="Course-all">
-        <p>{COURSE_INFO_LOADING_MESSAGE}</p>
+        <p>Loading course...</p>
+      </div>
+    );
+  }
+
+  if (hasFailed) {
+    return (
+      <div className="Course-all">
+        <ErrorMessage message={coursesError} onRetry={handleRetry} />
       </div>
     );
   }
@@ -32,7 +45,7 @@ function CourseInfo() {
   if (!course) {
     return (
       <div className="Course-all">
-        <p>{COURSE_INFO_NOT_FOUND_MESSAGE}</p>
+        <p>Course not found.</p>
         <Link to="/courses" className="back-button">
           Back to Courses
         </Link>
