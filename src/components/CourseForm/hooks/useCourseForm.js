@@ -28,11 +28,13 @@ const validateCourseFields = ({ title, description, duration }) => {
 };
 
 const useCourseForm = () => {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [duration, setDuration] = useState('');
+  const [fields, setFields] = useState({
+    title: '',
+    description: '',
+    duration: '',
+    newAuthorName: '',
+  });
   const [courseAuthors, setCourseAuthors] = useState([]);
-  const [newAuthorName, setNewAuthorName] = useState('');
   const [errors, setErrors] = useState({});
 
   const navigate = useNavigate();
@@ -52,11 +54,23 @@ const useCourseForm = () => {
     const courseToUpdate = courses.find((course) => course.id === courseId);
     if (!courseToUpdate) return;
 
-    setTitle(courseToUpdate.title);
-    setDescription(courseToUpdate.description);
-    setDuration(courseToUpdate.duration);
+    setFields({
+      title: courseToUpdate.title,
+      description: courseToUpdate.description,
+      duration: courseToUpdate.duration,
+      newAuthorName: '',
+    });
     setCourseAuthors(courseToUpdate.authors);
   }, [courses, courseId]);
+
+  // register() zwraca props gotowe do spread'owania na element formularza.
+  // Komponent nie obsługuje e.target.value — hook robi to wewnętrznie.
+  // Wzorzec popularyzowany przez react-hook-form.
+  const register = (fieldName) => ({
+    value: fields[fieldName],
+    onChange: (e) =>
+      setFields((prev) => ({ ...prev, [fieldName]: e.target.value })),
+  });
 
   const handleAddAuthorToCourse = (authorId) => {
     setCourseAuthors((prev) => [...prev, authorId]);
@@ -67,7 +81,7 @@ const useCourseForm = () => {
   };
 
   const handleCreateAuthor = async () => {
-    if (newAuthorName.length < MIN_AUTHOR_NAME_LENGTH) {
+    if (fields.newAuthorName.length < MIN_AUTHOR_NAME_LENGTH) {
       setErrors((prev) => ({
         ...prev,
         newAuthorName: `Author name should be at least ${MIN_AUTHOR_NAME_LENGTH} characters`,
@@ -75,10 +89,10 @@ const useCourseForm = () => {
       return;
     }
 
-    const result = await dispatch(createAuthor({ name: newAuthorName }));
+    const result = await dispatch(createAuthor({ name: fields.newAuthorName }));
 
     if (createAuthor.fulfilled.match(result)) {
-      setNewAuthorName('');
+      setFields((prev) => ({ ...prev, newAuthorName: '' }));
       setErrors((prev) => ({ ...prev, newAuthorName: null }));
     } else {
       setErrors((prev) => ({
@@ -90,7 +104,7 @@ const useCourseForm = () => {
   };
 
   const handleCreateCourse = async () => {
-    const validationErrors = validateCourseFields({ title, description, duration });
+    const validationErrors = validateCourseFields(fields);
 
     if (Object.keys(validationErrors).length) {
       setErrors(validationErrors);
@@ -98,9 +112,9 @@ const useCourseForm = () => {
     }
 
     const newCourse = {
-      title,
-      description,
-      duration: Number(duration),
+      title: fields.title,
+      description: fields.description,
+      duration: Number(fields.duration),
       authors: courseAuthors,
     };
 
@@ -117,7 +131,7 @@ const useCourseForm = () => {
   };
 
   const handleUpdateCourse = async () => {
-    const validationErrors = validateCourseFields({ title, description, duration });
+    const validationErrors = validateCourseFields(fields);
 
     if (Object.keys(validationErrors).length) {
       setErrors(validationErrors);
@@ -126,9 +140,9 @@ const useCourseForm = () => {
 
     const updatedCourse = {
       id: courseId,
-      title,
-      description,
-      duration: Number(duration),
+      title: fields.title,
+      description: fields.description,
+      duration: Number(fields.duration),
       authors: courseAuthors,
     };
 
@@ -156,32 +170,17 @@ const useCourseForm = () => {
     : 'Create Course';
 
   return {
-    fields: {
-      title,
-      description,
-      duration,
-      newAuthorName,
-    },
-    setters: {
-      setTitle,
-      setDescription,
-      setDuration,
-      setNewAuthorName,
-    },
-    state: {
-      errors,
-      isSaving,
-      isEditMode,
-      courseAuthors,
-      availableAuthors,
-      submitLabel,
-    },
-    handlers: {
-      handleSubmit,
-      handleCreateAuthor,
-      handleAddAuthorToCourse,
-      handleRemoveAuthorFromCourse,
-    },
+    register,
+    errors,
+    isSaving,
+    isEditMode,
+    courseAuthors,
+    availableAuthors,
+    submitLabel,
+    handleSubmit,
+    handleCreateAuthor,
+    handleAddAuthorToCourse,
+    handleRemoveAuthorFromCourse,
   };
 };
 
