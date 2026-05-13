@@ -105,7 +105,7 @@ const useCourseForm = () => {
     }
   };
 
-  const handleCreateCourse = async () => {
+  const handleSubmit = async () => {
     const validationErrors = validateCourseFields(fields);
 
     if (Object.keys(validationErrors).length) {
@@ -113,49 +113,25 @@ const useCourseForm = () => {
       return;
     }
 
-    const newCourse = {
+    const courseData = {
+      ...(isEditMode && { id: courseId }),
       title: fields.title,
       description: fields.description,
       duration: Number(fields.duration),
       authors: courseAuthors,
     };
 
-    const result = await dispatch(createCourse(newCourse));
+    const action = isEditMode ? updateCourse : createCourse;
+    const result = await dispatch(action(courseData));
 
-    if (createCourse.fulfilled.match(result)) {
+    if (action.fulfilled.match(result)) {
       navigate('/courses');
     } else {
       setErrors((prev) => ({
         ...prev,
-        server: result.payload || 'Failed to create course. Please try again.',
-      }));
-    }
-  };
-
-  const handleUpdateCourse = async () => {
-    const validationErrors = validateCourseFields(fields);
-
-    if (Object.keys(validationErrors).length) {
-      setErrors(validationErrors);
-      return;
-    }
-
-    const updatedCourse = {
-      id: courseId,
-      title: fields.title,
-      description: fields.description,
-      duration: Number(fields.duration),
-      authors: courseAuthors,
-    };
-
-    const result = await dispatch(updateCourse(updatedCourse));
-
-    if (updateCourse.fulfilled.match(result)) {
-      navigate('/courses');
-    } else {
-      setErrors((prev) => ({
-        ...prev,
-        server: result.payload || 'Failed to update course. Please try again.',
+        server:
+          result.payload ||
+          `Failed to ${isEditMode ? 'update' : 'create'} course. Please try again.`,
       }));
     }
   };
@@ -164,7 +140,6 @@ const useCourseForm = () => {
     (author) => !courseAuthors.includes(author.id)
   );
 
-  const handleSubmit = isEditMode ? handleUpdateCourse : handleCreateCourse;
   const submitLabel = isSaving
     ? 'Saving...'
     : isEditMode
