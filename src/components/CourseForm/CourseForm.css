@@ -1,0 +1,61 @@
+.CreateCourse {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.CreateCourse label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.CreateCourse input,
+.CreateCourse textarea {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.CreateCourse input:focus,
+.CreateCourse textarea:focus {
+  border-color: #555;
+}
+
+.CreateCourse textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.CreateCourse input[type='number'] {
+  width: 120px;
+}
+
+.CreateCourse .error-message {
+  font-size: 12px;
+  color: #c0392b;
+  min-height: 18px;
+  margin: 0;
+}
+
+.CreateCourse .authors-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.CreateCourse .authors-section__title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  margin: 0;
+}
