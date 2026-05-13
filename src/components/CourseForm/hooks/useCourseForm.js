@@ -140,6 +140,10 @@ const useCourseForm = () => {
     (author) => !courseAuthors.includes(author.id)
   );
 
+  const courseAuthorObjects = courseAuthors
+    .map((id) => authors.find((a) => a.id === id))
+    .filter(Boolean);
+
   const submitLabel = isSaving
     ? 'Saving...'
     : isEditMode
@@ -151,7 +155,7 @@ const useCourseForm = () => {
     errors,
     isSaving,
     isEditMode,
-    courseAuthors,
+    courseAuthorObjects,
     availableAuthors,
     submitLabel,
     handleSubmit,
