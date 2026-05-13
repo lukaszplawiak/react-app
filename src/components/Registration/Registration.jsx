@@ -4,11 +4,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import Button from '../../common/Button/Button';
 import Input from '../../common/Input/Input';
 import { registerUser } from '../../store/user/thunk';
+import { selectUserStatus } from '../../store/user/selectors';
 
 function Registration() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const status = useSelector((state) => state.user.status);
+
+  const status = useSelector(selectUserStatus);
   const isLoading = status === 'loading';
 
   const [userData, setUserData] = useState({
@@ -47,8 +49,7 @@ function Registration() {
     } else {
       setErrors({
         server:
-          resultAction.payload ||
-          'Registration failed. Please try again.',
+          resultAction.payload || 'Registration failed. Please try again.',
       });
     }
   };
