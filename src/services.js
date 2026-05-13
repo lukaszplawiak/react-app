@@ -9,6 +9,19 @@ const apiClient = axios.create({
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
+    const status = error.response?.status;
+
+    if (status === 401) {
+      window.location.href = '/login';
+    }
+
+    if (process.env.NODE_ENV !== 'test') {
+      console.error(
+        `[API Error] ${error.config?.method?.toUpperCase()} ${error.config?.url} — ${status ?? 'network error'}`,
+        error.message
+      );
+    }
+
     return Promise.reject(error);
   }
 );
