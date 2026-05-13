@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import { INPUT_PLACEHOLDER } from '../../../../constants/ui';
 import './SearchBar.css';
 
@@ -25,6 +26,10 @@ const SearchBar = ({ onSearch }) => {
       />
     </form>
   );
+};
+
+SearchBar.propTypes = {
+  onSearch: PropTypes.func.isRequired,
 };
 
 export default SearchBar;
