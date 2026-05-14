@@ -30,6 +30,7 @@ function Courses() {
   const hasFailed = coursesStatus === 'failed';
 
   const [query, setQuery] = useState('');
+  const [deleteError, setDeleteError] = useState(null);
 
   const filteredCourses = useMemo(
     () =>
@@ -47,8 +48,14 @@ function Courses() {
     navigate(`/courses/${course.id}`);
   };
 
-  const handleDelete = (courseId) => {
-    dispatch(deleteCourse(courseId));
+  const handleDelete = async (courseId) => {
+    setDeleteError(null);
+    const result = await dispatch(deleteCourse(courseId));
+    if (deleteCourse.rejected.match(result)) {
+      setDeleteError(
+        result.payload || 'Failed to delete course. Please try again.'
+      );
+    }
   };
 
   const handleUpdate = (courseId) => {
@@ -78,6 +85,12 @@ function Courses() {
   return (
     <div className="Courses">
       <SearchBar value={query} onSearch={setQuery} />
+      {deleteError && (
+        <ErrorMessage
+          message={deleteError}
+          onRetry={() => setDeleteError(null)}
+        />
+      )}
       {filteredCourses.length > 0 ? (
         filteredCourses.map((course) => (
           <CourseCard
