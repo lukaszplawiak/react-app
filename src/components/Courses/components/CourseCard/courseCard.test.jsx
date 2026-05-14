@@ -3,12 +3,12 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { MemoryRouter as Router } from 'react-router-dom';
 import { configureStore } from '@reduxjs/toolkit';
-import userReducer from '../../../../../store/user/reducer';
-import coursesReducer from '../../../../../store/courses/reducer';
-import authorsReducer from '../../../../../store/authors/reducer';
-import CourseCard from '../CourseCard';
+import userReducer from '../../../../store/user/reducer';
+import coursesReducer from '../../../../store/courses/reducer';
+import authorsReducer from '../../../../store/authors/reducer';
+import CourseCard from './CourseCard';
 
-vi.mock('../../../../../services');
+vi.mock('../../../../services');
 
 const initialState = {
   user: {

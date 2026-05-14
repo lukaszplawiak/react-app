@@ -3,17 +3,17 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { MemoryRouter as Router } from 'react-router-dom';
-import userReducer from '../../../store/user/reducer';
-import coursesReducer from '../../../store/courses/reducer';
-import authorsReducer from '../../../store/authors/reducer';
-import Courses from '../Courses';
+import userReducer from '../../store/user/reducer';
+import coursesReducer from '../../store/courses/reducer';
+import authorsReducer from '../../store/authors/reducer';
+import Courses from './Courses';
 import {
   getCoursesService,
   getAuthorsService,
   getUserService,
-} from '../../../services';
+} from '../../services';
 
-vi.mock('../../../services');
+vi.mock('../../services');
 
 const initialState = {
   user: {
@@ -95,7 +95,6 @@ describe('Courses Component', () => {
 
   it('should display a CourseCard for each course in the store', () => {
     renderCourses();
-
     expect(screen.getByText('Course 1')).toBeInTheDocument();
     expect(screen.getByText('Course 2')).toBeInTheDocument();
   });
@@ -105,18 +104,14 @@ describe('Courses Component', () => {
       ...initialState,
       courses: { ...initialState.courses, status: 'loading' },
     };
-
     renderCourses(loadingState);
-
     expect(screen.getByText('Loading courses...')).toBeInTheDocument();
   });
 
   it('should navigate to /courses/add after clicking "Add new course"', async () => {
     renderCourses();
-
     const addButton = screen.getByText(/ADD NEW COURSE/i);
     fireEvent.click(addButton);
-
     await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith('/courses/add');
     });
@@ -127,9 +122,7 @@ describe('Courses Component', () => {
       ...initialState,
       user: { ...initialState.user, role: 'user' },
     };
-
     renderCourses(userState);
-
     expect(screen.queryByText(/ADD NEW COURSE/i)).not.toBeInTheDocument();
   });
 });

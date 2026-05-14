@@ -3,13 +3,13 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { MemoryRouter as Router } from 'react-router-dom';
-import userReducer from '../../../store/user/reducer';
-import coursesReducer from '../../../store/courses/reducer';
-import authorsReducer from '../../../store/authors/reducer';
-import Header from '../Header';
-import { logoutUserService } from '../../../services';
+import userReducer from '../../store/user/reducer';
+import coursesReducer from '../../store/courses/reducer';
+import authorsReducer from '../../store/authors/reducer';
+import Header from './Header';
+import { logoutUserService } from '../../services';
 
-vi.mock('../../../services');
+vi.mock('../../services');
 
 const initialState = {
   user: {
@@ -86,17 +86,13 @@ describe('Header Component', () => {
       ...initialState,
       user: { ...initialState.user, isAuth: false, name: null },
     };
-
     renderHeader(guestState);
-
     expect(screen.getByText('LOGIN')).toBeInTheDocument();
   });
 
   it('should call logoutUserService and navigate to /login on logout', async () => {
     renderHeader();
-
     fireEvent.click(screen.getByText('Logout'));
-
     await waitFor(() => {
       expect(logoutUserService).toHaveBeenCalledTimes(1);
       expect(mockNavigate).toHaveBeenCalledWith('/login');
