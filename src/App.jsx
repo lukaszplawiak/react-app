@@ -53,24 +53,32 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route
             path="/courses"
-            element={isAuth ? <Courses /> : <Navigate to="/login" />}
+            element={
+              <PrivateRoute>
+                <Courses />
+              </PrivateRoute>
+            }
           />
           <Route
             path="/courses/add"
             element={
-              <PrivateRoute>
+              <PrivateRoute requireAdmin>
                 <CourseForm />
               </PrivateRoute>
             }
           />
           <Route
             path="/courses/:courseId"
-            element={isAuth ? <CourseInfo /> : <Navigate to="/login" />}
+            element={
+              <PrivateRoute>
+                <CourseInfo />
+              </PrivateRoute>
+            }
           />
           <Route
             path="/courses/update/:courseId"
             element={
-              <PrivateRoute>
+              <PrivateRoute requireAdmin>
                 <CourseForm />
               </PrivateRoute>
             }
