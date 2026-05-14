@@ -3,10 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { createCourse, updateCourse } from '../../../store/courses/thunk';
 import { createAuthor } from '../../../store/authors/thunk';
-import {
-  selectCourses,
-  selectCoursesStatus,
-} from '../../../store/courses/selectors';
+import { selectCourses } from '../../../store/courses/selectors';
 import { selectAuthors } from '../../../store/authors/selectors';
 import {
   MIN_AUTHOR_NAME_LENGTH,
@@ -41,17 +38,16 @@ const useCourseForm = () => {
   });
   const [courseAuthors, setCourseAuthors] = useState([]);
   const [errors, setErrors] = useState({});
+  const [isSaving, setIsSaving] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const authors = useSelector(selectAuthors);
   const courses = useSelector(selectCourses);
-  const coursesStatus = useSelector(selectCoursesStatus);
 
   const { courseId } = useParams();
   const isEditMode = Boolean(courseId);
-  const isSaving = coursesStatus === 'loading';
 
   useEffect(() => {
     if (!courseId) return;
@@ -122,7 +118,10 @@ const useCourseForm = () => {
     };
 
     const action = isEditMode ? updateCourse : createCourse;
+
+    setIsSaving(true);
     const result = await dispatch(action(courseData));
+    setIsSaving(false);
 
     if (action.fulfilled.match(result)) {
       navigate('/courses');
