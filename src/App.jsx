@@ -24,9 +24,13 @@ function App() {
 
   useEffect(() => {
     dispatch(fetchUser());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (!isAuth) return;
     dispatch(fetchCourses());
     dispatch(fetchAuthors());
-  }, [dispatch]);
+  }, [dispatch, isAuth]);
 
   if (isBootstrapping) {
     return (
