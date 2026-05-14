@@ -2,6 +2,7 @@ import { act, renderHook } from '@testing-library/react';
 import { configureStore } from '@reduxjs/toolkit';
 import { Provider } from 'react-redux';
 import React from 'react';
+import * as reactRouterDom from 'react-router-dom';
 import coursesReducer from '../../../store/courses/reducer';
 import authorsReducer from '../../../store/authors/reducer';
 import userReducer from '../../../store/user/reducer';
@@ -14,16 +15,16 @@ import {
 
 vi.mock('../../../services');
 
-const mockNavigate = vi.fn();
-
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return {
     ...actual,
-    useNavigate: () => mockNavigate,
-    useParams: () => ({ courseId: undefined }),
+    useNavigate: vi.fn(),
+    useParams: vi.fn(),
   };
 });
+
+const mockNavigate = vi.fn();
 
 const existingAuthor = { id: 'a1', name: 'Ada Lovelace' };
 const existingCourse = {
@@ -57,21 +58,21 @@ const buildWrapper =
 describe('useCourseForm', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(reactRouterDom.useNavigate).mockReturnValue(mockNavigate);
+    vi.mocked(reactRouterDom.useParams).mockReturnValue({ courseId: undefined });
   });
 
   describe('initial state — create mode', () => {
-    it('returns empty fields', () => {
+    it('initializes all fields as empty strings', () => {
       const store = buildStore();
       const { result } = renderHook(() => useCourseForm(), {
         wrapper: buildWrapper(store),
       });
 
-      expect(result.current.fields).toEqual({
-        title: '',
-        description: '',
-        duration: '',
-        newAuthorName: '',
-      });
+      expect(result.current.register('title').value).toBe('');
+      expect(result.current.register('description').value).toBe('');
+      expect(result.current.register('duration').value).toBe('');
+      expect(result.current.register('newAuthorName').value).toBe('');
     });
 
     it('isEditMode is false when no courseId in params', () => {
@@ -103,18 +104,9 @@ describe('useCourseForm', () => {
   });
 
   describe('edit mode — loads course data from store', () => {
-    beforeEach(() => {
-      vi.mock('react-router-dom', async () => {
-        const actual = await vi.importActual('react-router-dom');
-        return {
-          ...actual,
-          useNavigate: () => mockNavigate,
-          useParams: () => ({ courseId: 'c1' }),
-        };
-      });
-    });
-
     it('populates fields from store when courseId matches', async () => {
+      vi.mocked(reactRouterDom.useParams).mockReturnValue({ courseId: 'c1' });
+
       const store = buildStore({
         courses: {
           courses: [existingCourse],
@@ -129,9 +121,31 @@ describe('useCourseForm', () => {
 
       await act(async () => {});
 
-      expect(result.current.fields.title).toBe('Existing Course');
-      expect(result.current.fields.description).toBe('Existing description');
-      expect(result.current.fields.duration).toBe(90);
+      expect(result.current.register('title').value).toBe('Existing Course');
+      expect(result.current.register('description').value).toBe('Existing description');
+      expect(result.current.register('duration').value).toBe(90);
+    });
+
+    it('isEditMode is true when courseId is present', () => {
+      vi.mocked(reactRouterDom.useParams).mockReturnValue({ courseId: 'c1' });
+
+      const store = buildStore();
+      const { result } = renderHook(() => useCourseForm(), {
+        wrapper: buildWrapper(store),
+      });
+
+      expect(result.current.isEditMode).toBe(true);
+    });
+
+    it('submitLabel is "Update Course" in edit mode', () => {
+      vi.mocked(reactRouterDom.useParams).mockReturnValue({ courseId: 'c1' });
+
+      const store = buildStore();
+      const { result } = renderHook(() => useCourseForm(), {
+        wrapper: buildWrapper(store),
+      });
+
+      expect(result.current.submitLabel).toBe('Update Course');
     });
   });
 
