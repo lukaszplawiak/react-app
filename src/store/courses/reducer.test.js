@@ -1,5 +1,5 @@
-import coursesReducer from '../reducer';
-import { createCourse, fetchCourses, deleteCourse } from '../thunk';
+import coursesReducer from './reducer';
+import { createCourse, fetchCourses, deleteCourse } from './thunk';
 
 const initialState = {
   courses: [],

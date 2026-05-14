@@ -1,14 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit';
-import coursesReducer from '../reducer';
-import { fetchCourses, createCourse, deleteCourse, updateCourse } from '../thunk';
+import coursesReducer from './reducer';
+import { fetchCourses, createCourse, deleteCourse, updateCourse } from './thunk';
 import {
   getCoursesService,
   createCourseService,
   deleteCourseService,
   updateCourseService,
-} from '../../../services';
+} from '../../services';
 
-vi.mock('../../../services');
+vi.mock('../../services');
 
 const buildStore = (preloadedState) =>
   configureStore({
