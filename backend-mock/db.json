@@ -15,71 +15,37 @@
       "password": "user123",
       "role": "user",
       "token": "user-token-456"
-    },
-    {
-      "id": "1771165327669",
-      "name": "Luk",
-      "email": "luk@gmail.com",
-      "password": "luk",
-      "role": "user",
-      "token": "token-1771165327669"
     }
   ],
   "courses": [
     {
-      "id": "2",
+      "id": "1",
       "title": "Advanced JavaScript",
       "description": "Deep dive into ES6+, async programming, and modern JavaScript patterns.",
       "duration": 240,
-      "authors": [
-        "1"
-      ],
+      "authors": ["1"],
       "creationDate": "2024-02-01T10:00:00Z"
     },
     {
-      "id": "3",
+      "id": "2",
       "title": "Redux Toolkit Masterclass",
       "description": "Master state management with Redux Toolkit, slices, and thunks.",
       "duration": 150,
-      "authors": [
-        "2",
-        "3"
-      ],
+      "authors": ["2", "3"],
       "creationDate": "2024-01-20T10:00:00Z"
-    }
-  ],
-  "authors": [
-    {
-      "id": "1",
-      "name": "John Doe"
-    },
-    {
-      "id": "2",
-      "name": "Jane Smith"
     },
     {
       "id": "3",
-      "name": "Bob Johnson"
-    },
-    {
-      "name": "Jan Kow",
-      "id": "1770992431261"
-    },
-    {
-      "name": "New One",
-      "id": "1771021481126"
-    },
-    {
-      "name": "qw q ",
-      "id": "1771022409671"
-    },
-    {
-      "name": "123",
-      "id": "1771076299836"
-    },
-    {
-      "name": "sdcsdc",
-      "id": "1771195874406"
+      "title": "React Testing Library",
+      "description": "Write meaningful tests for React applications using RTL and Vitest.",
+      "duration": 120,
+      "authors": ["1", "3"],
+      "creationDate": "2024-03-10T10:00:00Z"
     }
+  ],
+  "authors": [
+    { "id": "1", "name": "John Doe" },
+    { "id": "2", "name": "Jane Smith" },
+    { "id": "3", "name": "Bob Johnson" }
   ]
 }

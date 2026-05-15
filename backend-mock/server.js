@@ -5,8 +5,6 @@ const server = jsonServer.create();
 const router = jsonServer.router('db.json');
 const middlewares = jsonServer.defaults();
 
-// SERVER CONFIGURATION
-
 server.use(middlewares);
 server.use(jsonServer.bodyParser);
 server.use(cookieParser());
@@ -14,8 +12,8 @@ server.use(cookieParser());
 const COOKIE_OPTIONS = {
   httpOnly: true,
   sameSite: 'lax',
-  maxAge: 24 * 60 * 60 * 1000, // 24 godziny
-  // secure: true — when HTTPS
+  maxAge: 24 * 60 * 60 * 1000,
+  secure: process.env.NODE_ENV === 'production',
 };
 
 const AUTH_COOKIE_NAME = 'authToken';
@@ -25,6 +23,13 @@ const AUTH_COOKIE_NAME = 'authToken';
 server.post('/login', (req, res) => {
   const { email, password } = req.body;
   const db = router.db;
+
+  /*
+   * MOCK ONLY — passwords stored and compared in plaintext.
+   * Production implementation:
+   *   const user = db.get('users').find({ email }).value();
+   *   const valid = await bcrypt.compare(password, user.passwordHash);
+   */
   const user = db.get('users').find({ email, password }).value();
 
   if (user) {
@@ -51,6 +56,17 @@ server.post('/register', (req, res) => {
   const { name, email, password } = req.body;
   const db = router.db;
 
+  /*
+   * MOCK ONLY — password stored in plaintext.
+   * Production implementation:
+   *   const passwordHash = await bcrypt.hash(password, 12);
+   *   store passwordHash instead of password
+   *
+   * MOCK ONLY — token is a predictable timestamp string.
+   * Production implementation:
+   *   const token = crypto.randomBytes(32).toString('hex');
+   *   or: jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '24h' })
+   */
   const newUser = {
     id: String(Date.now()),
     name,
@@ -74,7 +90,6 @@ server.post('/register', (req, res) => {
 
 server.get('/users/me', (req, res) => {
   const db = router.db;
-
   const token = req.cookies[AUTH_COOKIE_NAME];
 
   if (!token) {
@@ -174,9 +189,7 @@ server.use(router);
 
 const PORT = process.env.BACKEND_PORT || 4000;
 server.listen(PORT, () => {
-  console.log(`🚀 Mock API Server running on http://localhost:${PORT}`);
-  console.log(`📚 Courses: http://localhost:${PORT}/courses/all`);
-  console.log(`👥 Authors: http://localhost:${PORT}/authors/all`);
+  console.log(`Mock API Server running on http://localhost:${PORT}`);
   console.log('\nTest credentials:');
   console.log('Admin: admin@test.com / admin123');
   console.log('User:  user@test.com / user123');
