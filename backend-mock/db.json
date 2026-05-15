@@ -6,7 +6,7 @@
       "email": "admin@test.com",
       "password": "admin123",
       "role": "admin",
-      "token": "admin-token-123"
+      "token": "a3f8c2e1d4b7f6a9c2e5d8b1f4a7c0e3d6b9f2a5c8e1d4b7f0a3c6e9d2b5f8a1"
     },
     {
       "id": "2",
@@ -14,7 +14,7 @@
       "email": "user@test.com",
       "password": "user123",
       "role": "user",
-      "token": "user-token-456"
+      "token": "b4e9d3f2a1c8e7d0b3f6a9c2e5d8b1f4a7c0e3d6b9f2a5c8e1d4b7f0a3c6e9d2"
     }
   ],
   "courses": [

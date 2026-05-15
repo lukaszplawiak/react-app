@@ -1,5 +1,6 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
+const crypto = require('crypto');
 const jsonServer = require('json-server');
 const path = require('path');
 
@@ -18,8 +19,6 @@ const COOKIE_OPTIONS = {
   maxAge: 24 * 60 * 60 * 1000,
   secure: process.env.NODE_ENV === 'production',
 };
-
-// --- Auth middleware ---
 
 const requireAuth = (req, res, next) => {
   const token = req.cookies[AUTH_COOKIE_NAME];
@@ -51,8 +50,6 @@ const requireAdmin = (req, res, next) => {
   next();
 };
 
-// --- User endpoints ---
-
 app.post('/api/login', (req, res) => {
   const { email, password } = req.body;
 
@@ -66,7 +63,6 @@ app.post('/api/login', (req, res) => {
 
   if (user) {
     res.cookie(AUTH_COOKIE_NAME, user.token, COOKIE_OPTIONS);
-
     res.json({
       successful: true,
       result: user.token,
@@ -88,10 +84,10 @@ app.post('/api/register', (req, res) => {
   const { name, email, password } = req.body;
 
   /*
-   * MOCK ONLY — password stored in plaintext, token is predictable.
+   * MOCK ONLY — password stored in plaintext.
    * Production implementation:
    *   const passwordHash = await bcrypt.hash(password, 12);
-   *   const token = crypto.randomBytes(32).toString('hex');
+   *   store passwordHash instead of password
    */
   const newUser = {
     id: String(Date.now()),
@@ -99,7 +95,7 @@ app.post('/api/register', (req, res) => {
     email,
     password,
     role: 'user',
-    token: `token-${Date.now()}`,
+    token: crypto.randomBytes(32).toString('hex'),
   };
 
   db.get('users').push(newUser).write();
@@ -130,8 +126,6 @@ app.delete('/api/logout', (req, res) => {
   res.json({ successful: true });
 });
 
-// --- Courses endpoints ---
-
 app.get('/api/courses/all', (req, res) => {
   const courses = db.get('courses').value();
   res.json({ successful: true, result: courses });
@@ -161,8 +155,6 @@ app.put('/api/courses/:id', requireAuth, requireAdmin, (req, res) => {
   res.json({ successful: true, result: course });
 });
 
-// --- Authors endpoints ---
-
 app.get('/api/authors/all', (req, res) => {
   const authors = db.get('authors').value();
   res.json({ successful: true, result: authors });
@@ -177,15 +169,11 @@ app.post('/api/authors/add', requireAuth, requireAdmin, (req, res) => {
   res.json({ successful: true, result: newAuthor });
 });
 
-// --- Static files and React Router fallback ---
-
 app.use(express.static(path.join(__dirname, 'build')));
 
 app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'build/index.html'));
 });
-
-// --- Start server ---
 
 const PORT = process.env.PORT || 3000;
 

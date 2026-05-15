@@ -1,5 +1,6 @@
 const jsonServer = require('json-server');
 const cookieParser = require('cookie-parser');
+const crypto = require('crypto');
 
 const server = jsonServer.create();
 const router = jsonServer.router('db.json');
@@ -17,8 +18,6 @@ const COOKIE_OPTIONS = {
 };
 
 const AUTH_COOKIE_NAME = 'authToken';
-
-// CUSTOM ENDPOINTS (Mock Authentication)
 
 server.post('/login', (req, res) => {
   const { email, password } = req.body;
@@ -61,11 +60,6 @@ server.post('/register', (req, res) => {
    * Production implementation:
    *   const passwordHash = await bcrypt.hash(password, 12);
    *   store passwordHash instead of password
-   *
-   * MOCK ONLY — token is a predictable timestamp string.
-   * Production implementation:
-   *   const token = crypto.randomBytes(32).toString('hex');
-   *   or: jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '24h' })
    */
   const newUser = {
     id: String(Date.now()),
@@ -73,7 +67,7 @@ server.post('/register', (req, res) => {
     email,
     password,
     role: 'user',
-    token: `token-${Date.now()}`,
+    token: crypto.randomBytes(32).toString('hex'),
   };
 
   db.get('users').push(newUser).write();
@@ -118,14 +112,9 @@ server.delete('/logout', (req, res) => {
   res.json({ successful: true });
 });
 
-// COURSES ENDPOINTS
-
 server.get('/courses/all', (req, res) => {
   const courses = router.db.get('courses').value();
-  res.json({
-    successful: true,
-    result: courses,
-  });
+  res.json({ successful: true, result: courses });
 });
 
 server.post('/courses/add', (req, res) => {
@@ -134,13 +123,8 @@ server.post('/courses/add', (req, res) => {
     id: String(Date.now()),
     creationDate: new Date().toISOString(),
   };
-
   router.db.get('courses').push(newCourse).write();
-
-  res.json({
-    successful: true,
-    result: newCourse,
-  });
+  res.json({ successful: true, result: newCourse });
 });
 
 server.delete('/courses/:id', (req, res) => {
@@ -154,21 +138,12 @@ server.put('/courses/:id', (req, res) => {
     .find({ id: req.params.id })
     .assign(req.body)
     .write();
-
-  res.json({
-    successful: true,
-    result: course,
-  });
+  res.json({ successful: true, result: course });
 });
-
-// AUTHORS ENDPOINTS
 
 server.get('/authors/all', (req, res) => {
   const authors = router.db.get('authors').value();
-  res.json({
-    successful: true,
-    result: authors,
-  });
+  res.json({ successful: true, result: authors });
 });
 
 server.post('/authors/add', (req, res) => {
@@ -176,13 +151,8 @@ server.post('/authors/add', (req, res) => {
     ...req.body,
     id: String(Date.now()),
   };
-
   router.db.get('authors').push(newAuthor).write();
-
-  res.json({
-    successful: true,
-    result: newAuthor,
-  });
+  res.json({ successful: true, result: newAuthor });
 });
 
 server.use(router);
