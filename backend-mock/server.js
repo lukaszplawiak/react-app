@@ -60,6 +60,11 @@ server.post('/register', (req, res) => {
    * Production implementation:
    *   const passwordHash = await bcrypt.hash(password, 12);
    *   store passwordHash instead of password
+   *
+   * MOCK ONLY — token is a predictable timestamp string.
+   * Production implementation:
+   *   const token = crypto.randomBytes(32).toString('hex');
+   *   or: jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '24h' })
    */
   const newUser = {
     id: String(Date.now()),

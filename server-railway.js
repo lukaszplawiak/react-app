@@ -84,10 +84,10 @@ app.post('/api/register', (req, res) => {
   const { name, email, password } = req.body;
 
   /*
-   * MOCK ONLY — password stored in plaintext.
+   * MOCK ONLY — password stored in plaintext, token is predictable.
    * Production implementation:
    *   const passwordHash = await bcrypt.hash(password, 12);
-   *   store passwordHash instead of password
+   *   const token = crypto.randomBytes(32).toString('hex');
    */
   const newUser = {
     id: String(Date.now()),
