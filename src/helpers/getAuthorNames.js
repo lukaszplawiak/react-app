@@ -1,4 +1,4 @@
-import { MAX_AUTHORS_DISPLAY_LENGTH } from '../constants/validation';
+import { MAX_AUTHORS_DISPLAY_LENGTH } from '../constants';
 
 const getAuthorNames = (authorIds, authors, { truncate = false } = {}) => {
   if (!authorIds?.length || !authors?.length) return '';

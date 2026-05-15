@@ -9,7 +9,7 @@ import {
   MIN_AUTHOR_NAME_LENGTH,
   MIN_COURSE_TITLE_LENGTH,
   MIN_COURSE_DESCRIPTION_LENGTH,
-} from '../../../constants/validation';
+} from '../../../constants';
 
 const validateCourseFields = ({ title, description, duration }) => {
   const errors = {};
