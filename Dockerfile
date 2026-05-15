@@ -22,12 +22,13 @@ RUN npm ci --only=production --silent
 
 WORKDIR /app
 RUN npm init -y
-RUN npm install express json-server --save
+RUN npm install express json-server cookie-parser --save
 
-COPY backend-mock/db.json ./db.json
+COPY backend-mock/db.seed.json ./db.seed.json
+COPY backend-mock/scripts/init-db.js ./init-db.js
 COPY server-railway.js ./server.js
 COPY --from=builder /app/build ./build
 
 EXPOSE 3000
 
-CMD ["node", "server.js"]
+CMD ["sh", "-c", "node init-db.js && node server.js"]
