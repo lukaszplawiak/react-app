@@ -45,6 +45,57 @@ const authRateLimiter = rateLimit({
   },
 });
 
+// --- Auth middleware ---
+
+/**
+ * Verifies that the request carries a valid session cookie.
+ * Logs unauthorized access attempts for security monitoring.
+ */
+const requireAuth = (req, res, next) => {
+  const db = router.db;
+  const token = req.cookies[AUTH_COOKIE_NAME];
+
+  if (!token) {
+    console.warn(
+      `[AUTH] No token — ${req.method} ${req.url} — IP: ${req.ip}`
+    );
+    return res
+      .status(401)
+      .json({ successful: false, errors: ['No session cookie provided'] });
+  }
+
+  const user = db.get('users').find({ token }).value();
+
+  if (!user) {
+    console.warn(
+      `[AUTH] Invalid token — ${req.method} ${req.url} — IP: ${req.ip}`
+    );
+    return res
+      .status(401)
+      .json({ successful: false, errors: ['Invalid or expired session'] });
+  }
+
+  req.user = user;
+  next();
+};
+
+/**
+ * Verifies that the authenticated user has the admin role.
+ * Logs privilege escalation attempts.
+ * Must be used after requireAuth.
+ */
+const requireAdmin = (req, res, next) => {
+  if (req.user?.role !== 'admin') {
+    console.warn(
+      `[AUTHZ] Forbidden — user ${req.user?.email} attempted ${req.method} ${req.url} — IP: ${req.ip}`
+    );
+    return res
+      .status(403)
+      .json({ successful: false, errors: ['Admin access required'] });
+  }
+  next();
+};
+
 // --- Auth endpoints ---
 
 server.post('/login', authRateLimiter, (req, res) => {
@@ -145,49 +196,63 @@ server.delete('/logout', (req, res) => {
 });
 
 // --- Courses endpoints ---
+// Public reads, admin-only writes
 
 server.get('/courses/all', (req, res) => {
   const courses = router.db.get('courses').value();
   res.json({ successful: true, result: courses });
 });
 
-server.post('/courses/add', (req, res) => {
+server.post('/courses/add', requireAuth, requireAdmin, (req, res) => {
   const newCourse = {
     ...req.body,
     id: String(Date.now()),
     creationDate: new Date().toISOString(),
   };
   router.db.get('courses').push(newCourse).write();
+  console.info(
+    `[COURSES] Created — "${newCourse.title}" — by ${req.user.email}`
+  );
   res.json({ successful: true, result: newCourse });
 });
 
-server.delete('/courses/:id', (req, res) => {
+server.delete('/courses/:id', requireAuth, requireAdmin, (req, res) => {
   router.db.get('courses').remove({ id: req.params.id }).write();
+  console.info(
+    `[COURSES] Deleted — id: ${req.params.id} — by ${req.user.email}`
+  );
   res.json({ successful: true });
 });
 
-server.put('/courses/:id', (req, res) => {
+server.put('/courses/:id', requireAuth, requireAdmin, (req, res) => {
   const course = router.db
     .get('courses')
     .find({ id: req.params.id })
     .assign(req.body)
     .write();
+  console.info(
+    `[COURSES] Updated — id: ${req.params.id} — by ${req.user.email}`
+  );
   res.json({ successful: true, result: course });
 });
 
 // --- Authors endpoints ---
+// Public reads, admin-only writes
 
 server.get('/authors/all', (req, res) => {
   const authors = router.db.get('authors').value();
   res.json({ successful: true, result: authors });
 });
 
-server.post('/authors/add', (req, res) => {
+server.post('/authors/add', requireAuth, requireAdmin, (req, res) => {
   const newAuthor = {
     ...req.body,
     id: String(Date.now()),
   };
   router.db.get('authors').push(newAuthor).write();
+  console.info(
+    `[AUTHORS] Created — "${newAuthor.name}" — by ${req.user.email}`
+  );
   res.json({ successful: true, result: newAuthor });
 });
 
