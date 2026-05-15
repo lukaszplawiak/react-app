@@ -1,6 +1,7 @@
 const jsonServer = require('json-server');
 const cookieParser = require('cookie-parser');
 const crypto = require('crypto');
+const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 
 const server = jsonServer.create();
@@ -11,6 +12,12 @@ server.use(middlewares);
 server.use(jsonServer.bodyParser);
 server.use(cookieParser());
 
+// --- Request logging ---
+
+server.use(morgan(':method :url :status :response-time ms'));
+
+// --- Config ---
+
 const COOKIE_OPTIONS = {
   httpOnly: true,
   sameSite: 'lax',
@@ -20,10 +27,12 @@ const COOKIE_OPTIONS = {
 
 const AUTH_COOKIE_NAME = 'authToken';
 
+// --- Rate limiting ---
+
 /**
- * Rate limiter for auth endpoints.
- * Production note: replace default in-memory store with Redis
- * (rate-limit-redis) for persistence across restarts and horizontal scaling.
+ * Limits auth endpoints to 10 requests per 15 minutes per IP.
+ * Production note: use Redis store (rate-limit-redis) for persistence
+ * across restarts and horizontal scaling.
  */
 const authRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -35,6 +44,8 @@ const authRateLimiter = rateLimit({
     errors: ['Too many requests — please try again in 15 minutes'],
   },
 });
+
+// --- Auth endpoints ---
 
 server.post('/login', authRateLimiter, (req, res) => {
   const { email, password } = req.body;
@@ -49,6 +60,7 @@ server.post('/login', authRateLimiter, (req, res) => {
   const user = db.get('users').find({ email, password }).value();
 
   if (user) {
+    console.info(`[AUTH] Login success — ${email} — IP: ${req.ip}`);
     res.cookie(AUTH_COOKIE_NAME, user.token, COOKIE_OPTIONS);
     res.json({
       successful: true,
@@ -60,6 +72,7 @@ server.post('/login', authRateLimiter, (req, res) => {
       },
     });
   } else {
+    console.warn(`[AUTH] Login failed — ${email} — IP: ${req.ip}`);
     res.status(401).json({
       successful: false,
       errors: ['Invalid credentials'],
@@ -87,6 +100,7 @@ server.post('/register', authRateLimiter, (req, res) => {
   };
 
   db.get('users').push(newUser).write();
+  console.info(`[AUTH] Registration success — ${email} — IP: ${req.ip}`);
 
   res.json({
     successful: true,
@@ -103,6 +117,7 @@ server.get('/users/me', (req, res) => {
   const token = req.cookies[AUTH_COOKIE_NAME];
 
   if (!token) {
+    console.warn(`[AUTH] No token — GET /users/me — IP: ${req.ip}`);
     res.status(401).json({ successful: false, errors: ['No token provided'] });
     return;
   }
@@ -119,6 +134,7 @@ server.get('/users/me', (req, res) => {
       },
     });
   } else {
+    console.warn(`[AUTH] Invalid token — GET /users/me — IP: ${req.ip}`);
     res.status(401).json({ successful: false, errors: ['Invalid token'] });
   }
 });
@@ -127,6 +143,8 @@ server.delete('/logout', (req, res) => {
   res.clearCookie(AUTH_COOKIE_NAME);
   res.json({ successful: true });
 });
+
+// --- Courses endpoints ---
 
 server.get('/courses/all', (req, res) => {
   const courses = router.db.get('courses').value();
@@ -157,6 +175,8 @@ server.put('/courses/:id', (req, res) => {
   res.json({ successful: true, result: course });
 });
 
+// --- Authors endpoints ---
+
 server.get('/authors/all', (req, res) => {
   const authors = router.db.get('authors').value();
   res.json({ successful: true, result: authors });
@@ -175,8 +195,8 @@ server.use(router);
 
 const PORT = process.env.BACKEND_PORT || 4000;
 server.listen(PORT, () => {
-  console.log(`Mock API Server running on http://localhost:${PORT}`);
-  console.log('\nTest credentials:');
-  console.log('Admin: admin@test.com / admin123');
-  console.log('User:  user@test.com / user123');
+  console.info(`[SERVER] Mock API running on http://localhost:${PORT}`);
+  console.info('[SERVER] Test credentials:');
+  console.info('[SERVER] Admin: admin@test.com / admin123');
+  console.info('[SERVER] User:  user@test.com / user123');
 });
