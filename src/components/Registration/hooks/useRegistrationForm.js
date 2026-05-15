@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { registerUser } from '../../../store/user/thunk';
 import { selectUserStatus } from '../../../store/user/selectors';
 import isValidEmail from '../../../helpers/isValidEmail';
+import { MIN_PASSWORD_LENGTH } from '../../../constants/validation';
 
 const validate = (userData) => {
   const errors = {};
@@ -16,7 +17,11 @@ const validate = (userData) => {
     errors.email = 'Please enter a valid email address';
   }
 
-  if (!userData.password) errors.password = 'Password is required';
+  if (!userData.password) {
+    errors.password = 'Password is required';
+  } else if (userData.password.length < MIN_PASSWORD_LENGTH) {
+    errors.password = `Password must be at least ${MIN_PASSWORD_LENGTH} characters`;
+  }
 
   return errors;
 };
