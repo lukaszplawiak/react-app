@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { registerUser } from '../../../store/user/thunk';
 import { selectUserStatus } from '../../../store/user/selectors';
 import isValidEmail from '../../../helpers/isValidEmail';
-import { MIN_PASSWORD_LENGTH } from '../../../constants/validation';
+import { MIN_PASSWORD_LENGTH } from '../../../constants';
 
 const validate = (userData) => {
   const errors = {};

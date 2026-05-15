@@ -14,7 +14,7 @@ import {
 } from '../../store/courses/selectors';
 import { selectAuthors, selectAuthorsStatus } from '../../store/authors/selectors';
 import { fetchCourses, deleteCourse } from '../../store/courses/thunk';
-import { ADD_NEW_COURSE_LABEL } from '../../constants/ui';
+import { ADD_NEW_COURSE_LABEL } from '../../constants';
 import './Courses.css';
 
 function Courses() {

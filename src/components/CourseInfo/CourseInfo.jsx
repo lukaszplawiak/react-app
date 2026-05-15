@@ -15,7 +15,7 @@ import { fetchCourses } from '../../store/courses/thunk';
 import {
   COURSE_INFO_LOADING_MESSAGE,
   COURSE_INFO_NOT_FOUND_MESSAGE,
-} from '../../constants/ui';
+} from '../../constants';
 import './CourseInfo.css';
 
 function CourseInfo() {
@@ -64,7 +64,8 @@ function CourseInfo() {
     );
   }
 
-  const authorNames = getAuthorNames(course.authors, authors) || 'No authors assigned';
+  const authorNames =
+    getAuthorNames(course.authors, authors) || 'No authors assigned';
 
   return (
     <div className="Course-all">

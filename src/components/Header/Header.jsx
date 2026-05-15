@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logoutUser } from '../../store/user/thunk';
 import { selectIsAuth, selectUserName } from '../../store/user/selectors';
-import { LOGIN_LABEL } from '../../constants/ui';
+import { LOGIN_LABEL } from '../../constants';
 import Logo from './components/Logo/Logo';
 import Button from '../../common/Button/Button';
 import './Header.css';

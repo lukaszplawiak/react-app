@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { INPUT_PLACEHOLDER } from '../../../../constants/ui';
+import { INPUT_PLACEHOLDER } from '../../../../constants';
 import './SearchBar.css';
 
 const SearchBar = ({ value, onSearch }) => {

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { HAS_ERROR_CLASS, ERROR_TEXT_CLASS } from '../../constants/ui';
+import { HAS_ERROR_CLASS, ERROR_TEXT_CLASS } from '../../constants';
 
 function Input({
   name,
