@@ -165,6 +165,29 @@ describe('useRegistrationForm', () => {
       expect(result.current.errors.password).toBe('Password is required');
     });
 
+    it('sets password length error when password is too short', async () => {
+      const { result } = renderHook(() => useRegistrationForm(), {
+        wrapper: buildWrapper(buildStore()),
+      });
+      act(() => {
+        result.current.handleChange({
+          target: { name: 'name', value: 'Jan Kowalski' },
+        });
+        result.current.handleChange({
+          target: { name: 'email', value: 'jan@example.com' },
+        });
+        result.current.handleChange({
+          target: { name: 'password', value: 'abc' },
+        });
+      });
+      await act(async () => {
+        await result.current.handleSubmit({ preventDefault: vi.fn() });
+      });
+      expect(result.current.errors.password).toBe(
+        'Password must be at least 6 characters'
+      );
+    });
+
     it('does not call registerUserService when validation fails', async () => {
       const { result } = renderHook(() => useRegistrationForm(), {
         wrapper: buildWrapper(buildStore()),
