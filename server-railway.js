@@ -1,6 +1,7 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const crypto = require('crypto');
+const morgan = require('morgan');
 const jsonServer = require('json-server');
 const path = require('path');
 const rateLimit = require('express-rate-limit');
@@ -11,6 +12,21 @@ const db = router.db;
 
 app.use(express.json());
 app.use(cookieParser());
+
+// --- Request logging ---
+
+/**
+ * Morgan logs every request: method, URL, status, response time.
+ * In production this output goes to Railway's log stream —
+ * visible in the Railway dashboard and exportable to log aggregators.
+ *
+ * Production note: for structured logging use 'winston' or 'pino'
+ * with JSON output format for easier parsing by log aggregators
+ * (Datadog, Papertrail, CloudWatch).
+ */
+app.use(morgan(':method :url :status :response-time ms'));
+
+// --- Config ---
 
 const AUTH_COOKIE_NAME = 'authToken';
 
@@ -25,11 +41,8 @@ const COOKIE_OPTIONS = {
 
 /**
  * Limits auth endpoints to 10 requests per 15 minutes per IP.
- * Prevents brute-force attacks on login and registration.
- *
- * Production note: use a Redis store (rate-limit-redis) instead of
- * the default in-memory store so limits persist across server restarts
- * and work correctly in multi-instance deployments.
+ * Production note: use Redis store (rate-limit-redis) for persistence
+ * across restarts and horizontal scaling.
  */
 const authRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -44,10 +57,17 @@ const authRateLimiter = rateLimit({
 
 // --- Auth middleware ---
 
+/**
+ * Verifies that the request carries a valid session cookie.
+ * Logs unauthorized access attempts for security monitoring.
+ */
 const requireAuth = (req, res, next) => {
   const token = req.cookies[AUTH_COOKIE_NAME];
 
   if (!token) {
+    console.warn(
+      `[AUTH] No token — ${req.method} ${req.url} — IP: ${req.ip}`
+    );
     return res
       .status(401)
       .json({ successful: false, errors: ['No session cookie provided'] });
@@ -56,6 +76,9 @@ const requireAuth = (req, res, next) => {
   const user = db.get('users').find({ token }).value();
 
   if (!user) {
+    console.warn(
+      `[AUTH] Invalid token — ${req.method} ${req.url} — IP: ${req.ip}`
+    );
     return res
       .status(401)
       .json({ successful: false, errors: ['Invalid or expired session'] });
@@ -65,8 +88,15 @@ const requireAuth = (req, res, next) => {
   next();
 };
 
+/**
+ * Verifies that the authenticated user has the admin role.
+ * Logs privilege escalation attempts.
+ */
 const requireAdmin = (req, res, next) => {
   if (req.user?.role !== 'admin') {
+    console.warn(
+      `[AUTHZ] Forbidden — user ${req.user?.email} attempted ${req.method} ${req.url} — IP: ${req.ip}`
+    );
     return res
       .status(403)
       .json({ successful: false, errors: ['Admin access required'] });
@@ -88,6 +118,7 @@ app.post('/api/login', authRateLimiter, (req, res) => {
   const user = db.get('users').find({ email, password }).value();
 
   if (user) {
+    console.info(`[AUTH] Login success — ${email} — IP: ${req.ip}`);
     res.cookie(AUTH_COOKIE_NAME, user.token, COOKIE_OPTIONS);
     res.json({
       successful: true,
@@ -99,6 +130,7 @@ app.post('/api/login', authRateLimiter, (req, res) => {
       },
     });
   } else {
+    console.warn(`[AUTH] Login failed — ${email} — IP: ${req.ip}`);
     res.status(401).json({
       successful: false,
       errors: ['Invalid credentials'],
@@ -125,6 +157,7 @@ app.post('/api/register', authRateLimiter, (req, res) => {
   };
 
   db.get('users').push(newUser).write();
+  console.info(`[AUTH] Registration success — ${email} — IP: ${req.ip}`);
 
   res.json({
     successful: true,
@@ -148,6 +181,9 @@ app.get('/api/users/me', requireAuth, (req, res) => {
 });
 
 app.delete('/api/logout', (req, res) => {
+  console.info(
+    `[AUTH] Logout — ${req.user?.email ?? 'unknown'} — IP: ${req.ip}`
+  );
   res.clearCookie(AUTH_COOKIE_NAME);
   res.json({ successful: true });
 });
@@ -166,11 +202,17 @@ app.post('/api/courses/add', requireAuth, requireAdmin, (req, res) => {
     creationDate: new Date().toISOString(),
   };
   db.get('courses').push(newCourse).write();
+  console.info(
+    `[COURSES] Created — "${newCourse.title}" — by ${req.user.email}`
+  );
   res.json({ successful: true, result: newCourse });
 });
 
 app.delete('/api/courses/:id', requireAuth, requireAdmin, (req, res) => {
   db.get('courses').remove({ id: req.params.id }).write();
+  console.info(
+    `[COURSES] Deleted — id: ${req.params.id} — by ${req.user.email}`
+  );
   res.json({ successful: true });
 });
 
@@ -180,6 +222,9 @@ app.put('/api/courses/:id', requireAuth, requireAdmin, (req, res) => {
     .find({ id: req.params.id })
     .assign(req.body)
     .write();
+  console.info(
+    `[COURSES] Updated — id: ${req.params.id} — by ${req.user.email}`
+  );
   res.json({ successful: true, result: course });
 });
 
@@ -196,6 +241,9 @@ app.post('/api/authors/add', requireAuth, requireAdmin, (req, res) => {
     id: String(Date.now()),
   };
   db.get('authors').push(newAuthor).write();
+  console.info(
+    `[AUTHORS] Created — "${newAuthor.name}" — by ${req.user.email}`
+  );
   res.json({ successful: true, result: newAuthor });
 });
 
@@ -212,5 +260,5 @@ app.use((req, res) => {
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.info(`[SERVER] Running on port ${PORT}`);
 });
