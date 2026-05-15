@@ -49,7 +49,6 @@ describe('useRegistrationForm', () => {
       const { result } = renderHook(() => useRegistrationForm(), {
         wrapper: buildWrapper(buildStore()),
       });
-
       expect(result.current.userData).toEqual({
         name: '',
         email: '',
@@ -61,7 +60,6 @@ describe('useRegistrationForm', () => {
       const { result } = renderHook(() => useRegistrationForm(), {
         wrapper: buildWrapper(buildStore()),
       });
-
       expect(result.current.errors).toEqual({});
     });
 
@@ -69,7 +67,6 @@ describe('useRegistrationForm', () => {
       const { result } = renderHook(() => useRegistrationForm(), {
         wrapper: buildWrapper(buildStore()),
       });
-
       expect(result.current.isLoading).toBe(false);
     });
   });
@@ -79,13 +76,11 @@ describe('useRegistrationForm', () => {
       const { result } = renderHook(() => useRegistrationForm(), {
         wrapper: buildWrapper(buildStore()),
       });
-
       act(() => {
         result.current.handleChange({
           target: { name: 'name', value: 'Jan Kowalski' },
         });
       });
-
       expect(result.current.userData.name).toBe('Jan Kowalski');
     });
 
@@ -93,7 +88,6 @@ describe('useRegistrationForm', () => {
       const { result } = renderHook(() => useRegistrationForm(), {
         wrapper: buildWrapper(buildStore()),
       });
-
       act(() => {
         result.current.handleChange({
           target: { name: 'name', value: 'Jan Kowalski' },
@@ -102,7 +96,6 @@ describe('useRegistrationForm', () => {
           target: { name: 'email', value: 'jan@example.com' },
         });
       });
-
       expect(result.current.userData.name).toBe('Jan Kowalski');
       expect(result.current.userData.email).toBe('jan@example.com');
     });
@@ -113,11 +106,9 @@ describe('useRegistrationForm', () => {
       const { result } = renderHook(() => useRegistrationForm(), {
         wrapper: buildWrapper(buildStore()),
       });
-
       await act(async () => {
         await result.current.handleSubmit({ preventDefault: vi.fn() });
       });
-
       expect(result.current.errors.name).toBe('Name is required');
     });
 
@@ -125,25 +116,41 @@ describe('useRegistrationForm', () => {
       const { result } = renderHook(() => useRegistrationForm(), {
         wrapper: buildWrapper(buildStore()),
       });
-
       act(() => {
         result.current.handleChange({
           target: { name: 'name', value: 'Jan Kowalski' },
         });
       });
-
       await act(async () => {
         await result.current.handleSubmit({ preventDefault: vi.fn() });
       });
-
       expect(result.current.errors.email).toBe('Email is required');
+    });
+
+    it('sets email format error when email is invalid', async () => {
+      const { result } = renderHook(() => useRegistrationForm(), {
+        wrapper: buildWrapper(buildStore()),
+      });
+      act(() => {
+        result.current.handleChange({
+          target: { name: 'name', value: 'Jan Kowalski' },
+        });
+        result.current.handleChange({
+          target: { name: 'email', value: 'notanemail' },
+        });
+      });
+      await act(async () => {
+        await result.current.handleSubmit({ preventDefault: vi.fn() });
+      });
+      expect(result.current.errors.email).toBe(
+        'Please enter a valid email address'
+      );
     });
 
     it('sets password error when password is empty', async () => {
       const { result } = renderHook(() => useRegistrationForm(), {
         wrapper: buildWrapper(buildStore()),
       });
-
       act(() => {
         result.current.handleChange({
           target: { name: 'name', value: 'Jan Kowalski' },
@@ -152,11 +159,9 @@ describe('useRegistrationForm', () => {
           target: { name: 'email', value: 'jan@example.com' },
         });
       });
-
       await act(async () => {
         await result.current.handleSubmit({ preventDefault: vi.fn() });
       });
-
       expect(result.current.errors.password).toBe('Password is required');
     });
 
@@ -164,11 +169,9 @@ describe('useRegistrationForm', () => {
       const { result } = renderHook(() => useRegistrationForm(), {
         wrapper: buildWrapper(buildStore()),
       });
-
       await act(async () => {
         await result.current.handleSubmit({ preventDefault: vi.fn() });
       });
-
       expect(registerUserService).not.toHaveBeenCalled();
     });
   });
@@ -192,17 +195,13 @@ describe('useRegistrationForm', () => {
       registerUserService.mockResolvedValueOnce({
         data: { successful: true, user: { name: 'Jan Kowalski' } },
       });
-
       const { result } = renderHook(() => useRegistrationForm(), {
         wrapper: buildWrapper(buildStore()),
       });
-
       fillValidForm(result);
-
       await act(async () => {
         await result.current.handleSubmit({ preventDefault: vi.fn() });
       });
-
       expect(registerUserService).toHaveBeenCalledWith({
         name: 'Jan Kowalski',
         email: 'jan@example.com',
@@ -214,17 +213,13 @@ describe('useRegistrationForm', () => {
       registerUserService.mockResolvedValueOnce({
         data: { successful: true, user: { name: 'Jan Kowalski' } },
       });
-
       const { result } = renderHook(() => useRegistrationForm(), {
         wrapper: buildWrapper(buildStore()),
       });
-
       fillValidForm(result);
-
       await act(async () => {
         await result.current.handleSubmit({ preventDefault: vi.fn() });
       });
-
       expect(mockNavigate).toHaveBeenCalledWith('/login');
     });
 
@@ -232,29 +227,25 @@ describe('useRegistrationForm', () => {
       registerUserService.mockResolvedValueOnce({
         data: { successful: true, user: { name: 'Jan Kowalski' } },
       });
-
       const { result } = renderHook(() => useRegistrationForm(), {
         wrapper: buildWrapper(buildStore()),
       });
-
       fillValidForm(result);
-
       await act(async () => {
         await result.current.handleSubmit({ preventDefault: vi.fn() });
       });
-
       expect(mockNavigate).not.toHaveBeenCalledWith('/courses');
     });
   });
 
   describe('handleSubmit — failure', () => {
     it('sets server error when registerUserService rejects', async () => {
-      registerUserService.mockRejectedValueOnce(new Error('Email already taken'));
-
+      registerUserService.mockRejectedValueOnce(
+        new Error('Email already taken')
+      );
       const { result } = renderHook(() => useRegistrationForm(), {
         wrapper: buildWrapper(buildStore()),
       });
-
       act(() => {
         result.current.handleChange({
           target: { name: 'name', value: 'Jan Kowalski' },
@@ -266,11 +257,9 @@ describe('useRegistrationForm', () => {
           target: { name: 'password', value: 'secret123' },
         });
       });
-
       await act(async () => {
         await result.current.handleSubmit({ preventDefault: vi.fn() });
       });
-
       expect(result.current.errors.server).toBeDefined();
       expect(mockNavigate).not.toHaveBeenCalled();
     });

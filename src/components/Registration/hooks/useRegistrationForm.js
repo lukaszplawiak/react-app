@@ -3,12 +3,21 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { registerUser } from '../../../store/user/thunk';
 import { selectUserStatus } from '../../../store/user/selectors';
+import isValidEmail from '../../../helpers/isValidEmail';
 
 const validate = (userData) => {
   const errors = {};
+
   if (!userData.name) errors.name = 'Name is required';
-  if (!userData.email) errors.email = 'Email is required';
+
+  if (!userData.email) {
+    errors.email = 'Email is required';
+  } else if (!isValidEmail(userData.email)) {
+    errors.email = 'Please enter a valid email address';
+  }
+
   if (!userData.password) errors.password = 'Password is required';
+
   return errors;
 };
 
