@@ -15,7 +15,16 @@ apiClient.interceptors.response.use(
       window.location.href = '/login';
     }
 
-    if (import.meta.env.MODE !== 'test') {
+    /**
+     * Log API errors in development only.
+     * In production, errors should be sent to a monitoring service
+     * (e.g. Sentry, Datadog) — not logged to the browser console
+     * where they are visible to anyone with DevTools open.
+     *
+     * Production example:
+     *   Sentry.captureException(error);
+     */
+    if (import.meta.env.MODE === 'development') {
       console.error(
         `[API Error] ${error.config?.method?.toUpperCase()} ${error.config?.url} — ${status ?? 'network error'}`,
         error.message
