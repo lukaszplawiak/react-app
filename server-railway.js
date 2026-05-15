@@ -21,11 +21,6 @@ const COOKIE_OPTIONS = {
 
 // --- Auth middleware ---
 
-/**
- * Verifies that the request carries a valid session cookie.
- * In production this would verify a signed JWT.
- * Here it looks up the token in db.json (mock only).
- */
 const requireAuth = (req, res, next) => {
   const token = req.cookies[AUTH_COOKIE_NAME];
 
@@ -47,10 +42,6 @@ const requireAuth = (req, res, next) => {
   next();
 };
 
-/**
- * Verifies that the authenticated user has the admin role.
- * Must be used after requireAuth.
- */
 const requireAdmin = (req, res, next) => {
   if (req.user?.role !== 'admin') {
     return res
@@ -64,6 +55,13 @@ const requireAdmin = (req, res, next) => {
 
 app.post('/api/login', (req, res) => {
   const { email, password } = req.body;
+
+  /*
+   * MOCK ONLY — passwords stored and compared in plaintext.
+   * Production implementation:
+   *   const user = db.get('users').find({ email }).value();
+   *   const valid = await bcrypt.compare(password, user.passwordHash);
+   */
   const user = db.get('users').find({ email, password }).value();
 
   if (user) {
@@ -89,6 +87,12 @@ app.post('/api/login', (req, res) => {
 app.post('/api/register', (req, res) => {
   const { name, email, password } = req.body;
 
+  /*
+   * MOCK ONLY — password stored in plaintext, token is predictable.
+   * Production implementation:
+   *   const passwordHash = await bcrypt.hash(password, 12);
+   *   const token = crypto.randomBytes(32).toString('hex');
+   */
   const newUser = {
     id: String(Date.now()),
     name,
@@ -127,7 +131,6 @@ app.delete('/api/logout', (req, res) => {
 });
 
 // --- Courses endpoints ---
-// Public reads, admin-only writes
 
 app.get('/api/courses/all', (req, res) => {
   const courses = db.get('courses').value();
@@ -159,7 +162,6 @@ app.put('/api/courses/:id', requireAuth, requireAdmin, (req, res) => {
 });
 
 // --- Authors endpoints ---
-// Public reads, admin-only writes
 
 app.get('/api/authors/all', (req, res) => {
   const authors = db.get('authors').value();
