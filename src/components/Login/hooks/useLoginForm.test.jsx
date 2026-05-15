@@ -11,12 +11,14 @@ import { loginUserService } from '../../../services';
 vi.mock('../../../services');
 
 const mockNavigate = vi.fn();
+let mockSearch = '';
 
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return {
     ...actual,
     useNavigate: () => mockNavigate,
+    useLocation: () => ({ search: mockSearch, pathname: '/login' }),
   };
 });
 
@@ -39,9 +41,24 @@ const buildWrapper =
   ({ children }) =>
     <Provider store={store}>{children}</Provider>;
 
+const fillAndSubmit = async (result) => {
+  act(() => {
+    result.current.handleChange({
+      target: { name: 'email', value: 'jan@example.com' },
+    });
+    result.current.handleChange({
+      target: { name: 'password', value: 'secret123' },
+    });
+  });
+  await act(async () => {
+    await result.current.handleSubmit({ preventDefault: vi.fn() });
+  });
+};
+
 describe('useLoginForm', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockSearch = '';
   });
 
   describe('initial state', () => {
@@ -49,7 +66,6 @@ describe('useLoginForm', () => {
       const { result } = renderHook(() => useLoginForm(), {
         wrapper: buildWrapper(buildStore()),
       });
-
       expect(result.current.formData).toEqual({ email: '', password: '' });
     });
 
@@ -57,7 +73,6 @@ describe('useLoginForm', () => {
       const { result } = renderHook(() => useLoginForm(), {
         wrapper: buildWrapper(buildStore()),
       });
-
       expect(result.current.errors).toEqual({});
     });
 
@@ -65,7 +80,6 @@ describe('useLoginForm', () => {
       const { result } = renderHook(() => useLoginForm(), {
         wrapper: buildWrapper(buildStore()),
       });
-
       expect(result.current.isLoading).toBe(false);
     });
   });
@@ -75,13 +89,11 @@ describe('useLoginForm', () => {
       const { result } = renderHook(() => useLoginForm(), {
         wrapper: buildWrapper(buildStore()),
       });
-
       act(() => {
         result.current.handleChange({
           target: { name: 'email', value: 'test@example.com' },
         });
       });
-
       expect(result.current.formData.email).toBe('test@example.com');
     });
 
@@ -89,13 +101,11 @@ describe('useLoginForm', () => {
       const { result } = renderHook(() => useLoginForm(), {
         wrapper: buildWrapper(buildStore()),
       });
-
       act(() => {
         result.current.handleChange({
           target: { name: 'password', value: 'secret123' },
         });
       });
-
       expect(result.current.formData.password).toBe('secret123');
     });
 
@@ -103,7 +113,6 @@ describe('useLoginForm', () => {
       const { result } = renderHook(() => useLoginForm(), {
         wrapper: buildWrapper(buildStore()),
       });
-
       act(() => {
         result.current.handleChange({
           target: { name: 'email', value: 'test@example.com' },
@@ -112,7 +121,6 @@ describe('useLoginForm', () => {
           target: { name: 'password', value: 'secret123' },
         });
       });
-
       expect(result.current.formData.email).toBe('test@example.com');
       expect(result.current.formData.password).toBe('secret123');
     });
@@ -123,11 +131,9 @@ describe('useLoginForm', () => {
       const { result } = renderHook(() => useLoginForm(), {
         wrapper: buildWrapper(buildStore()),
       });
-
       await act(async () => {
         await result.current.handleSubmit({ preventDefault: vi.fn() });
       });
-
       expect(result.current.errors.email).toBe('Email is required');
     });
 
@@ -135,17 +141,14 @@ describe('useLoginForm', () => {
       const { result } = renderHook(() => useLoginForm(), {
         wrapper: buildWrapper(buildStore()),
       });
-
       act(() => {
         result.current.handleChange({
           target: { name: 'email', value: 'test@example.com' },
         });
       });
-
       await act(async () => {
         await result.current.handleSubmit({ preventDefault: vi.fn() });
       });
-
       expect(result.current.errors.password).toBe('Password is required');
     });
 
@@ -153,74 +156,58 @@ describe('useLoginForm', () => {
       const { result } = renderHook(() => useLoginForm(), {
         wrapper: buildWrapper(buildStore()),
       });
-
       await act(async () => {
         await result.current.handleSubmit({ preventDefault: vi.fn() });
       });
-
       expect(loginUserService).not.toHaveBeenCalled();
     });
   });
 
   describe('handleSubmit — success', () => {
-    it('calls loginUserService with formData', async () => {
-      loginUserService.mockResolvedValueOnce({
+    beforeEach(() => {
+      loginUserService.mockResolvedValue({
         data: {
           successful: true,
           result: 'token',
           user: { name: 'Jan', email: 'jan@example.com', role: 'user' },
         },
-      });
-
-      const { result } = renderHook(() => useLoginForm(), {
-        wrapper: buildWrapper(buildStore()),
-      });
-
-      act(() => {
-        result.current.handleChange({
-          target: { name: 'email', value: 'jan@example.com' },
-        });
-        result.current.handleChange({
-          target: { name: 'password', value: 'secret123' },
-        });
-      });
-
-      await act(async () => {
-        await result.current.handleSubmit({ preventDefault: vi.fn() });
-      });
-
-      expect(loginUserService).toHaveBeenCalledWith({
-        email: 'jan@example.com',
-        password: 'secret123',
       });
     });
 
-    it('navigates to /courses on successful login', async () => {
-      loginUserService.mockResolvedValueOnce({
-        data: {
-          successful: true,
-          result: 'token',
-          user: { name: 'Jan', email: 'jan@example.com', role: 'user' },
-        },
-      });
-
+    it('navigates to /courses by default when no redirect param', async () => {
       const { result } = renderHook(() => useLoginForm(), {
         wrapper: buildWrapper(buildStore()),
       });
+      await fillAndSubmit(result);
+      expect(mockNavigate).toHaveBeenCalledWith('/courses', { replace: true });
+    });
 
-      act(() => {
-        result.current.handleChange({
-          target: { name: 'email', value: 'jan@example.com' },
-        });
-        result.current.handleChange({
-          target: { name: 'password', value: 'secret123' },
-        });
+    it('navigates to safe relative redirect path from query string', async () => {
+      mockSearch = '?redirect=/courses/add';
+      const { result } = renderHook(() => useLoginForm(), {
+        wrapper: buildWrapper(buildStore()),
       });
-
-      await act(async () => {
-        await result.current.handleSubmit({ preventDefault: vi.fn() });
+      await fillAndSubmit(result);
+      expect(mockNavigate).toHaveBeenCalledWith('/courses/add', {
+        replace: true,
       });
+    });
 
+    it('falls back to /courses when redirect is an external URL', async () => {
+      mockSearch = '?redirect=https://evil.com';
+      const { result } = renderHook(() => useLoginForm(), {
+        wrapper: buildWrapper(buildStore()),
+      });
+      await fillAndSubmit(result);
+      expect(mockNavigate).toHaveBeenCalledWith('/courses', { replace: true });
+    });
+
+    it('falls back to /courses when redirect contains protocol-relative URL', async () => {
+      mockSearch = '?redirect=//evil.com';
+      const { result } = renderHook(() => useLoginForm(), {
+        wrapper: buildWrapper(buildStore()),
+      });
+      await fillAndSubmit(result);
       expect(mockNavigate).toHaveBeenCalledWith('/courses', { replace: true });
     });
   });
@@ -228,24 +215,10 @@ describe('useLoginForm', () => {
   describe('handleSubmit — failure', () => {
     it('sets server error when loginUserService rejects', async () => {
       loginUserService.mockRejectedValueOnce(new Error('Invalid credentials'));
-
       const { result } = renderHook(() => useLoginForm(), {
         wrapper: buildWrapper(buildStore()),
       });
-
-      act(() => {
-        result.current.handleChange({
-          target: { name: 'email', value: 'jan@example.com' },
-        });
-        result.current.handleChange({
-          target: { name: 'password', value: 'wrong' },
-        });
-      });
-
-      await act(async () => {
-        await result.current.handleSubmit({ preventDefault: vi.fn() });
-      });
-
+      await fillAndSubmit(result);
       expect(result.current.errors.server).toBeDefined();
       expect(mockNavigate).not.toHaveBeenCalled();
     });

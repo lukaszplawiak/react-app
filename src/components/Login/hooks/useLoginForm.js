@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from '../../../store/user/thunk';
 import { selectUserStatus } from '../../../store/user/selectors';
@@ -11,11 +11,29 @@ const validate = (formData) => {
   return errors;
 };
 
+/**
+ * Returns the redirect path from the URL query string if it is safe.
+ * Accepts only relative paths (starting with /) to prevent open redirect.
+ * Example: /login?redirect=/courses/add → '/courses/add'
+ */
+const getSafeRedirectPath = (search) => {
+  const params = new URLSearchParams(search);
+  const redirect = params.get('redirect');
+
+  if (!redirect) return '/courses';
+
+  const isSafeRelativePath =
+    redirect.startsWith('/') && !redirect.includes('://');
+
+  return isSafeRelativePath ? redirect : '/courses';
+};
+
 const useLoginForm = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({});
 
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
 
   const status = useSelector(selectUserStatus);
@@ -38,7 +56,8 @@ const useLoginForm = () => {
     const result = await dispatch(loginUser(formData));
 
     if (loginUser.fulfilled.match(result)) {
-      navigate('/courses', { replace: true });
+      const redirectPath = getSafeRedirectPath(location.search);
+      navigate(redirectPath, { replace: true });
     } else {
       setErrors({
         server:
