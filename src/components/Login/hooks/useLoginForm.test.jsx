@@ -137,6 +137,23 @@ describe('useLoginForm', () => {
       expect(result.current.errors.email).toBe('Email is required');
     });
 
+    it('sets email format error when email is invalid', async () => {
+      const { result } = renderHook(() => useLoginForm(), {
+        wrapper: buildWrapper(buildStore()),
+      });
+      act(() => {
+        result.current.handleChange({
+          target: { name: 'email', value: 'notanemail' },
+        });
+      });
+      await act(async () => {
+        await result.current.handleSubmit({ preventDefault: vi.fn() });
+      });
+      expect(result.current.errors.email).toBe(
+        'Please enter a valid email address'
+      );
+    });
+
     it('sets password error when password is empty', async () => {
       const { result } = renderHook(() => useLoginForm(), {
         wrapper: buildWrapper(buildStore()),

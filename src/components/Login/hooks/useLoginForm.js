@@ -3,19 +3,22 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from '../../../store/user/thunk';
 import { selectUserStatus } from '../../../store/user/selectors';
+import isValidEmail from '../../../helpers/isValidEmail';
 
 const validate = (formData) => {
   const errors = {};
-  if (!formData.email) errors.email = 'Email is required';
+
+  if (!formData.email) {
+    errors.email = 'Email is required';
+  } else if (!isValidEmail(formData.email)) {
+    errors.email = 'Please enter a valid email address';
+  }
+
   if (!formData.password) errors.password = 'Password is required';
+
   return errors;
 };
 
-/**
- * Returns the redirect path from the URL query string if it is safe.
- * Accepts only relative paths (starting with /) to prevent open redirect.
- * Example: /login?redirect=/courses/add → '/courses/add'
- */
 const getSafeRedirectPath = (search) => {
   const params = new URLSearchParams(search);
   const redirect = params.get('redirect');
