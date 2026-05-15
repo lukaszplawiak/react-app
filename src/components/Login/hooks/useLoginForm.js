@@ -23,7 +23,9 @@ const getSafeRedirectPath = (search) => {
   if (!redirect) return '/courses';
 
   const isSafeRelativePath =
-    redirect.startsWith('/') && !redirect.includes('://');
+    redirect.startsWith('/') &&
+    !redirect.startsWith('//') &&
+    !redirect.includes('://');
 
   return isSafeRelativePath ? redirect : '/courses';
 };
