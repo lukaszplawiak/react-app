@@ -1,6 +1,7 @@
 const jsonServer = require('json-server');
 const cookieParser = require('cookie-parser');
 const crypto = require('crypto');
+const rateLimit = require('express-rate-limit');
 
 const server = jsonServer.create();
 const router = jsonServer.router('db.json');
@@ -19,7 +20,23 @@ const COOKIE_OPTIONS = {
 
 const AUTH_COOKIE_NAME = 'authToken';
 
-server.post('/login', (req, res) => {
+/**
+ * Rate limiter for auth endpoints.
+ * Production note: replace default in-memory store with Redis
+ * (rate-limit-redis) for persistence across restarts and horizontal scaling.
+ */
+const authRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    successful: false,
+    errors: ['Too many requests — please try again in 15 minutes'],
+  },
+});
+
+server.post('/login', authRateLimiter, (req, res) => {
   const { email, password } = req.body;
   const db = router.db;
 
@@ -33,7 +50,6 @@ server.post('/login', (req, res) => {
 
   if (user) {
     res.cookie(AUTH_COOKIE_NAME, user.token, COOKIE_OPTIONS);
-
     res.json({
       successful: true,
       result: user.token,
@@ -51,7 +67,7 @@ server.post('/login', (req, res) => {
   }
 });
 
-server.post('/register', (req, res) => {
+server.post('/register', authRateLimiter, (req, res) => {
   const { name, email, password } = req.body;
   const db = router.db;
 
@@ -60,11 +76,6 @@ server.post('/register', (req, res) => {
    * Production implementation:
    *   const passwordHash = await bcrypt.hash(password, 12);
    *   store passwordHash instead of password
-   *
-   * MOCK ONLY — token is a predictable timestamp string.
-   * Production implementation:
-   *   const token = crypto.randomBytes(32).toString('hex');
-   *   or: jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '24h' })
    */
   const newUser = {
     id: String(Date.now()),

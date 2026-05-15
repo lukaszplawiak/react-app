@@ -3,6 +3,7 @@ const cookieParser = require('cookie-parser');
 const crypto = require('crypto');
 const jsonServer = require('json-server');
 const path = require('path');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const router = jsonServer.router('db.json');
@@ -19,6 +20,29 @@ const COOKIE_OPTIONS = {
   maxAge: 24 * 60 * 60 * 1000,
   secure: process.env.NODE_ENV === 'production',
 };
+
+// --- Rate limiting ---
+
+/**
+ * Limits auth endpoints to 10 requests per 15 minutes per IP.
+ * Prevents brute-force attacks on login and registration.
+ *
+ * Production note: use a Redis store (rate-limit-redis) instead of
+ * the default in-memory store so limits persist across server restarts
+ * and work correctly in multi-instance deployments.
+ */
+const authRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    successful: false,
+    errors: ['Too many requests — please try again in 15 minutes'],
+  },
+});
+
+// --- Auth middleware ---
 
 const requireAuth = (req, res, next) => {
   const token = req.cookies[AUTH_COOKIE_NAME];
@@ -50,7 +74,9 @@ const requireAdmin = (req, res, next) => {
   next();
 };
 
-app.post('/api/login', (req, res) => {
+// --- User endpoints ---
+
+app.post('/api/login', authRateLimiter, (req, res) => {
   const { email, password } = req.body;
 
   /*
@@ -80,14 +106,14 @@ app.post('/api/login', (req, res) => {
   }
 });
 
-app.post('/api/register', (req, res) => {
+app.post('/api/register', authRateLimiter, (req, res) => {
   const { name, email, password } = req.body;
 
   /*
-   * MOCK ONLY — password stored in plaintext, token is predictable.
+   * MOCK ONLY — password stored in plaintext.
    * Production implementation:
    *   const passwordHash = await bcrypt.hash(password, 12);
-   *   const token = crypto.randomBytes(32).toString('hex');
+   *   store passwordHash instead of password
    */
   const newUser = {
     id: String(Date.now()),
@@ -126,6 +152,8 @@ app.delete('/api/logout', (req, res) => {
   res.json({ successful: true });
 });
 
+// --- Courses endpoints ---
+
 app.get('/api/courses/all', (req, res) => {
   const courses = db.get('courses').value();
   res.json({ successful: true, result: courses });
@@ -155,6 +183,8 @@ app.put('/api/courses/:id', requireAuth, requireAdmin, (req, res) => {
   res.json({ successful: true, result: course });
 });
 
+// --- Authors endpoints ---
+
 app.get('/api/authors/all', (req, res) => {
   const authors = db.get('authors').value();
   res.json({ successful: true, result: authors });
@@ -169,11 +199,15 @@ app.post('/api/authors/add', requireAuth, requireAdmin, (req, res) => {
   res.json({ successful: true, result: newAuthor });
 });
 
+// --- Static files and React Router fallback ---
+
 app.use(express.static(path.join(__dirname, 'build')));
 
 app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'build/index.html'));
 });
+
+// --- Start server ---
 
 const PORT = process.env.PORT || 3000;
 
