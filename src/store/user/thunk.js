@@ -52,9 +52,6 @@ export const loginUser = createAsyncThunk(
       const response = await loginUserService(credentials);
       const result = response.data;
 
-      // Session is maintained via HttpOnly cookie set by the server.
-      // Token from result.result is intentionally not stored in Redux —
-      // it is only used server-side for cookie-based authentication.
       if (result.successful) {
         return {
           name: result.user.name,
