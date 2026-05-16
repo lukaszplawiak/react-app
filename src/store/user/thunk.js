@@ -52,6 +52,7 @@ export const loginUser = createAsyncThunk(
       const response = await loginUserService(credentials);
       const result = response.data;
 
+
       if (result.successful) {
         return {
           name: result.user.name,
