@@ -10,23 +10,15 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error.response?.status;
+    const url = error.config?.url ?? '';
 
-    if (status === 401) {
+    if (status === 401 && !url.includes('/users/me')) {
       window.location.href = '/login';
     }
 
-    /**
-     * Log API errors in development only.
-     * In production, errors should be sent to a monitoring service
-     * (e.g. Sentry, Datadog) — not logged to the browser console
-     * where they are visible to anyone with DevTools open.
-     *
-     * Production example:
-     *   Sentry.captureException(error);
-     */
     if (import.meta.env.MODE === 'development') {
       console.error(
-        `[API Error] ${error.config?.method?.toUpperCase()} ${error.config?.url} — ${status ?? 'network error'}`,
+        `[API Error] ${error.config?.method?.toUpperCase()} ${url} — ${status ?? 'network error'}`,
         error.message
       );
     }
@@ -36,7 +28,6 @@ apiClient.interceptors.response.use(
 );
 
 // --- Courses ---
-
 export const getCoursesService = () =>
   apiClient.get('/courses/all');
 
@@ -50,7 +41,6 @@ export const updateCourseService = (course) =>
   apiClient.put(`/courses/${course.id}`, course);
 
 // --- Authors ---
-
 export const getAuthorsService = () =>
   apiClient.get('/authors/all');
 
@@ -58,7 +48,6 @@ export const createAuthorService = (author) =>
   apiClient.post('/authors/add', author);
 
 // --- User ---
-
 export const registerUserService = (userData) =>
   apiClient.post('/register', userData);
 
