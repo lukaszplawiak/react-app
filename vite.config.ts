@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
@@ -9,7 +9,8 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:4000',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+        cookieDomainRewrite: 'localhost',
+        rewrite: (path: string) => path.replace(/^\/api/, ''),
       },
     },
   },
