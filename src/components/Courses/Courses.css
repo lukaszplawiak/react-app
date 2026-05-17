@@ -7,6 +7,26 @@
   gap: 20px;
 }
 
-.Courses .Search-bar {
-  margin-bottom: 20px;
+.Courses-toolbar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.ButtonEnrolled {
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .Courses-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .ButtonEnrolled {
+    width: 100%;
+  }
 }

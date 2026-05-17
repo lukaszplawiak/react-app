@@ -8,16 +8,22 @@ import Courses from './components/Courses/Courses';
 import Registration from './components/Registration/Registration';
 import Login from './components/Login/Login';
 import CourseForm from './components/CourseForm/CourseForm';
+import Enrolled from './components/Enrolled/Enrolled';
 import { fetchCourses } from './store/courses/thunk';
 import { fetchAuthors } from './store/authors/thunk';
 import { fetchUser } from './store/user/thunk';
-import { selectIsAuth, selectUserStatus } from './store/user/selectors';
-
+import { fetchEnrollments } from './store/enrollments/thunk';
+import {
+  selectIsAuth,
+  selectIsAdmin,
+  selectUserStatus,
+} from './store/user/selectors';
 import './App.css';
 
 function App() {
   const dispatch = useDispatch();
   const isAuth = useSelector(selectIsAuth);
+  const isAdmin = useSelector(selectIsAdmin);
   const userStatus = useSelector(selectUserStatus);
   const isBootstrapping = userStatus === 'bootstrapping';
   const defaultPath = isAuth ? '/courses' : '/login';
@@ -31,6 +37,11 @@ function App() {
     dispatch(fetchCourses());
     dispatch(fetchAuthors());
   }, [dispatch, isAuth]);
+
+  useEffect(() => {
+    if (!isAuth || !isAdmin) return;
+    dispatch(fetchEnrollments());
+  }, [dispatch, isAuth, isAdmin]);
 
   if (isBootstrapping) {
     return (
@@ -80,6 +91,14 @@ function App() {
             element={
               <PrivateRoute requireAdmin>
                 <CourseForm />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/enrolled"
+            element={
+              <PrivateRoute requireAdmin>
+                <Enrolled />
               </PrivateRoute>
             }
           />

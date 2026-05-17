@@ -1,12 +1,29 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useDispatch, useSelector } from 'react-redux';
 import Button from '../../../../common/Button/Button';
 import formatCreationDate from '../../../../helpers/formatCreationDate';
 import getCourseDuration from '../../../../helpers/getCourseDuration';
 import getAuthorNames from '../../../../helpers/getAuthorNames';
+import { enrollCourse } from '../../../../store/enrollments/thunk';
+import { selectIsEnrolled } from '../../../../store/enrollments/selectors';
 import './CourseCard.css';
 
-function CourseCard({ course, authors, onCourseSelect, onDelete, onUpdate, isAdmin }) {
+function CourseCard({
+  course,
+  authors,
+  isAdmin,
+  onCourseSelect,
+  onDelete,
+  onUpdate,
+}) {
+  const dispatch = useDispatch();
+  const isEnrolled = useSelector(selectIsEnrolled(course.id));
+
+  const handleEnroll = () => {
+    dispatch(enrollCourse(course.id));
+  };
+
   return (
     <div className="Course-card">
       <div className="Course-rect">
@@ -25,7 +42,7 @@ function CourseCard({ course, authors, onCourseSelect, onDelete, onUpdate, isAdm
             className="Course-button"
             onClick={() => onCourseSelect(course)}
           />
-          {isAdmin && (
+          {isAdmin ? (
             <>
               <Button
                 label="DELETE"
@@ -38,6 +55,13 @@ function CourseCard({ course, authors, onCourseSelect, onDelete, onUpdate, isAdm
                 onClick={() => onUpdate(course.id)}
               />
             </>
+          ) : (
+            <Button
+              label={isEnrolled ? 'Enrolled ✓' : 'Enroll'}
+              className={`Course-button${isEnrolled ? ' Course-button--enrolled' : ''}`}
+              onClick={handleEnroll}
+              disabled={isEnrolled}
+            />
           )}
         </div>
       </div>

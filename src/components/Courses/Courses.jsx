@@ -12,7 +12,10 @@ import {
   selectCoursesStatus,
   selectCoursesError,
 } from '../../store/courses/selectors';
-import { selectAuthors, selectAuthorsStatus } from '../../store/authors/selectors';
+import {
+  selectAuthors,
+  selectAuthorsStatus,
+} from '../../store/authors/selectors';
 import { fetchCourses, deleteCourse } from '../../store/courses/thunk';
 import { ADD_NEW_COURSE_LABEL } from '../../constants';
 import './Courses.css';
@@ -40,13 +43,8 @@ function Courses() {
     [courses, query]
   );
 
-  const handleAddNewCourse = () => {
-    navigate('/courses/add');
-  };
-
-  const handleCourseSelect = (course) => {
-    navigate(`/courses/${course.id}`);
-  };
+  const handleAddNewCourse = () => navigate('/courses/add');
+  const handleCourseSelect = (course) => navigate(`/courses/${course.id}`);
 
   const handleDelete = async (courseId) => {
     setDeleteError(null);
@@ -58,13 +56,8 @@ function Courses() {
     }
   };
 
-  const handleUpdate = (courseId) => {
-    navigate(`/courses/update/${courseId}`);
-  };
-
-  const handleRetry = () => {
-    dispatch(fetchCourses());
-  };
+  const handleUpdate = (courseId) => navigate(`/courses/update/${courseId}`);
+  const handleRetry = () => dispatch(fetchCourses());
 
   if (isLoading) {
     return (
@@ -84,7 +77,18 @@ function Courses() {
 
   return (
     <div className="Courses">
-      <SearchBar value={query} onSearch={setQuery} />
+      <div className="Courses-toolbar">
+        <SearchBar value={query} onSearch={setQuery} />
+        {isAdmin && (
+          <div className="Courses-toolbar-actions">
+            <Button
+              label="Enrolled Students"
+              className="ButtonEnrolled"
+              onClick={() => navigate('/enrolled')}
+            />
+          </div>
+        )}
+      </div>
       {deleteError && (
         <ErrorMessage
           message={deleteError}

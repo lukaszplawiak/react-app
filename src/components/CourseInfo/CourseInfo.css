@@ -38,3 +38,12 @@
   flex-direction: column;
   gap: 20px;
 }
+
+.enroll-button {
+  margin-top: 1rem;
+}
+
+.enroll-button--enrolled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}

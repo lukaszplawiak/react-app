@@ -12,11 +12,7 @@ server.use(middlewares);
 server.use(jsonServer.bodyParser);
 server.use(cookieParser());
 
-// --- Request logging ---
-
 server.use(morgan(':method :url :status :response-time ms'));
-
-// --- Config ---
 
 const COOKIE_OPTIONS = {
   httpOnly: true,
@@ -27,13 +23,6 @@ const COOKIE_OPTIONS = {
 
 const AUTH_COOKIE_NAME = 'authToken';
 
-// --- Rate limiting ---
-
-/**
- * Limits auth endpoints to 10 requests per 15 minutes per IP.
- * Production note: use Redis store (rate-limit-redis) for persistence
- * across restarts and horizontal scaling.
- */
 const authRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 10,
@@ -45,20 +34,12 @@ const authRateLimiter = rateLimit({
   },
 });
 
-// --- Auth middleware ---
-
-/**
- * Verifies that the request carries a valid session cookie.
- * Logs unauthorized access attempts for security monitoring.
- */
 const requireAuth = (req, res, next) => {
   const db = router.db;
   const token = req.cookies[AUTH_COOKIE_NAME];
 
   if (!token) {
-    console.warn(
-      `[AUTH] No token — ${req.method} ${req.url} — IP: ${req.ip}`
-    );
+    console.warn(`[AUTH] No token — ${req.method} ${req.url} — IP: ${req.ip}`);
     return res
       .status(401)
       .json({ successful: false, errors: ['No session cookie provided'] });
@@ -67,9 +48,7 @@ const requireAuth = (req, res, next) => {
   const user = db.get('users').find({ token }).value();
 
   if (!user) {
-    console.warn(
-      `[AUTH] Invalid token — ${req.method} ${req.url} — IP: ${req.ip}`
-    );
+    console.warn(`[AUTH] Invalid token — ${req.method} ${req.url} — IP: ${req.ip}`);
     return res
       .status(401)
       .json({ successful: false, errors: ['Invalid or expired session'] });
@@ -79,11 +58,6 @@ const requireAuth = (req, res, next) => {
   next();
 };
 
-/**
- * Verifies that the authenticated user has the admin role.
- * Logs privilege escalation attempts.
- * Must be used after requireAuth.
- */
 const requireAdmin = (req, res, next) => {
   if (req.user?.role !== 'admin') {
     console.warn(
@@ -102,12 +76,6 @@ server.post('/login', authRateLimiter, (req, res) => {
   const { email, password } = req.body;
   const db = router.db;
 
-  /*
-   * MOCK ONLY — passwords stored and compared in plaintext.
-   * Production implementation:
-   *   const user = db.get('users').find({ email }).value();
-   *   const valid = await bcrypt.compare(password, user.passwordHash);
-   */
   const user = db.get('users').find({ email, password }).value();
 
   if (user) {
@@ -116,18 +84,11 @@ server.post('/login', authRateLimiter, (req, res) => {
     res.json({
       successful: true,
       result: user.token,
-      user: {
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
+      user: { name: user.name, email: user.email, role: user.role },
     });
   } else {
     console.warn(`[AUTH] Login failed — ${email} — IP: ${req.ip}`);
-    res.status(401).json({
-      successful: false,
-      errors: ['Invalid credentials'],
-    });
+    res.status(401).json({ successful: false, errors: ['Invalid credentials'] });
   }
 });
 
@@ -135,12 +96,6 @@ server.post('/register', authRateLimiter, (req, res) => {
   const { name, email, password } = req.body;
   const db = router.db;
 
-  /*
-   * MOCK ONLY — password stored in plaintext.
-   * Production implementation:
-   *   const passwordHash = await bcrypt.hash(password, 12);
-   *   store passwordHash instead of password
-   */
   const newUser = {
     id: String(Date.now()),
     name,
@@ -155,11 +110,7 @@ server.post('/register', authRateLimiter, (req, res) => {
 
   res.json({
     successful: true,
-    user: {
-      name: newUser.name,
-      email: newUser.email,
-      role: newUser.role,
-    },
+    user: { name: newUser.name, email: newUser.email, role: newUser.role },
   });
 });
 
@@ -178,11 +129,7 @@ server.get('/users/me', (req, res) => {
   if (user) {
     res.json({
       successful: true,
-      result: {
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
+      result: { name: user.name, email: user.email, role: user.role },
     });
   } else {
     console.warn(`[AUTH] Invalid token — GET /users/me — IP: ${req.ip}`);
@@ -196,7 +143,6 @@ server.delete('/logout', (req, res) => {
 });
 
 // --- Courses endpoints ---
-// Public reads, admin-only writes
 
 server.get('/courses/all', (req, res) => {
   const courses = router.db.get('courses').value();
@@ -210,17 +156,13 @@ server.post('/courses/add', requireAuth, requireAdmin, (req, res) => {
     creationDate: new Date().toISOString(),
   };
   router.db.get('courses').push(newCourse).write();
-  console.info(
-    `[COURSES] Created — "${newCourse.title}" — by ${req.user.email}`
-  );
+  console.info(`[COURSES] Created — "${newCourse.title}" — by ${req.user.email}`);
   res.json({ successful: true, result: newCourse });
 });
 
 server.delete('/courses/:id', requireAuth, requireAdmin, (req, res) => {
   router.db.get('courses').remove({ id: req.params.id }).write();
-  console.info(
-    `[COURSES] Deleted — id: ${req.params.id} — by ${req.user.email}`
-  );
+  console.info(`[COURSES] Deleted — id: ${req.params.id} — by ${req.user.email}`);
   res.json({ successful: true });
 });
 
@@ -230,14 +172,11 @@ server.put('/courses/:id', requireAuth, requireAdmin, (req, res) => {
     .find({ id: req.params.id })
     .assign(req.body)
     .write();
-  console.info(
-    `[COURSES] Updated — id: ${req.params.id} — by ${req.user.email}`
-  );
+  console.info(`[COURSES] Updated — id: ${req.params.id} — by ${req.user.email}`);
   res.json({ successful: true, result: course });
 });
 
 // --- Authors endpoints ---
-// Public reads, admin-only writes
 
 server.get('/authors/all', (req, res) => {
   const authors = router.db.get('authors').value();
@@ -245,15 +184,66 @@ server.get('/authors/all', (req, res) => {
 });
 
 server.post('/authors/add', requireAuth, requireAdmin, (req, res) => {
-  const newAuthor = {
-    ...req.body,
-    id: String(Date.now()),
-  };
+  const newAuthor = { ...req.body, id: String(Date.now()) };
   router.db.get('authors').push(newAuthor).write();
-  console.info(
-    `[AUTHORS] Created — "${newAuthor.name}" — by ${req.user.email}`
-  );
+  console.info(`[AUTHORS] Created — "${newAuthor.name}" — by ${req.user.email}`);
   res.json({ successful: true, result: newAuthor });
+});
+
+// --- Enrollments endpoints ---
+
+server.post('/enrollments', requireAuth, (req, res) => {
+  const db = router.db;
+  const { courseId } = req.body;
+  const userEmail = req.user.email;
+
+  if (!courseId) {
+    return res
+      .status(400)
+      .json({ successful: false, errors: ['courseId is required'] });
+  }
+
+  const course = db.get('courses').find({ id: courseId }).value();
+  if (!course) {
+    return res
+      .status(404)
+      .json({ successful: false, errors: ['Course not found'] });
+  }
+
+  const existing = db.get('enrollments').find({ userEmail, courseId }).value();
+  if (existing) {
+    return res
+      .status(409)
+      .json({ successful: false, errors: ['Already enrolled in this course'] });
+  }
+
+  const newEnrollment = {
+    id: String(Date.now()),
+    userEmail,
+    courseId,
+    enrolledAt: new Date().toISOString(),
+  };
+
+  db.get('enrollments').push(newEnrollment).write();
+  console.info(`[ENROLLMENTS] ${userEmail} enrolled in course ${courseId}`);
+
+  res.json({ successful: true, result: newEnrollment });
+});
+
+/**
+ * GET /enrollments — admin gets all enrollments with course and user details
+ */
+server.get('/enrollments', requireAuth, requireAdmin, (req, res) => {
+  const db = router.db;
+  const enrollments = db.get('enrollments').value();
+  const courses = db.get('courses').value();
+
+  const result = enrollments.map((enrollment) => ({
+    ...enrollment,
+    courseName: courses.find((c) => c.id === enrollment.courseId)?.title ?? 'Unknown',
+  }));
+
+  res.json({ successful: true, result });
 });
 
 server.use(router);
