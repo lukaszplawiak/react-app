@@ -93,3 +93,8 @@
     text-align: left;
   }
 }
+
+.Course-button--enrolled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}

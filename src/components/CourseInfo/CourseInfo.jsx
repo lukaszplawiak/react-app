@@ -5,12 +5,16 @@ import formatCreationDate from '../../helpers/formatCreationDate';
 import getCourseDuration from '../../helpers/getCourseDuration';
 import getAuthorNames from '../../helpers/getAuthorNames';
 import ErrorMessage from '../../common/ErrorMessage/ErrorMessage';
+import Button from '../../common/Button/Button';
 import {
   selectCourses,
   selectCoursesStatus,
   selectCoursesError,
 } from '../../store/courses/selectors';
 import { selectAuthors, selectAuthorsStatus } from '../../store/authors/selectors';
+import { selectIsAdmin } from '../../store/user/selectors';
+import { selectIsEnrolled } from '../../store/enrollments/selectors';
+import { enrollCourse } from '../../store/enrollments/thunk';
 import { fetchCourses } from '../../store/courses/thunk';
 import {
   COURSE_INFO_LOADING_MESSAGE,
@@ -27,13 +31,14 @@ function CourseInfo() {
   const authorsStatus = useSelector(selectAuthorsStatus);
   const courses = useSelector(selectCourses);
   const authors = useSelector(selectAuthors);
+  const isAdmin = useSelector(selectIsAdmin);
+  const isEnrolled = useSelector(selectIsEnrolled(courseId));
 
   const isLoading = coursesStatus === 'loading' || authorsStatus === 'loading';
   const hasFailed = coursesStatus === 'failed';
 
-  const handleRetry = () => {
-    dispatch(fetchCourses());
-  };
+  const handleRetry = () => dispatch(fetchCourses());
+  const handleEnroll = () => dispatch(enrollCourse(courseId));
 
   if (isLoading) {
     return (
@@ -79,24 +84,20 @@ function CourseInfo() {
             </p>
           </div>
           <div className="Course-det">
-            <p>
-              <strong>ID: </strong>
-              {course.id}
-            </p>
-            <p>
-              <strong>Duration: </strong>
-              {getCourseDuration(course.duration)}
-            </p>
-            <p>
-              <strong>Authors: </strong>
-              {authorNames}
-            </p>
-            <p>
-              <strong>Creation Date: </strong>
-              {formatCreationDate(course.creationDate)}
-            </p>
+            <p><strong>ID: </strong>{course.id}</p>
+            <p><strong>Duration: </strong>{getCourseDuration(course.duration)}</p>
+            <p><strong>Authors: </strong>{authorNames}</p>
+            <p><strong>Creation Date: </strong>{formatCreationDate(course.creationDate)}</p>
           </div>
         </div>
+        {!isAdmin && (
+          <Button
+            label={isEnrolled ? 'Enrolled ✓' : 'Enroll in this course'}
+            className={`enroll-button${isEnrolled ? ' enroll-button--enrolled' : ''}`}
+            onClick={handleEnroll}
+            disabled={isEnrolled}
+          />
+        )}
       </div>
       <Link to="/courses" className="back-button">
         Back to Courses

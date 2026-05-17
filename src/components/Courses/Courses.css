@@ -10,3 +10,16 @@
 .Courses .Search-bar {
   margin-bottom: 20px;
 }
+
+.Courses-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.ButtonEnrolled {
+  white-space: nowrap;
+  flex-shrink: 0;
+}

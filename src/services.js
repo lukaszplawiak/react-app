@@ -28,34 +28,24 @@ apiClient.interceptors.response.use(
 );
 
 // --- Courses ---
-export const getCoursesService = () =>
-  apiClient.get('/courses/all');
-
-export const createCourseService = (course) =>
-  apiClient.post('/courses/add', course);
-
-export const deleteCourseService = (courseId) =>
-  apiClient.delete(`/courses/${courseId}`);
-
-export const updateCourseService = (course) =>
-  apiClient.put(`/courses/${course.id}`, course);
+export const getCoursesService = () => apiClient.get('/courses/all');
+export const createCourseService = (course) => apiClient.post('/courses/add', course);
+export const deleteCourseService = (courseId) => apiClient.delete(`/courses/${courseId}`);
+export const updateCourseService = (course) => apiClient.put(`/courses/${course.id}`, course);
 
 // --- Authors ---
-export const getAuthorsService = () =>
-  apiClient.get('/authors/all');
-
-export const createAuthorService = (author) =>
-  apiClient.post('/authors/add', author);
+export const getAuthorsService = () => apiClient.get('/authors/all');
+export const createAuthorService = (author) => apiClient.post('/authors/add', author);
 
 // --- User ---
-export const registerUserService = (userData) =>
-  apiClient.post('/register', userData);
+export const registerUserService = (userData) => apiClient.post('/register', userData);
+export const loginUserService = (credentials) => apiClient.post('/login', credentials);
+export const getUserService = () => apiClient.get('/users/me');
+export const logoutUserService = () => apiClient.delete('/logout');
 
-export const loginUserService = (credentials) =>
-  apiClient.post('/login', credentials);
+// --- Enrollments ---
+export const enrollCourseService = (courseId) =>
+  apiClient.post('/enrollments', { courseId });
 
-export const getUserService = () =>
-  apiClient.get('/users/me');
-
-export const logoutUserService = () =>
-  apiClient.delete('/logout');
+export const getEnrollmentsService = () =>
+  apiClient.get('/enrollments');
