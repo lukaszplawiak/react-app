@@ -80,11 +80,13 @@ function Courses() {
       <div className="Courses-toolbar">
         <SearchBar value={query} onSearch={setQuery} />
         {isAdmin && (
-          <Button
-            label="Enrolled Students"
-            className="ButtonEnrolled"
-            onClick={() => navigate('/enrolled')}
-          />
+          <div className="Courses-toolbar-actions">
+            <Button
+              label="Enrolled Students"
+              className="ButtonEnrolled"
+              onClick={() => navigate('/enrolled')}
+            />
+          </div>
         )}
       </div>
       {deleteError && (
