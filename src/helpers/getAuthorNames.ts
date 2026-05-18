@@ -1,6 +1,15 @@
 import { MAX_AUTHORS_DISPLAY_LENGTH } from '../constants';
+import type { Author } from '../types';
 
-const getAuthorNames = (authorIds, authors, { truncate = false } = {}) => {
+interface GetAuthorNamesOptions {
+  truncate?: boolean;
+}
+
+const getAuthorNames = (
+  authorIds: string[] | null | undefined,
+  authors: Author[] | null | undefined,
+  { truncate = false }: GetAuthorNamesOptions = {}
+): string => {
   if (!authorIds?.length || !authors?.length) return '';
 
   const names = authorIds
