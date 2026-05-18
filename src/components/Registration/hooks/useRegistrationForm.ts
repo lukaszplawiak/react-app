@@ -5,9 +5,26 @@ import { registerUser } from '../../../store/user/thunk';
 import { selectUserStatus } from '../../../store/user/selectors';
 import isValidEmail from '../../../helpers/isValidEmail';
 import { MIN_PASSWORD_LENGTH } from '../../../constants';
+import type { AppDispatch } from '../../../store';
+import type { RegistrationFormData } from '../../../types';
 
-const validate = (userData) => {
-  const errors = {};
+interface RegistrationFormErrors {
+  name?: string;
+  email?: string;
+  password?: string;
+  server?: string;
+}
+
+interface UseRegistrationFormReturn {
+  userData: RegistrationFormData;
+  errors: RegistrationFormErrors;
+  isLoading: boolean;
+  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleSubmit: (e: React.FormEvent) => Promise<void>;
+}
+
+const validate = (userData: RegistrationFormData): RegistrationFormErrors => {
+  const errors: RegistrationFormErrors = {};
 
   if (!userData.name) errors.name = 'Name is required';
 
@@ -26,26 +43,26 @@ const validate = (userData) => {
   return errors;
 };
 
-const useRegistrationForm = () => {
-  const [userData, setUserData] = useState({
+const useRegistrationForm = (): UseRegistrationFormReturn => {
+  const [userData, setUserData] = useState<RegistrationFormData>({
     name: '',
     email: '',
     password: '',
   });
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<RegistrationFormErrors>({});
 
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   const status = useSelector(selectUserStatus);
   const isLoading = status === 'loading';
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
     setUserData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
 
     const validationErrors = validate(userData);
@@ -60,8 +77,7 @@ const useRegistrationForm = () => {
       navigate('/login');
     } else {
       setErrors({
-        server:
-          result.payload || 'Registration failed. Please try again.',
+        server: result.payload || 'Registration failed. Please try again.',
       });
     }
   };

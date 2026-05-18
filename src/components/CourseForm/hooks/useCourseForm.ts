@@ -5,48 +5,73 @@ import { createCourse, updateCourse } from '../../../store/courses/thunk';
 import { createAuthor } from '../../../store/authors/thunk';
 import { selectCourses } from '../../../store/courses/selectors';
 import { selectAuthors } from '../../../store/authors/selectors';
-import {
-  MIN_AUTHOR_NAME_LENGTH,
-  MIN_COURSE_TITLE_LENGTH,
-  MIN_COURSE_DESCRIPTION_LENGTH,
-} from '../../../constants';
+import { MIN_AUTHOR_NAME_LENGTH, MIN_COURSE_TITLE_LENGTH, MIN_COURSE_DESCRIPTION_LENGTH } from '../../../constants';
+import type { AppDispatch } from '../../../store';
+import type { Author, CourseFormFields } from '../../../types';
 
-const validateCourseFields = ({ title, description, duration }) => {
-  const errors = {};
+interface CourseFormErrors {
+  title?: string;
+  description?: string;
+  duration?: string;
+  newAuthorName?: string | null;
+  server?: string;
+}
 
-  if (title.length < MIN_COURSE_TITLE_LENGTH) {
+interface RegisterField {
+  value: string | number;
+  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+}
+
+interface UseCourseFormReturn {
+  register: (fieldName: keyof CourseFormFields) => RegisterField;
+  errors: CourseFormErrors;
+  isSaving: boolean;
+  isEditMode: boolean;
+  courseAuthorObjects: Author[];
+  availableAuthors: Author[];
+  submitLabel: string;
+  handleSubmit: () => Promise<void>;
+  handleCreateAuthor: () => Promise<void>;
+  handleAddAuthorToCourse: (authorId: string) => void;
+  handleRemoveAuthorFromCourse: (authorId: string) => void;
+}
+
+const validateCourseFields = (fields: CourseFormFields): CourseFormErrors => {
+  const errors: CourseFormErrors = {};
+
+  if (String(fields.title).length < MIN_COURSE_TITLE_LENGTH) {
     errors.title = `Title should be at least ${MIN_COURSE_TITLE_LENGTH} characters`;
   }
 
-  if (description.length < MIN_COURSE_DESCRIPTION_LENGTH) {
+  if (String(fields.description).length < MIN_COURSE_DESCRIPTION_LENGTH) {
     errors.description = `Description should be at least ${MIN_COURSE_DESCRIPTION_LENGTH} characters`;
   }
 
-  if (isNaN(duration) || Number(duration) <= 0) {
+  if (isNaN(Number(fields.duration)) || Number(fields.duration) <= 0) {
     errors.duration = 'Duration should be a number greater than 0';
   }
 
   return errors;
 };
 
-const useCourseForm = () => {
-  const [fields, setFields] = useState({
+const useCourseForm = (): UseCourseFormReturn => {
+  const [fields, setFields] = useState<CourseFormFields>({
     title: '',
     description: '',
     duration: '',
     newAuthorName: '',
   });
-  const [courseAuthors, setCourseAuthors] = useState([]);
-  const [errors, setErrors] = useState({});
-  const [isSaving, setIsSaving] = useState(false);
+  const [courseAuthors, setCourseAuthors] = useState<string[]>([]);
+  const [errors, setErrors] = useState<CourseFormErrors>({});
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   const authors = useSelector(selectAuthors);
   const courses = useSelector(selectCourses);
 
-  const { courseId } = useParams();
+  const { courseId } = useParams<{ courseId: string }>();
   const isEditMode = Boolean(courseId);
 
   useEffect(() => {
@@ -64,22 +89,22 @@ const useCourseForm = () => {
     setCourseAuthors(courseToUpdate.authors);
   }, [courses, courseId]);
 
-  const register = (fieldName) => ({
+  const register = (fieldName: keyof CourseFormFields): RegisterField => ({
     value: fields[fieldName],
-    onChange: (e) =>
+    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       setFields((prev) => ({ ...prev, [fieldName]: e.target.value })),
   });
 
-  const handleAddAuthorToCourse = (authorId) => {
+  const handleAddAuthorToCourse = (authorId: string): void => {
     setCourseAuthors((prev) => [...prev, authorId]);
   };
 
-  const handleRemoveAuthorFromCourse = (authorId) => {
+  const handleRemoveAuthorFromCourse = (authorId: string): void => {
     setCourseAuthors((prev) => prev.filter((id) => id !== authorId));
   };
 
-  const handleCreateAuthor = async () => {
-    if (fields.newAuthorName.length < MIN_AUTHOR_NAME_LENGTH) {
+  const handleCreateAuthor = async (): Promise<void> => {
+    if (String(fields.newAuthorName).length < MIN_AUTHOR_NAME_LENGTH) {
       setErrors((prev) => ({
         ...prev,
         newAuthorName: `Author name should be at least ${MIN_AUTHOR_NAME_LENGTH} characters`,
@@ -87,7 +112,9 @@ const useCourseForm = () => {
       return;
     }
 
-    const result = await dispatch(createAuthor({ name: fields.newAuthorName }));
+    const result = await dispatch(
+      createAuthor({ name: String(fields.newAuthorName) })
+    );
 
     if (createAuthor.fulfilled.match(result)) {
       setFields((prev) => ({ ...prev, newAuthorName: '' }));
@@ -101,7 +128,7 @@ const useCourseForm = () => {
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (): Promise<void> => {
     const validationErrors = validateCourseFields(fields);
 
     if (Object.keys(validationErrors).length) {
@@ -110,9 +137,9 @@ const useCourseForm = () => {
     }
 
     const courseData = {
-      ...(isEditMode && { id: courseId }),
-      title: fields.title,
-      description: fields.description,
+      ...(isEditMode && courseId ? { id: courseId } : {}),
+      title: String(fields.title),
+      description: String(fields.description),
       duration: Number(fields.duration),
       authors: courseAuthors,
     };
@@ -141,7 +168,7 @@ const useCourseForm = () => {
 
   const courseAuthorObjects = courseAuthors
     .map((id) => authors.find((a) => a.id === id))
-    .filter(Boolean);
+    .filter((author): author is Author => author !== undefined);
 
   const submitLabel = isSaving
     ? 'Saving...'

@@ -4,22 +4,29 @@ import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from '../../../store/user/thunk';
 import { selectUserStatus } from '../../../store/user/selectors';
 import isValidEmail from '../../../helpers/isValidEmail';
+import type { AppDispatch } from '../../../store';
+import type { LoginFormData } from '../../../types';
 
-const validate = (formData) => {
-  const errors = {};
+interface LoginFormErrors {
+  email?: string;
+  password?: string;
+  server?: string;
+}
 
-  if (!formData.email) {
-    errors.email = 'Email is required';
-  } else if (!isValidEmail(formData.email)) {
-    errors.email = 'Please enter a valid email address';
-  }
+interface UseLoginFormReturn {
+  formData: LoginFormData;
+  errors: LoginFormErrors;
+  isLoading: boolean;
+  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleSubmit: (e: React.FormEvent) => Promise<void>;
+}
 
-  if (!formData.password) errors.password = 'Password is required';
-
-  return errors;
-};
-
-const getSafeRedirectPath = (search) => {
+/**
+ * Returns the redirect path from the URL query string if it is safe.
+ * Accepts only relative paths (starting with /) to prevent open redirect.
+ * Protocol-relative URLs (//evil.com) are explicitly rejected.
+ */
+const getSafeRedirectPath = (search: string): string => {
   const params = new URLSearchParams(search);
   const redirect = params.get('redirect');
 
@@ -33,23 +40,40 @@ const getSafeRedirectPath = (search) => {
   return isSafeRelativePath ? redirect : '/courses';
 };
 
-const useLoginForm = () => {
-  const [formData, setFormData] = useState({ email: '', password: '' });
-  const [errors, setErrors] = useState({});
+const validate = (formData: LoginFormData): LoginFormErrors => {
+  const errors: LoginFormErrors = {};
+
+  if (!formData.email) {
+    errors.email = 'Email is required';
+  } else if (!isValidEmail(formData.email)) {
+    errors.email = 'Please enter a valid email address';
+  }
+
+  if (!formData.password) errors.password = 'Password is required';
+
+  return errors;
+};
+
+const useLoginForm = (): UseLoginFormReturn => {
+  const [formData, setFormData] = useState<LoginFormData>({
+    email: '',
+    password: '',
+  });
+  const [errors, setErrors] = useState<LoginFormErrors>({});
 
   const navigate = useNavigate();
   const location = useLocation();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   const status = useSelector(selectUserStatus);
   const isLoading = status === 'loading';
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
 
     const validationErrors = validate(formData);
