@@ -6,6 +6,7 @@ import { MemoryRouter as Router } from 'react-router-dom';
 import userReducer from '../../store/user/reducer';
 import coursesReducer from '../../store/courses/reducer';
 import authorsReducer from '../../store/authors/reducer';
+import enrollmentsReducer from '../../store/enrollments/reducer';
 import Courses from './Courses';
 import {
   getCoursesService,
@@ -48,6 +49,11 @@ const initialState = {
     status: 'succeeded',
     error: null,
   },
+  enrollments: {
+    enrollments: [],
+    status: 'idle',
+    error: null,
+  },
 };
 
 const buildStore = (state = initialState) =>
@@ -56,6 +62,7 @@ const buildStore = (state = initialState) =>
       user: userReducer,
       courses: coursesReducer,
       authors: authorsReducer,
+      enrollments: enrollmentsReducer,
     },
     preloadedState: state,
   });
