@@ -20,7 +20,7 @@
     "noImplicitAny": false,
     "strictNullChecks": false,
 
-    "types": ["vitest/globals"]
+    "types": ["vitest/globals", "vite/client"]
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist", "build"]

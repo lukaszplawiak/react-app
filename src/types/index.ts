@@ -46,6 +46,11 @@ export interface LoginApiResponse {
   user: User;
 }
 
+export interface RegisterApiResponse {
+  successful: boolean;
+  user: User;
+}
+
 // ============================================================
 // Redux slice state types
 // ============================================================
