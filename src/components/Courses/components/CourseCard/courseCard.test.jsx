@@ -6,6 +6,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import userReducer from '../../../../store/user/reducer';
 import coursesReducer from '../../../../store/courses/reducer';
 import authorsReducer from '../../../../store/authors/reducer';
+import enrollmentsReducer from '../../../../store/enrollments/reducer';
 import CourseCard from './CourseCard';
 
 vi.mock('../../../../services');
@@ -31,6 +32,11 @@ const initialState = {
     status: 'succeeded',
     error: null,
   },
+  enrollments: {
+    enrollments: [],
+    status: 'idle',
+    error: null,
+  },
 };
 
 const sampleCourse = {
@@ -48,6 +54,7 @@ const buildStore = (state = initialState) =>
       user: userReducer,
       courses: coursesReducer,
       authors: authorsReducer,
+      enrollments: enrollmentsReducer,
     },
     preloadedState: state,
   });
