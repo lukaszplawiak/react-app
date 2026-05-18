@@ -1,7 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import type { UserState, User } from '../../types';
 import { fetchUser, loginUser, logoutUser } from './thunk';
 
-const initialState = {
+const initialState: UserState = {
   name: null,
   email: null,
   isAuth: false,
@@ -19,7 +21,7 @@ const userSlice = createSlice({
       .addCase(fetchUser.pending, (state) => {
         state.status = 'bootstrapping';
       })
-      .addCase(fetchUser.fulfilled, (state, action) => {
+      .addCase(fetchUser.fulfilled, (state, action: PayloadAction<User>) => {
         state.status = 'succeeded';
         state.name = action.payload.name;
         state.email = action.payload.email;
@@ -38,7 +40,7 @@ const userSlice = createSlice({
         state.status = 'loading';
         state.error = null;
       })
-      .addCase(loginUser.fulfilled, (state, action) => {
+      .addCase(loginUser.fulfilled, (state, action: PayloadAction<User>) => {
         state.status = 'succeeded';
         state.name = action.payload.name;
         state.email = action.payload.email;
@@ -46,9 +48,9 @@ const userSlice = createSlice({
         state.isAuth = true;
         state.error = null;
       })
-      .addCase(loginUser.rejected, (state, action) => {
+      .addCase(loginUser.rejected, (state, action: PayloadAction<unknown>) => {
         state.status = 'failed';
-        state.error = action.payload;
+        state.error = action.payload as string | null;
       })
       .addCase(logoutUser.fulfilled, (state) => {
         state.status = 'idle';

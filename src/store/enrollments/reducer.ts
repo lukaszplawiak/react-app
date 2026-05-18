@@ -1,7 +1,9 @@
 import { createSlice } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import type { EnrollmentsState, Enrollment } from '../../types';
 import { fetchEnrollments, enrollCourse } from './thunk';
 
-const initialState = {
+const initialState: EnrollmentsState = {
   enrollments: [],
   status: 'idle',
   error: null,
@@ -17,15 +19,15 @@ const enrollmentsSlice = createSlice({
         state.status = 'loading';
         state.error = null;
       })
-      .addCase(fetchEnrollments.fulfilled, (state, action) => {
+      .addCase(fetchEnrollments.fulfilled, (state, action: PayloadAction<Enrollment[]>) => {
         state.status = 'succeeded';
         state.enrollments = action.payload;
       })
-      .addCase(fetchEnrollments.rejected, (state, action) => {
+      .addCase(fetchEnrollments.rejected, (state, action: PayloadAction<unknown>) => {
         state.status = 'failed';
-        state.error = action.payload;
+        state.error = action.payload as string | null;
       })
-      .addCase(enrollCourse.fulfilled, (state, action) => {
+      .addCase(enrollCourse.fulfilled, (state, action: PayloadAction<Enrollment>) => {
         state.enrollments.push(action.payload);
       });
   },
