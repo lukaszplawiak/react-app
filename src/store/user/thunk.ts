@@ -17,7 +17,10 @@ export const fetchUser = createAsyncThunk<User, void, { rejectValue: string }>(
       }
       throw new Error('Application level request failed');
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'An error occurred while fetching user data.';
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'An error occurred while fetching user data.';
       return rejectWithValue(message);
     }
   }
@@ -31,12 +34,15 @@ export const registerUser = createAsyncThunk<User, { name: string; email: string
       const result = response.data;
 
       if (result.successful) {
-        return result.user as User;
+        return result.user;
       }
 
-      throw new Error(result.message || 'An error occurred while registering.');
+      throw new Error('An error occurred while registering.');
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Registration failed. Please try again.';
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Registration failed. Please try again.';
       return rejectWithValue(message);
     }
   }
@@ -49,20 +55,16 @@ export const loginUser = createAsyncThunk<User, { email: string; password: strin
       const response = await loginUserService(credentials);
       const result = response.data;
 
-      // Session is maintained via HttpOnly cookie set by the server.
-      // Token from result.result is intentionally not stored in Redux —
-      // it is only used server-side for cookie-based authentication.
       if (result.successful) {
-        return {
-          name: result.user.name,
-          email: result.user.email,
-          role: result.user.role,
-        } as User;
+        return result.user;
       }
 
-      throw new Error(result.message || 'An error occurred while logging in.');
+      throw new Error('An error occurred while logging in.');
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'An error occurred while logging in.';
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'An error occurred while logging in.';
       return rejectWithValue(message);
     }
   }
@@ -74,7 +76,10 @@ export const logoutUser = createAsyncThunk<void, void, { rejectValue: string }>(
     try {
       await logoutUserService();
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'An error occurred while logging out.';
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'An error occurred while logging out.';
       return rejectWithValue(message);
     }
   }
