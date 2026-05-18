@@ -29,4 +29,14 @@ describe('isValidEmail', () => {
       expect(isValidEmail(email)).toBe(false);
     });
   });
+
+  describe('edge cases', () => {
+    it('returns false for null', () => {
+      expect(isValidEmail(null)).toBe(false);
+    });
+
+    it('returns false for undefined', () => {
+      expect(isValidEmail(undefined)).toBe(false);
+    });
+  });
 });

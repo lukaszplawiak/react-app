@@ -1,4 +1,4 @@
-const getCourseDuration = (duration) => {
+const getCourseDuration = (duration: number | null | undefined): string => {
   const value = Number(duration);
 
   if (!Number.isFinite(value) || value <= 0) {
