@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
@@ -13,15 +13,12 @@ import { fetchCourses } from './store/courses/thunk';
 import { fetchAuthors } from './store/authors/thunk';
 import { fetchUser } from './store/user/thunk';
 import { fetchEnrollments } from './store/enrollments/thunk';
-import {
-  selectIsAuth,
-  selectIsAdmin,
-  selectUserStatus,
-} from './store/user/selectors';
+import { selectIsAuth, selectIsAdmin, selectUserStatus } from './store/user/selectors';
+import type { AppDispatch } from './store';
 import './App.css';
 
 function App() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const isAuth = useSelector(selectIsAuth);
   const isAdmin = useSelector(selectIsAdmin);
   const userStatus = useSelector(selectUserStatus);

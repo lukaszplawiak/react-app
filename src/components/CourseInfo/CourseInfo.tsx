@@ -1,4 +1,3 @@
-import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import formatCreationDate from '../../helpers/formatCreationDate';
@@ -6,25 +5,19 @@ import getCourseDuration from '../../helpers/getCourseDuration';
 import getAuthorNames from '../../helpers/getAuthorNames';
 import ErrorMessage from '../../common/ErrorMessage/ErrorMessage';
 import Button from '../../common/Button/Button';
-import {
-  selectCourses,
-  selectCoursesStatus,
-  selectCoursesError,
-} from '../../store/courses/selectors';
+import { selectCourses, selectCoursesStatus, selectCoursesError } from '../../store/courses/selectors';
 import { selectAuthors, selectAuthorsStatus } from '../../store/authors/selectors';
 import { selectIsAdmin } from '../../store/user/selectors';
 import { selectIsEnrolled } from '../../store/enrollments/selectors';
 import { enrollCourse } from '../../store/enrollments/thunk';
 import { fetchCourses } from '../../store/courses/thunk';
-import {
-  COURSE_INFO_LOADING_MESSAGE,
-  COURSE_INFO_NOT_FOUND_MESSAGE,
-} from '../../constants';
+import { COURSE_INFO_LOADING_MESSAGE, COURSE_INFO_NOT_FOUND_MESSAGE } from '../../constants';
+import type { AppDispatch } from '../../store';
 import './CourseInfo.css';
 
 function CourseInfo() {
-  const { courseId } = useParams();
-  const dispatch = useDispatch();
+  const { courseId } = useParams<{ courseId: string }>();
+  const dispatch = useDispatch<AppDispatch>();
 
   const coursesStatus = useSelector(selectCoursesStatus);
   const coursesError = useSelector(selectCoursesError);
@@ -32,13 +25,19 @@ function CourseInfo() {
   const courses = useSelector(selectCourses);
   const authors = useSelector(selectAuthors);
   const isAdmin = useSelector(selectIsAdmin);
-  const isEnrolled = useSelector(selectIsEnrolled(courseId));
+
+  const isEnrolled = useSelector(selectIsEnrolled(courseId ?? ''));
 
   const isLoading = coursesStatus === 'loading' || authorsStatus === 'loading';
   const hasFailed = coursesStatus === 'failed';
 
-  const handleRetry = () => dispatch(fetchCourses());
-  const handleEnroll = () => dispatch(enrollCourse(courseId));
+  const handleRetry = (): void => {
+    dispatch(fetchCourses());
+  };
+
+  const handleEnroll = (): void => {
+    if (courseId) dispatch(enrollCourse(courseId));
+  };
 
   if (isLoading) {
     return (

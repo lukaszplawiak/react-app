@@ -1,6 +1,12 @@
-import React from 'react';
 import './Button.css';
-import PropTypes from 'prop-types';
+
+interface ButtonProps {
+  label: string;
+  onClick?: () => void;
+  className?: string;
+  type?: 'button' | 'submit' | 'reset';
+  disabled?: boolean;
+}
 
 function Button({
   className = '',
@@ -8,7 +14,7 @@ function Button({
   label,
   type = 'button',
   disabled = false,
-}) {
+}: ButtonProps) {
   return (
     <button
       type={type}
@@ -20,13 +26,5 @@ function Button({
     </button>
   );
 }
-
-Button.propTypes = {
-  label: PropTypes.string.isRequired,
-  onClick: PropTypes.func,
-  className: PropTypes.string,
-  type: PropTypes.oneOf(['button', 'submit', 'reset']),
-  disabled: PropTypes.bool,
-};
 
 export default Button;

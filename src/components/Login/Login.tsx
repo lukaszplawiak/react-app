@@ -1,9 +1,11 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import Input from '../../common/Input/Input';
 import Button from '../../common/Button/Button';
 import useLoginForm from './hooks/useLoginForm';
 
+// Login is a pure presentational component after hook extraction.
+// All logic lives in useLoginForm — this component only renders.
+// No Props interface needed — Login takes no props from parent.
 function Login() {
   const { formData, errors, isLoading, handleChange, handleSubmit } =
     useLoginForm();

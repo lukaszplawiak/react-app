@@ -1,11 +1,6 @@
-import React from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import {
-  selectEnrollments,
-  selectEnrollmentsStatus,
-  selectEnrollmentsError,
-} from '../../store/enrollments/selectors';
+import { selectEnrollments, selectEnrollmentsStatus, selectEnrollmentsError } from '../../store/enrollments/selectors';
 import ErrorMessage from '../../common/ErrorMessage/ErrorMessage';
 import './Enrolled.css';
 
@@ -57,7 +52,9 @@ function Enrolled() {
               <tr key={enrollment.id}>
                 <td>{enrollment.userEmail}</td>
                 <td>{enrollment.courseName}</td>
-                <td>{new Date(enrollment.enrolledAt).toLocaleDateString('pl-PL')}</td>
+                <td>
+                  {new Date(enrollment.enrolledAt).toLocaleDateString('pl-PL')}
+                </td>
               </tr>
             ))}
           </tbody>

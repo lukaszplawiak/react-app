@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import CourseCard from './components/CourseCard/CourseCard';
@@ -7,21 +7,16 @@ import Button from '../../common/Button/Button';
 import EmptyCourseList from './components/EmptyCourseList';
 import ErrorMessage from '../../common/ErrorMessage/ErrorMessage';
 import { selectIsAdmin } from '../../store/user/selectors';
-import {
-  selectCourses,
-  selectCoursesStatus,
-  selectCoursesError,
-} from '../../store/courses/selectors';
-import {
-  selectAuthors,
-  selectAuthorsStatus,
-} from '../../store/authors/selectors';
+import { selectCourses, selectCoursesStatus, selectCoursesError } from '../../store/courses/selectors';
+import { selectAuthors, selectAuthorsStatus } from '../../store/authors/selectors';
 import { fetchCourses, deleteCourse } from '../../store/courses/thunk';
 import { ADD_NEW_COURSE_LABEL } from '../../constants';
+import type { AppDispatch } from '../../store';
+import type { Course } from '../../types';
 import './Courses.css';
 
 function Courses() {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const isAdmin = useSelector(selectIsAdmin);
   const courses = useSelector(selectCourses);
@@ -32,8 +27,8 @@ function Courses() {
   const isLoading = coursesStatus === 'loading' || authorsStatus === 'loading';
   const hasFailed = coursesStatus === 'failed';
 
-  const [query, setQuery] = useState('');
-  const [deleteError, setDeleteError] = useState(null);
+  const [query, setQuery] = useState<string>('');
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const filteredCourses = useMemo(
     () =>
@@ -43,10 +38,13 @@ function Courses() {
     [courses, query]
   );
 
-  const handleAddNewCourse = () => navigate('/courses/add');
-  const handleCourseSelect = (course) => navigate(`/courses/${course.id}`);
+  const handleAddNewCourse = (): void => navigate('/courses/add');
 
-  const handleDelete = async (courseId) => {
+  const handleCourseSelect = (course: Course): void => {
+    navigate(`/courses/${course.id}`);
+  };
+
+  const handleDelete = async (courseId: string): Promise<void> => {
     setDeleteError(null);
     const result = await dispatch(deleteCourse(courseId));
     if (deleteCourse.rejected.match(result)) {
@@ -56,8 +54,13 @@ function Courses() {
     }
   };
 
-  const handleUpdate = (courseId) => navigate(`/courses/update/${courseId}`);
-  const handleRetry = () => dispatch(fetchCourses());
+  const handleUpdate = (courseId: string): void => {
+    navigate(`/courses/update/${courseId}`);
+  };
+
+  const handleRetry = (): void => {
+    dispatch(fetchCourses());
+  };
 
   if (isLoading) {
     return (

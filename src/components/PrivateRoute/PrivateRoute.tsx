@@ -1,10 +1,14 @@
-import React from 'react';
-import PropTypes from 'prop-types';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { selectIsAuth, selectIsAdmin } from '../../store/user/selectors';
+import type { ReactNode } from 'react';
 
-const PrivateRoute = ({ children, requireAdmin = false }) => {
+interface PrivateRouteProps {
+  children: ReactNode;
+  requireAdmin?: boolean;
+}
+
+function PrivateRoute({ children, requireAdmin = false }: PrivateRouteProps) {
   const isAuth = useSelector(selectIsAuth);
   const isAdmin = useSelector(selectIsAdmin);
   const location = useLocation();
@@ -17,12 +21,7 @@ const PrivateRoute = ({ children, requireAdmin = false }) => {
     return <Navigate to="/courses" replace />;
   }
 
-  return children;
-};
-
-PrivateRoute.propTypes = {
-  children: PropTypes.node.isRequired,
-  requireAdmin: PropTypes.bool,
-};
+  return <>{children}</>;
+}
 
 export default PrivateRoute;
