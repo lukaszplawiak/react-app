@@ -1,5 +1,3 @@
-import React from 'react';
-import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import Button from '../../../../common/Button/Button';
 import formatCreationDate from '../../../../helpers/formatCreationDate';
@@ -7,7 +5,18 @@ import getCourseDuration from '../../../../helpers/getCourseDuration';
 import getAuthorNames from '../../../../helpers/getAuthorNames';
 import { enrollCourse } from '../../../../store/enrollments/thunk';
 import { selectIsEnrolled } from '../../../../store/enrollments/selectors';
+import type { Course, Author } from '../../../../types';
+import type { AppDispatch } from '../../../../store';
 import './CourseCard.css';
+
+interface CourseCardProps {
+  course: Course;
+  authors: Author[];
+  isAdmin: boolean;
+  onCourseSelect: (course: Course) => void;
+  onDelete: (courseId: string) => void;
+  onUpdate: (courseId: string) => void;
+}
 
 function CourseCard({
   course,
@@ -16,11 +25,12 @@ function CourseCard({
   onCourseSelect,
   onDelete,
   onUpdate,
-}) {
-  const dispatch = useDispatch();
+}: CourseCardProps) {
+  const dispatch = useDispatch<AppDispatch>();
+
   const isEnrolled = useSelector(selectIsEnrolled(course.id));
 
-  const handleEnroll = () => {
+  const handleEnroll = (): void => {
     dispatch(enrollCourse(course.id));
   };
 
@@ -68,26 +78,5 @@ function CourseCard({
     </div>
   );
 }
-
-CourseCard.propTypes = {
-  course: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
-    duration: PropTypes.number.isRequired,
-    creationDate: PropTypes.string,
-    authors: PropTypes.arrayOf(PropTypes.string).isRequired,
-  }).isRequired,
-  authors: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-    })
-  ).isRequired,
-  isAdmin: PropTypes.bool.isRequired,
-  onCourseSelect: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
-  onUpdate: PropTypes.func.isRequired,
-};
 
 export default CourseCard;

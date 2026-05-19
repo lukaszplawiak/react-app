@@ -1,32 +1,31 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import type { ChangeEvent, FormEvent } from 'react';
 import { INPUT_PLACEHOLDER } from '../../../../constants';
 import './SearchBar.css';
 
-const SearchBar = ({ value, onSearch }) => {
-  const handleChange = (event) => {
+interface SearchBarProps {
+  value: string;
+  onSearch: (value: string) => void;
+}
+
+function SearchBar({ value, onSearch }: SearchBarProps) {
+  const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
     onSearch(event.target.value);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
   };
 
   return (
     <form className="Search-bar" onSubmit={handleSubmit}>
       <input
-        type="search"
+        type="text"
         value={value}
         onChange={handleChange}
         placeholder={INPUT_PLACEHOLDER}
       />
     </form>
   );
-};
-
-SearchBar.propTypes = {
-  value: PropTypes.string.isRequired,
-  onSearch: PropTypes.func.isRequired,
-};
+}
 
 export default SearchBar;

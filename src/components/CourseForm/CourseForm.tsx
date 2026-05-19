@@ -1,4 +1,3 @@
-import React from 'react';
 import AuthorItem from './components/AuthorItem/AuthorItem';
 import Button from '../../common/Button/Button';
 import useCourseForm from './hooks/useCourseForm';
@@ -27,7 +26,13 @@ function CourseForm() {
       </label>
       <label>
         Description:
-        <textarea {...register('description')} />
+        {/* textarea does not support spread of register() directly
+            because register returns onChange typed for HTMLInputElement.
+            So extract value and onChange manually for textarea. */}
+        <textarea
+          value={String(register('description').value)}
+          onChange={register('description').onChange}
+        />
         <p className="error-message">{errors.description || ' '}</p>
       </label>
       <label>
