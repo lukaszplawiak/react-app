@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
@@ -13,34 +12,57 @@ import {
   getAuthorsService,
   getUserService,
 } from '../../services';
+import type { UserState, CoursesState, AuthorsState, EnrollmentsState, Course } from '../../types';
 
 vi.mock('../../services');
 
-const initialState = {
+const mockNavigate = vi.fn();
+
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  };
+});
+
+const sampleCourses: Course[] = [
+  {
+    id: '1',
+    title: 'Course 1',
+    description: 'Description 1',
+    duration: 125,
+    authors: ['11', '22'],
+    creationDate: '2024-01-01T00:00:00Z',
+  },
+  {
+    id: '2',
+    title: 'Course 2',
+    description: 'Description 2',
+    duration: 125,
+    authors: ['11', '22'],
+    creationDate: '2024-01-02T00:00:00Z',
+  },
+];
+
+interface TestPreloadedState {
+  user: UserState;
+  courses: CoursesState;
+  authors: AuthorsState;
+  enrollments: EnrollmentsState;
+}
+
+const initialState: TestPreloadedState = {
   user: {
     isAuth: true,
     name: 'Test Name',
+    email: 'admin@test.com',
     role: 'admin',
     status: 'succeeded',
     error: null,
   },
   courses: {
-    courses: [
-      {
-        id: '1',
-        title: 'Course 1',
-        description: 'Description 1',
-        duration: 125,
-        authors: ['11', '22'],
-      },
-      {
-        id: '2',
-        title: 'Course 2',
-        description: 'Description 2',
-        duration: 125,
-        authors: ['11', '22'],
-      },
-    ],
+    courses: sampleCourses,
     status: 'succeeded',
     error: null,
   },
@@ -56,7 +78,7 @@ const initialState = {
   },
 };
 
-const buildStore = (state = initialState) =>
+const buildStore = (state: TestPreloadedState = initialState) =>
   configureStore({
     reducer: {
       user: userReducer,
@@ -67,17 +89,7 @@ const buildStore = (state = initialState) =>
     preloadedState: state,
   });
 
-const mockNavigate = vi.fn();
-
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
-  return {
-    ...actual,
-    useNavigate: () => mockNavigate,
-  };
-});
-
-const renderCourses = (state = initialState) =>
+const renderCourses = (state: TestPreloadedState = initialState) =>
   render(
     <Provider store={buildStore(state)}>
       <Router>
@@ -89,15 +101,15 @@ const renderCourses = (state = initialState) =>
 describe('Courses Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    getCoursesService.mockResolvedValue({
+    vi.mocked(getCoursesService).mockResolvedValue({
       data: { successful: true, result: [] },
-    });
-    getAuthorsService.mockResolvedValue({
+    } as any);
+    vi.mocked(getAuthorsService).mockResolvedValue({
       data: { successful: true, result: [] },
-    });
-    getUserService.mockResolvedValue({
+    } as any);
+    vi.mocked(getUserService).mockResolvedValue({
       data: { successful: true, result: { name: 'Test Name', role: 'admin' } },
-    });
+    } as any);
   });
 
   it('should display a CourseCard for each course in the store', () => {
@@ -107,7 +119,7 @@ describe('Courses Component', () => {
   });
 
   it('should display loading message when courses are loading', () => {
-    const loadingState = {
+    const loadingState: TestPreloadedState = {
       ...initialState,
       courses: { ...initialState.courses, status: 'loading' },
     };
@@ -125,7 +137,7 @@ describe('Courses Component', () => {
   });
 
   it('should not display "Add new course" button for non-admin user', () => {
-    const userState = {
+    const userState: TestPreloadedState = {
       ...initialState,
       user: { ...initialState.user, role: 'user' },
     };
