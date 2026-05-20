@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { MemoryRouter as Router } from 'react-router-dom';
@@ -8,13 +7,36 @@ import coursesReducer from '../../../../store/courses/reducer';
 import authorsReducer from '../../../../store/authors/reducer';
 import enrollmentsReducer from '../../../../store/enrollments/reducer';
 import CourseCard from './CourseCard';
+import type { UserState, CoursesState, AuthorsState, EnrollmentsState, Course, Author } from '../../../../types';
 
 vi.mock('../../../../services');
 
-const initialState = {
+interface TestPreloadedState {
+  user: UserState;
+  courses: CoursesState;
+  authors: AuthorsState;
+  enrollments: EnrollmentsState;
+}
+
+const testAuthors: Author[] = [
+  { id: '1', name: 'Author One' },
+  { id: '2', name: 'Author Two' },
+];
+
+const sampleCourse: Course = {
+  id: 'sampleId',
+  title: 'Sample Course',
+  description: 'Sample Description',
+  duration: 125,
+  creationDate: '2021-07-20T10:00:00Z',
+  authors: ['1', '2'],
+};
+
+const initialState: TestPreloadedState = {
   user: {
     isAuth: true,
     name: 'username',
+    email: 'admin@test.com',
     role: 'admin',
     status: 'succeeded',
     error: null,
@@ -25,10 +47,7 @@ const initialState = {
     error: null,
   },
   authors: {
-    authors: [
-      { id: '1', name: 'Author One' },
-      { id: '2', name: 'Author Two' },
-    ],
+    authors: testAuthors,
     status: 'succeeded',
     error: null,
   },
@@ -39,16 +58,7 @@ const initialState = {
   },
 };
 
-const sampleCourse = {
-  id: 'sampleId',
-  title: 'Sample Course',
-  description: 'Sample Description',
-  duration: 125,
-  creationDate: '2021-07-20T10:00:00Z',
-  authors: ['1', '2'],
-};
-
-const buildStore = (state = initialState) =>
+const buildStore = (state: TestPreloadedState = initialState) =>
   configureStore({
     reducer: {
       user: userReducer,
@@ -59,18 +69,27 @@ const buildStore = (state = initialState) =>
     preloadedState: state,
   });
 
+// Typed render helper — TypeScript ensures all required props are passed.
+// Missing or mistyped props cause compile-time error, not runtime crash.
+interface RenderOptions {
+  isAdmin?: boolean;
+  onDelete?: (id: string) => void;
+  onUpdate?: (id: string) => void;
+  state?: TestPreloadedState;
+}
+
 const renderCourseCard = ({
   isAdmin = true,
   onDelete = vi.fn(),
   onUpdate = vi.fn(),
   state = initialState,
-} = {}) =>
+}: RenderOptions = {}) =>
   render(
     <Provider store={buildStore(state)}>
       <Router>
         <CourseCard
           course={sampleCourse}
-          authors={initialState.authors.authors}
+          authors={testAuthors}
           isAdmin={isAdmin}
           onCourseSelect={vi.fn()}
           onDelete={onDelete}
