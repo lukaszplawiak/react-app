@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Button from '../../../../common/Button/Button';
 import formatCreationDate from '../../../../helpers/formatCreationDate';
@@ -27,11 +28,18 @@ function CourseCard({
   onUpdate,
 }: CourseCardProps) {
   const dispatch = useDispatch<AppDispatch>();
-
   const isEnrolled = useSelector(selectIsEnrolled(course.id));
+  const [enrollError, setEnrollError] = useState<string | null>(null);
 
-  const handleEnroll = (): void => {
-    dispatch(enrollCourse(course.id));
+  const handleEnroll = async (): Promise<void> => {
+    setEnrollError(null);
+    const result = await dispatch(enrollCourse(course.id));
+
+    if (enrollCourse.rejected.match(result)) {
+      setEnrollError(
+        result.payload || 'Failed to enroll. Please try again.'
+      );
+    }
   };
 
   return (
@@ -66,12 +74,17 @@ function CourseCard({
               />
             </>
           ) : (
-            <Button
-              label={isEnrolled ? 'Enrolled ✓' : 'Enroll'}
-              className={`Course-button${isEnrolled ? ' Course-button--enrolled' : ''}`}
-              onClick={handleEnroll}
-              disabled={isEnrolled}
-            />
+            <>
+              <Button
+                label={isEnrolled ? 'Enrolled ✓' : 'Enroll'}
+                className={`Course-button${isEnrolled ? ' Course-button--enrolled' : ''}`}
+                onClick={handleEnroll}
+                disabled={isEnrolled}
+              />
+              {enrollError && (
+                <p className="enroll-error">{enrollError}</p>
+              )}
+            </>
           )}
         </div>
       </div>
