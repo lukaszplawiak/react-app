@@ -10,25 +10,25 @@
 .CreateCourse label {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  font-size: 14px;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-base);
   font-weight: 500;
-  color: #333;
+  color: var(--color-text);
 }
 
 .CreateCourse input,
 .CreateCourse textarea {
-  padding: 8px 12px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  padding: var(--spacing-sm) 12px;
+  font-size: var(--font-size-base);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
   outline: none;
   transition: border-color 0.2s;
 }
 
 .CreateCourse input:focus,
 .CreateCourse textarea:focus {
-  border-color: #555;
+  border-color: var(--color-text-secondary);
 }
 
 .CreateCourse textarea {
@@ -41,8 +41,8 @@
 }
 
 .CreateCourse .error-message {
-  font-size: 12px;
-  color: #c0392b;
+  font-size: var(--font-size-sm);
+  color: var(--color-error);
   min-height: 18px;
   margin: 0;
 }
@@ -50,12 +50,12 @@
 .CreateCourse .authors-section {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--spacing-sm);
 }
 
 .CreateCourse .authors-section__title {
-  font-size: 14px;
+  font-size: var(--font-size-base);
   font-weight: 500;
-  color: #333;
+  color: var(--color-text);
   margin: 0;
 }

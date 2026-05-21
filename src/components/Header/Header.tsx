@@ -27,10 +27,14 @@ function Header() {
 
   return (
     <div className="Header">
-      <Logo />
+      <div className="Header-left">
+        <Logo />
+      </div>
+      {!isAuthPage && userName && (
+        <div className="Hello">Hello, {userName}</div>
+      )}
       {!isAuthPage && (
-        <>
-          {userName && <div className="Hello">Hello, {userName}</div>}
+        <div className="Header-right">
           {isAuth ? (
             <div className="Header-actions">
               <Button
@@ -53,7 +57,7 @@ function Header() {
               onClick={() => navigate('/login')}
             />
           )}
-        </>
+        </div>
       )}
     </div>
   );

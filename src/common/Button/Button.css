@@ -1,13 +1,16 @@
 .Button {
-  display: inline-block;
-  padding: 10px 20px;
-  font-size: 14px;
+  width: var(--button-width);
+  padding: 10px var(--spacing-lg);
+  font-size: var(--font-size-base);
   font-weight: 500;
   text-align: center;
   text-decoration: none;
 
+  color: var(--color-surface);
+  background-color: var(--color-primary);
+
   border: none;
-  border-radius: 4px;
+  border-radius: var(--border-radius);
 
   cursor: pointer;
   transition: all 0.2s ease;
@@ -15,55 +18,4 @@
 
   font-family: inherit;
   line-height: 1;
-}
-
-.Button--primary {
-  color: #ffffff;
-  background-color: #007bff;
-}
-
-.Button--primary:hover {
-  background-color: #0056b3;
-  box-shadow: 0 2px 8px rgba(0, 86, 179, 0.2);
-}
-
-.Button--primary:active {
-  transform: scale(0.98);
-  box-shadow: 0 1px 4px rgba(0, 86, 179, 0.2);
-}
-
-.Button--danger {
-  color: #ffffff;
-  background-color: #dc3545;
-}
-
-.Button--danger:hover {
-  background-color: #b02a37;
-  box-shadow: 0 2px 8px rgba(176, 42, 55, 0.2);
-}
-
-.Button--danger:active {
-  transform: scale(0.98);
-  box-shadow: 0 1px 4px rgba(176, 42, 55, 0.2);
-}
-
-.Button:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-  opacity: 0.6;
-  box-shadow: none;
-}
-
-.Button:disabled:hover {
-  background-color: #cccccc;
-  transform: none;
-}
-
-.Button:focus {
-  outline: 2px solid #0056b3;
-  outline-offset: 2px;
-}
-
-.Button:focus:not(:focus-visible) {
-  outline: none;
 }
