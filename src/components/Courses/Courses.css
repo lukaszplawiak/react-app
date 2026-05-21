@@ -1,14 +1,28 @@
 .Courses {
   width: 100%;
   min-height: 100vh;
-  padding: 20px 0;
+  padding: var(--spacing-lg) 0;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: var(--spacing-lg);
 }
 
 .Courses-toolbar {
   display: flex;
+  flex-direction: row;
   align-items: center;
   width: 100%;
+}
+
+@media (max-width: 768px) {
+  .Courses-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+}
+
+.ButtonAdd {
+  width: var(--button-width);
+  align-self: center;
 }

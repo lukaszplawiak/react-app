@@ -1,10 +1,57 @@
+:root {
+  /* Components */
+  --button-width: 200px;
+  --button-width-sm: 160px;
+  
+  /* Colors — brand */
+  --color-primary: #007bff;
+  --color-primary-dark: #0056b3;
+  --color-danger: #dc3545;
+  --color-danger-dark: #b02a37;
+
+  /* Colors — text */
+  --color-text: #333;
+  --color-text-secondary: #555;
+  --color-text-muted: #666;
+
+  /* Colors — UI */
+  --color-background: #f5f5f5;
+  --color-surface: #ffffff;
+  --color-border: #ccc;
+  --color-border-light: #e0e0e0;
+  --color-error: #c0392b;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+  /* Shape */
+  --border-radius: 4px;
+  --border-radius-lg: 8px;
+
+  /* Typography */
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 20px;
+
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 20px;
+  --spacing-xl: 40px;
+}
+
 body {
   margin: 0;
   font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
-    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-background);
 }
 
 code {

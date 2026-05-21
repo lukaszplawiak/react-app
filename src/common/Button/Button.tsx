@@ -8,7 +8,7 @@ interface ButtonProps {
   type?: 'button' | 'submit' | 'reset';
   disabled?: boolean;
   to?: string;
-  variant?: 'primary' | 'danger';
+  variant?: 'primary' | 'danger' | 'link';
 }
 
 function Button({
@@ -24,7 +24,7 @@ function Button({
 
   if (to) {
     return (
-      <Link to={to} className={classes}>
+      <Link to={to} className={classes} style={{ display: 'inline-block', textDecoration: 'none' }}>
         {label}
       </Link>
     );

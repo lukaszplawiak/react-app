@@ -1,16 +1,17 @@
 .Course-all {
-  width: 1000px;
-  box-shadow: 4px 4px 4px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
+  width: 100%;
+  max-width: 1000px;
+  box-shadow: var(--shadow-sm);
+  border-radius: var(--border-radius-lg);
   overflow: hidden;
-  background: white;
-  padding: 20px;
+  background: var(--color-surface);
+  padding: var(--spacing-lg);
 }
 
 .Course-info {
   display: flex;
   flex-direction: column;
-  padding-right: 20px;
+  padding-right: var(--spacing-lg);
   flex: 0.7;
 }
 
@@ -23,24 +24,10 @@
   flex-direction: column;
 }
 
-.Button {
-  margin-top: 24px;
-  width: 190px;
-  height: 30px;
-  color: #f7f7f7;
-  background: #007bff;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
 .course-detail-panel {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-}
-
-.enroll-button {
-  margin-top: 1rem;
+  gap: var(--spacing-lg);
 }
 
 .enroll-button--enrolled {
