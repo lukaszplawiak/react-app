@@ -4,7 +4,7 @@ import './Logo.css';
 function Logo() {
   return (
     <Link to="/">
-      <img src="/react-logo.png" alt="logo" className="Logo" />
+      <img src="/logo512.png" alt="logo" className="Logo" />
     </Link>
   );
 }
