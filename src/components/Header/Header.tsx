@@ -1,7 +1,7 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logoutUser } from '../../store/user/thunk';
-import { selectIsAuth, selectUserName } from '../../store/user/selectors';
+import { selectIsAuth, selectIsAdmin, selectUserName } from '../../store/user/selectors';
 import { LOGIN_LABEL } from '../../constants';
 import Logo from './components/Logo/Logo';
 import Button from '../../common/Button/Button';
@@ -13,6 +13,7 @@ function Header() {
   const location = useLocation();
   const dispatch = useDispatch<AppDispatch>();
   const isAuth = useSelector(selectIsAuth);
+  const isAdmin = useSelector(selectIsAdmin);
   const userName = useSelector(selectUserName);
 
   const handleLogout = async (): Promise<void> => {
@@ -31,11 +32,20 @@ function Header() {
         <>
           {userName && <div className="Hello">Hello, {userName}</div>}
           {isAuth ? (
-            <Button
-              label="Logout"
-              className="ButtonHeader"
-              onClick={handleLogout}
-            />
+            <div className="Header-actions">
+              <Button
+                label="Logout"
+                className="ButtonHeader"
+                onClick={handleLogout}
+              />
+              {isAdmin && (
+                <Button
+                  label="Enrolled Students"
+                  className="ButtonHeader ButtonHeader--secondary"
+                  to="/enrolled"
+                />
+              )}
+            </div>
           ) : (
             <Button
               label={LOGIN_LABEL}
