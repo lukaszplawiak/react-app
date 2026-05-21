@@ -1,4 +1,4 @@
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import formatCreationDate from '../../helpers/formatCreationDate';
 import getCourseDuration from '../../helpers/getCourseDuration';
@@ -61,9 +61,7 @@ function CourseInfo() {
     return (
       <div className="Course-all">
         <p>{COURSE_INFO_NOT_FOUND_MESSAGE}</p>
-        <Link to="/courses" className="back-button">
-          Back to Courses
-        </Link>
+          <Button label="Back to Courses" to="/courses" />
       </div>
     );
   }
@@ -98,9 +96,7 @@ function CourseInfo() {
           />
         )}
       </div>
-      <Link to="/courses" className="back-button">
-        Back to Courses
-      </Link>
+        <Button label="Back to Courses" to="/courses" />
     </div>
   );
 }

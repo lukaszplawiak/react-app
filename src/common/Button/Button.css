@@ -1,30 +1,50 @@
 .Button {
+  display: inline-block;
   padding: 10px 20px;
   font-size: 14px;
   font-weight: 500;
-  
-  color: #ffffff;
-  background-color: #007bff;
-  
+  text-align: center;
+  text-decoration: none;
+
   border: none;
   border-radius: 4px;
-  
+
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
-  
+
   font-family: inherit;
   line-height: 1;
 }
 
-.Button:hover {
+.Button--primary {
+  color: #ffffff;
+  background-color: #007bff;
+}
+
+.Button--primary:hover {
   background-color: #0056b3;
   box-shadow: 0 2px 8px rgba(0, 86, 179, 0.2);
 }
 
-.Button:active {
+.Button--primary:active {
   transform: scale(0.98);
   box-shadow: 0 1px 4px rgba(0, 86, 179, 0.2);
+}
+
+.Button--danger {
+  color: #ffffff;
+  background-color: #dc3545;
+}
+
+.Button--danger:hover {
+  background-color: #b02a37;
+  box-shadow: 0 2px 8px rgba(176, 42, 55, 0.2);
+}
+
+.Button--danger:active {
+  transform: scale(0.98);
+  box-shadow: 0 1px 4px rgba(176, 42, 55, 0.2);
 }
 
 .Button:disabled {
@@ -46,21 +66,4 @@
 
 .Button:focus:not(:focus-visible) {
   outline: none;
-}
-
-.Button--link {
-  background: transparent;
-  color: #007bff;
-  padding: 0;
-  font-size: 14px;
-  font-weight: 500;
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
-}
-
-.Button--link:hover {
-  text-decoration: underline;
-  background: transparent;
-  box-shadow: none;
 }

@@ -64,6 +64,7 @@ function CourseCard({
             <>
               <Button
                 label="DELETE"
+                variant="danger"
                 className="Course-button"
                 onClick={() => onDelete(course.id)}
               />
