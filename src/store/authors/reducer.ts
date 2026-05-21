@@ -23,16 +23,16 @@ const authorsSlice = createSlice({
         state.status = 'succeeded';
         state.authors = action.payload;
       })
-      .addCase(fetchAuthors.rejected, (state, action: PayloadAction<unknown>) => {
+      .addCase(fetchAuthors.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.payload as string | null;
+        state.error = action.payload ?? null;
       })
       .addCase(createAuthor.fulfilled, (state, action: PayloadAction<Author>) => {
         state.authors.push(action.payload);
       })
-      .addCase(createAuthor.rejected, (state, action: PayloadAction<unknown>) => {
+      .addCase(createAuthor.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.payload as string | null;
+        state.error = action.payload ?? null;
       });
   },
 });

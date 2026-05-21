@@ -23,25 +23,25 @@ const coursesSlice = createSlice({
         state.status = 'succeeded';
         state.courses = action.payload;
       })
-      .addCase(fetchCourses.rejected, (state, action: PayloadAction<unknown>) => {
+      .addCase(fetchCourses.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.payload as string | null;
+        state.error = action.payload ?? null;
       })
       .addCase(createCourse.fulfilled, (state, action: PayloadAction<Course>) => {
         state.courses.push(action.payload);
       })
-      .addCase(createCourse.rejected, (state, action: PayloadAction<unknown>) => {
+      .addCase(createCourse.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.payload as string | null;
+        state.error = action.payload ?? null;
       })
-      .addCase(deleteCourse.fulfilled, (state, action: PayloadAction<string>) => {
+      .addCase(deleteCourse.fulfilled, (state, action) => {
         state.courses = state.courses.filter(
           (course) => course.id !== action.payload
         );
       })
-      .addCase(deleteCourse.rejected, (state, action: PayloadAction<unknown>) => {
+      .addCase(deleteCourse.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.payload as string | null;
+        state.error = action.payload ?? null;
       })
       .addCase(updateCourse.fulfilled, (state, action: PayloadAction<Course>) => {
         const index = state.courses.findIndex(
@@ -51,9 +51,9 @@ const coursesSlice = createSlice({
           state.courses[index] = action.payload;
         }
       })
-      .addCase(updateCourse.rejected, (state, action: PayloadAction<unknown>) => {
+      .addCase(updateCourse.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.payload as string | null;
+        state.error = action.payload ?? null;
       });
   },
 });

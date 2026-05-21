@@ -28,13 +28,13 @@ const userSlice = createSlice({
         state.role = action.payload.role;
         state.isAuth = true;
       })
-      .addCase(fetchUser.rejected, (state) => {
+      .addCase(fetchUser.rejected, (state, action) => {
         state.status = 'idle';
         state.isAuth = false;
         state.name = null;
         state.email = null;
         state.role = null;
-        state.error = null;
+        state.error = action.payload ?? null;
       })
       .addCase(loginUser.pending, (state) => {
         state.status = 'loading';
@@ -48,9 +48,9 @@ const userSlice = createSlice({
         state.isAuth = true;
         state.error = null;
       })
-      .addCase(loginUser.rejected, (state, action: PayloadAction<unknown>) => {
+      .addCase(loginUser.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.payload as string | null;
+        state.error = action.payload ?? null;
       })
       .addCase(logoutUser.fulfilled, (state) => {
         state.status = 'idle';
