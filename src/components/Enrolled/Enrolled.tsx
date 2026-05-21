@@ -1,8 +1,8 @@
 import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
 import { selectEnrollments, selectEnrollmentsStatus, selectEnrollmentsError } from '../../store/enrollments/selectors';
 import ErrorMessage from '../../common/ErrorMessage/ErrorMessage';
 import './Enrolled.css';
+import Button from '../../common/Button/Button';
 
 function Enrolled() {
   const enrollments = useSelector(selectEnrollments);
@@ -32,9 +32,7 @@ function Enrolled() {
     <div className="Enrolled">
       <div className="Enrolled-header">
         <h2>Enrolled Students</h2>
-        <Link to="/courses" className="back-button">
-          Back to Courses
-        </Link>
+        <Button label="Back to Courses" to="/courses" />
       </div>
       {enrollments.length === 0 ? (
         <p className="Enrolled-empty">No students enrolled yet.</p>

@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import './Button.css';
 
 interface ButtonProps {
@@ -6,6 +7,8 @@ interface ButtonProps {
   className?: string;
   type?: 'button' | 'submit' | 'reset';
   disabled?: boolean;
+  to?: string;
+  variant?: 'primary' | 'danger';
 }
 
 function Button({
@@ -14,11 +17,23 @@ function Button({
   label,
   type = 'button',
   disabled = false,
+  to,
+  variant = 'primary',
 }: ButtonProps) {
+  const classes = `Button Button--${variant} ${className}`.trim();
+
+  if (to) {
+    return (
+      <Link to={to} className={classes}>
+        {label}
+      </Link>
+    );
+  }
+
   return (
     <button
       type={type}
-      className={`Button ${className}`}
+      className={classes}
       onClick={onClick}
       disabled={disabled}
     >

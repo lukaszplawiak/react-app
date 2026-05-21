@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import Button from '../../common/Button/Button';
 import Input from '../../common/Input/Input';
 import useRegistrationForm from './hooks/useRegistrationForm';
@@ -38,9 +37,7 @@ function Registration() {
         label={isLoading ? 'Registering...' : 'Register'}
         disabled={isLoading}
       />
-      <Link to="/login">
-        If you have an account you may <strong>Login</strong>
-      </Link>
+      <Button label="Click to login" to="/login" />
     </form>
   );
 }
