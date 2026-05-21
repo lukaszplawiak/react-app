@@ -23,9 +23,9 @@ const enrollmentsSlice = createSlice({
         state.status = 'succeeded';
         state.enrollments = action.payload;
       })
-      .addCase(fetchEnrollments.rejected, (state, action: PayloadAction<unknown>) => {
+      .addCase(fetchEnrollments.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.payload as string | null;
+        state.error = action.payload ?? null;
       })
       .addCase(enrollCourse.fulfilled, (state, action: PayloadAction<Enrollment>) => {
         state.enrollments.push(action.payload);
