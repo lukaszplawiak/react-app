@@ -51,23 +51,32 @@ const buildWrapper = (store: ReturnType<typeof buildStore>) =>
   ({ children }: { children: ReactNode }) =>
     <Provider store={store}>{children}</Provider>;
 
-const fillAndSubmit = async (
-  result: ReturnType<typeof renderHook<ReturnType<typeof useLoginForm>, void>>['result']
+type HookResult = { current: ReturnType<typeof useLoginForm> };
+
+const fillFields = async (
+  result: HookResult,
+  fields: Partial<Record<'email' | 'password', string>>
 ) => {
-  result.current.handleChange({
-    target: { name: 'email', value: 'jan@example.com' },
-  } as React.ChangeEvent<HTMLInputElement>);
-  await waitFor(() => {
-    expect(result.current.formData.email).toBe('jan@example.com');
+  Object.entries(fields).forEach(([name, value]) => {
+    result.current.handleChange({
+      target: { name, value },
+    } as React.ChangeEvent<HTMLInputElement>);
   });
 
-  result.current.handleChange({
-    target: { name: 'password', value: 'secret123' },
-  } as React.ChangeEvent<HTMLInputElement>);
   await waitFor(() => {
-    expect(result.current.formData.password).toBe('secret123');
+    Object.entries(fields).forEach(([name, value]) => {
+      expect(
+        result.current.formData[name as keyof typeof result.current.formData]
+      ).toBe(value);
+    });
   });
+};
 
+const fillAndSubmit = async (result: HookResult) => {
+  await fillFields(result, {
+    email: 'jan@example.com',
+    password: 'secret123',
+  });
   await result.current.handleSubmit({
     preventDefault: vi.fn(),
   } as unknown as React.FormEvent);
@@ -87,6 +96,13 @@ describe('useLoginForm', () => {
       expect(result.current.formData).toEqual({ email: '', password: '' });
     });
 
+    it('initializes errors as empty object', () => {
+      const { result } = renderHook(() => useLoginForm(), {
+        wrapper: buildWrapper(buildStore()),
+      });
+      expect(result.current.errors).toEqual({});
+    });
+
     it('isLoading is false on init', () => {
       const { result } = renderHook(() => useLoginForm(), {
         wrapper: buildWrapper(buildStore()),
@@ -100,14 +116,25 @@ describe('useLoginForm', () => {
       const { result } = renderHook(() => useLoginForm(), {
         wrapper: buildWrapper(buildStore()),
       });
+      await fillFields(result, { email: 'test@example.com' });
+      expect(result.current.formData.email).toBe('test@example.com');
+    });
 
-      result.current.handleChange({
-        target: { name: 'email', value: 'test@example.com' },
-      } as React.ChangeEvent<HTMLInputElement>);
-
-      await waitFor(() => {
-        expect(result.current.formData.email).toBe('test@example.com');
+    it('updates password field', async () => {
+      const { result } = renderHook(() => useLoginForm(), {
+        wrapper: buildWrapper(buildStore()),
       });
+      await fillFields(result, { password: 'secret123' });
+      expect(result.current.formData.password).toBe('secret123');
+    });
+
+    it('does not overwrite other fields when updating one', async () => {
+      const { result } = renderHook(() => useLoginForm(), {
+        wrapper: buildWrapper(buildStore()),
+      });
+      await fillFields(result, { email: 'test@example.com', password: 'secret123' });
+      expect(result.current.formData.email).toBe('test@example.com');
+      expect(result.current.formData.password).toBe('secret123');
     });
   });
 
@@ -116,11 +143,9 @@ describe('useLoginForm', () => {
       const { result } = renderHook(() => useLoginForm(), {
         wrapper: buildWrapper(buildStore()),
       });
-
       await result.current.handleSubmit({
         preventDefault: vi.fn(),
       } as unknown as React.FormEvent);
-
       await waitFor(() => {
         expect(result.current.errors.email).toBe('Email is required');
       });
@@ -130,22 +155,36 @@ describe('useLoginForm', () => {
       const { result } = renderHook(() => useLoginForm(), {
         wrapper: buildWrapper(buildStore()),
       });
-
-      result.current.handleChange({
-        target: { name: 'email', value: 'notanemail' },
-      } as React.ChangeEvent<HTMLInputElement>);
-
-      await waitFor(() => {
-        expect(result.current.formData.email).toBe('notanemail');
-      });
-
+      await fillFields(result, { email: 'notanemail' });
       await result.current.handleSubmit({
         preventDefault: vi.fn(),
       } as unknown as React.FormEvent);
-
       await waitFor(() => {
         expect(result.current.errors.email).toBe('Please enter a valid email address');
       });
+    });
+
+    it('sets password error when password is empty', async () => {
+      const { result } = renderHook(() => useLoginForm(), {
+        wrapper: buildWrapper(buildStore()),
+      });
+      await fillFields(result, { email: 'test@example.com' });
+      await result.current.handleSubmit({
+        preventDefault: vi.fn(),
+      } as unknown as React.FormEvent);
+      await waitFor(() => {
+        expect(result.current.errors.password).toBe('Password is required');
+      });
+    });
+
+    it('does not call loginUserService when validation fails', async () => {
+      const { result } = renderHook(() => useLoginForm(), {
+        wrapper: buildWrapper(buildStore()),
+      });
+      await result.current.handleSubmit({
+        preventDefault: vi.fn(),
+      } as unknown as React.FormEvent);
+      expect(vi.mocked(loginUserService)).not.toHaveBeenCalled();
     });
   });
 
@@ -167,6 +206,17 @@ describe('useLoginForm', () => {
       await fillAndSubmit(result);
       await waitFor(() => {
         expect(mockNavigate).toHaveBeenCalledWith('/courses', { replace: true });
+      });
+    });
+
+    it('navigates to safe relative redirect path from query string', async () => {
+      mockSearch = '?redirect=/courses/add';
+      const { result } = renderHook(() => useLoginForm(), {
+        wrapper: buildWrapper(buildStore()),
+      });
+      await fillAndSubmit(result);
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledWith('/courses/add', { replace: true });
       });
     });
 

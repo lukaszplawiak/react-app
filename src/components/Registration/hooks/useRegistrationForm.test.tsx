@@ -49,11 +49,8 @@ const buildWrapper = (store: ReturnType<typeof buildStore>) =>
   ({ children }: { children: ReactNode }) =>
     <Provider store={store}>{children}</Provider>;
 
-// type HookResult = ReturnType<typeof renderHook<ReturnType<typeof useRegistrationForm>, void>>['result'];
-type HookResult = ReturnType<typeof useRegistrationForm>;
+type HookResult = { current: ReturnType<typeof useRegistrationForm> };
 
-// Fills multiple fields at once and waits until ALL updates are reflected in state.
-// This prevents race conditions where submit fires before state is fully updated.
 const fillFields = async (
   result: HookResult,
   fields: Partial<Record<'name' | 'email' | 'password', string>>
@@ -85,7 +82,7 @@ describe('useRegistrationForm', () => {
   });
 
   describe('initial state', () => {
-    it('initializes userData with empty fields', () => {
+    it('initializes userData with empty name, email and password', () => {
       const { result } = renderHook(() => useRegistrationForm(), {
         wrapper: buildWrapper(buildStore()),
       });
@@ -159,9 +156,7 @@ describe('useRegistrationForm', () => {
       await fillFields(result, { name: 'Jan Kowalski', email: 'notanemail' });
       await submitForm(result);
       await waitFor(() => {
-        expect(result.current.errors.email).toBe(
-          'Please enter a valid email address'
-        );
+        expect(result.current.errors.email).toBe('Please enter a valid email address');
       });
     });
 
@@ -203,6 +198,32 @@ describe('useRegistrationForm', () => {
   });
 
   describe('handleSubmit — success', () => {
+    it('calls registerUserService with userData', async () => {
+      vi.mocked(registerUserService).mockResolvedValueOnce({
+        data: {
+          successful: true,
+          user: { name: 'Jan Kowalski', email: 'jan@example.com', role: 'user' },
+        },
+      } as any);
+
+      const { result } = renderHook(() => useRegistrationForm(), {
+        wrapper: buildWrapper(buildStore()),
+      });
+
+      await fillFields(result, {
+        name: 'Jan Kowalski',
+        email: 'jan@example.com',
+        password: 'secret123',
+      });
+      await submitForm(result);
+
+      expect(vi.mocked(registerUserService)).toHaveBeenCalledWith({
+        name: 'Jan Kowalski',
+        email: 'jan@example.com',
+        password: 'secret123',
+      });
+    });
+
     it('navigates to /login after successful registration', async () => {
       vi.mocked(registerUserService).mockResolvedValueOnce({
         data: {
@@ -227,7 +248,7 @@ describe('useRegistrationForm', () => {
       });
     });
 
-    it('does not navigate to /courses after registration', async () => {
+    it('does not navigate to /courses — registration always goes to /login', async () => {
       vi.mocked(registerUserService).mockResolvedValueOnce({
         data: {
           successful: true,
