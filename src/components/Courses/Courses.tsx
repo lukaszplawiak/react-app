@@ -78,19 +78,10 @@ function Courses() {
     );
   }
 
-  return (
+    return (
     <div className="Courses">
       <div className="Courses-toolbar">
         <SearchBar value={query} onSearch={setQuery} />
-        {isAdmin && (
-          <div className="Courses-toolbar-actions">
-            <Button
-              label="Enrolled Students"
-              className="ButtonEnrolled"
-              onClick={() => navigate('/enrolled')}
-            />
-          </div>
-        )}
       </div>
       {deleteError && (
         <ErrorMessage
