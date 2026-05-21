@@ -16,9 +16,7 @@
     "allowJs": true,
     "checkJs": false,
 
-    "strict": false,
-    "noImplicitAny": false,
-    "strictNullChecks": false,
+    "strict": true,
 
     "types": ["vitest/globals", "vite/client"]
   },
