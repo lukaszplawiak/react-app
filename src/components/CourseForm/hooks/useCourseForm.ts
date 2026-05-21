@@ -136,19 +136,39 @@ const useCourseForm = (): UseCourseFormReturn => {
       return;
     }
 
-    const courseData = {
-      ...(isEditMode && courseId ? { id: courseId } : {}),
-      title: String(fields.title),
-      description: String(fields.description),
-      duration: Number(fields.duration),
-      authors: courseAuthors,
-    };
+    setIsSaving(true);
+
+    let result;
+
+    if (isEditMode && courseId) {
+      const courseToUpdate = courses.find((course) => course.id === courseId);
+
+      const creationDate = courseToUpdate?.creationDate ?? new Date().toISOString();
+
+      result = await dispatch(
+        updateCourse({
+          id: courseId,
+          title: String(fields.title),
+          description: String(fields.description),
+          duration: Number(fields.duration),
+          authors: courseAuthors,
+          creationDate,
+        })
+      );
+    } else {
+      result = await dispatch(
+        createCourse({
+          title: String(fields.title),
+          description: String(fields.description),
+          duration: Number(fields.duration),
+          authors: courseAuthors,
+        })
+      );
+    }
+
+    setIsSaving(false);
 
     const action = isEditMode ? updateCourse : createCourse;
-
-    setIsSaving(true);
-    const result = await dispatch(action(courseData));
-    setIsSaving(false);
 
     if (action.fulfilled.match(result)) {
       navigate('/courses');
