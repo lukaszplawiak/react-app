@@ -37,38 +37,7 @@
 }
 
 .ButtonHeader {
-  min-width: var(--button-width);
-  padding: 10px var(--spacing-lg);
-  background-color: var(--color-primary);
-  color: var(--color-surface);
-  border: none;
-  border-radius: var(--border-radius);
-  cursor: pointer;
-  font-size: var(--font-size-base);
-  font-weight: 500;
-  transition: background-color 0.2s;
-  white-space: nowrap;
   text-decoration: none;
-  display: inline-block;
-  text-align: center;
-}
-
-.ButtonHeader:hover {
-  background-color: var(--color-primary-dark);
-}
-
-.ButtonHeader--secondary {
-  background-color: var(--color-primary);
-  color: var(--color-surface);
-  border: none;
-  padding: 10px var(--spacing-lg);
-  font-size: var(--font-size-base);
-  min-width: var(--button-width);
-  text-align: center;
-}
-
-.ButtonHeader--secondary:hover {
-  background-color: var(--color-primary-dark);
 }
 
 @media (max-width: 768px) {
@@ -82,11 +51,5 @@
     font-size: var(--font-size-base);
     text-align: left;
     flex: unset;
-  }
-
-  .ButtonHeader {
-    padding: var(--spacing-sm) var(--spacing-md);
-    font-size: 13px;
-    min-width: unset;
   }
 }
