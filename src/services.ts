@@ -34,7 +34,7 @@ apiClient.interceptors.response.use(
     // In production, errors should be sent to a monitoring service
     // (e.g. Sentry, Datadog) — not logged to the browser console
     // where they are visible to anyone with DevTools open.
-    if (import.meta.env.MODE === 'development') {
+    if (import.meta.env.DEV) {
       console.error(
         `[API Error] ${error.config?.method?.toUpperCase()} ${url} — ${status ?? 'network error'}`,
         error.message

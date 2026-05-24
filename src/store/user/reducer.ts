@@ -62,12 +62,13 @@ const userSlice = createSlice({
         state.role = null;
         state.error = null;
       })
-      .addCase(logoutUser.rejected, (state) => {
+      .addCase(logoutUser.rejected, (state, action) => {
         state.status = 'idle';
         state.name = null;
         state.email = null;
         state.isAuth = false;
         state.role = null;
+        state.error = action.payload ?? null;
       });
   },
 });
