@@ -68,6 +68,7 @@ const userSlice = createSlice({
         state.email = null;
         state.isAuth = false;
         state.role = null;
+        state.error = action.payload ?? null;
       });
   },
 });
