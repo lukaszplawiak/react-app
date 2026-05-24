@@ -1,52 +1,23 @@
-import { useEffect } from 'react';
+import { Route, Routes, Navigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
-import { Navigate, Route, Routes } from 'react-router-dom';
-
-import { useDispatch, useSelector } from 'react-redux';
-
-import CourseForm from './components/CourseForm/CourseForm';
+import PrivateRoute from './components/PrivateRoute/PrivateRoute';
+import Header from './components/Header/Header';
 import CourseInfo from './components/CourseInfo/CourseInfo';
 import Courses from './components/Courses/Courses';
-import Enrolled from './components/Enrolled/Enrolled';
-import Header from './components/Header/Header';
-import Login from './components/Login/Login';
-import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 import Registration from './components/Registration/Registration';
-
+import Login from './components/Login/Login';
+import CourseForm from './components/CourseForm/CourseForm';
+import Enrolled from './components/Enrolled/Enrolled';
+import { useAppBootstrap } from './hooks/useAppBootstrap';
+import { selectIsAuth, selectIsAdmin } from './store/user/selectors';
 import './App.css';
-import type { AppDispatch } from './store';
-import { fetchAuthors } from './store/authors/thunk';
-import { fetchCourses } from './store/courses/thunk';
-import { fetchEnrollments } from './store/enrollments/thunk';
-import {
-  selectIsAdmin,
-  selectIsAuth,
-  selectUserStatus,
-} from './store/user/selectors';
-import { fetchUser } from './store/user/thunk';
 
 function App() {
-  const dispatch = useDispatch<AppDispatch>();
+  const { isBootstrapping } = useAppBootstrap();
   const isAuth = useSelector(selectIsAuth);
   const isAdmin = useSelector(selectIsAdmin);
-  const userStatus = useSelector(selectUserStatus);
-  const isBootstrapping = userStatus === 'bootstrapping';
   const defaultPath = isAuth ? '/courses' : '/login';
-
-  useEffect(() => {
-    dispatch(fetchUser());
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (!isAuth) return;
-    dispatch(fetchCourses());
-    dispatch(fetchAuthors());
-  }, [dispatch, isAuth]);
-
-  useEffect(() => {
-    if (!isAuth || !isAdmin) return;
-    dispatch(fetchEnrollments());
-  }, [dispatch, isAuth, isAdmin]);
 
   if (isBootstrapping) {
     return (
