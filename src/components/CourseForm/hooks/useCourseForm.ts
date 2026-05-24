@@ -1,12 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+
 import { useNavigate, useParams } from 'react-router-dom';
+
 import { useDispatch, useSelector } from 'react-redux';
-import { createCourse, updateCourse } from '../../../store/courses/thunk';
+
+import {
+  MIN_AUTHOR_NAME_LENGTH,
+  MIN_COURSE_DESCRIPTION_LENGTH,
+  MIN_COURSE_TITLE_LENGTH,
+} from '../../../constants';
+import type { AppDispatch } from '../../../store';
+import { selectAuthors } from '../../../store/authors/selectors';
 import { createAuthor } from '../../../store/authors/thunk';
 import { selectCourses } from '../../../store/courses/selectors';
-import { selectAuthors } from '../../../store/authors/selectors';
-import { MIN_AUTHOR_NAME_LENGTH, MIN_COURSE_TITLE_LENGTH, MIN_COURSE_DESCRIPTION_LENGTH } from '../../../constants';
-import type { AppDispatch } from '../../../store';
+import { createCourse, updateCourse } from '../../../store/courses/thunk';
 import type { Author, CourseFormFields } from '../../../types';
 
 interface CourseFormErrors {
@@ -19,7 +26,9 @@ interface CourseFormErrors {
 
 interface RegisterField {
   value: string | number;
-  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  onChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void;
 }
 
 interface UseCourseFormReturn {
@@ -143,7 +152,8 @@ const useCourseForm = (): UseCourseFormReturn => {
     if (isEditMode && courseId) {
       const courseToUpdate = courses.find((course) => course.id === courseId);
 
-      const creationDate = courseToUpdate?.creationDate ?? new Date().toISOString();
+      const creationDate =
+        courseToUpdate?.creationDate ?? new Date().toISOString();
 
       result = await dispatch(
         updateCourse({
@@ -193,8 +203,8 @@ const useCourseForm = (): UseCourseFormReturn => {
   const submitLabel = isSaving
     ? 'Saving...'
     : isEditMode
-    ? 'Update Course'
-    : 'Create Course';
+      ? 'Update Course'
+      : 'Create Course';
 
   return {
     register,

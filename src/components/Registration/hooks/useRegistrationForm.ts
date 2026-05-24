@@ -1,11 +1,14 @@
 import { useState } from 'react';
+
 import { useNavigate } from 'react-router-dom';
+
 import { useDispatch, useSelector } from 'react-redux';
-import { registerUser } from '../../../store/user/thunk';
-import { selectUserStatus } from '../../../store/user/selectors';
-import isValidEmail from '../../../helpers/isValidEmail';
+
 import { MIN_PASSWORD_LENGTH } from '../../../constants';
+import isValidEmail from '../../../helpers/isValidEmail';
 import type { AppDispatch } from '../../../store';
+import { selectUserStatus } from '../../../store/user/selectors';
+import { registerUser } from '../../../store/user/thunk';
 import type { RegistrationFormData } from '../../../types';
 
 interface RegistrationFormErrors {

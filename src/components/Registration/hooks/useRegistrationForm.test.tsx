@@ -1,14 +1,23 @@
-import { renderHook, waitFor } from '@testing-library/react';
-import { configureStore } from '@reduxjs/toolkit';
-import { Provider } from 'react-redux';
 import type { ReactNode } from 'react';
-import userReducer from '../../../store/user/reducer';
-import coursesReducer from '../../../store/courses/reducer';
-import authorsReducer from '../../../store/authors/reducer';
-import enrollmentsReducer from '../../../store/enrollments/reducer';
-import useRegistrationForm from './useRegistrationForm';
+
+import { Provider } from 'react-redux';
+
+import { configureStore } from '@reduxjs/toolkit';
+
+import { renderHook, waitFor } from '@testing-library/react';
+
 import { registerUserService } from '../../../services';
-import type { UserState, CoursesState, AuthorsState, EnrollmentsState } from '../../../types';
+import authorsReducer from '../../../store/authors/reducer';
+import coursesReducer from '../../../store/courses/reducer';
+import enrollmentsReducer from '../../../store/enrollments/reducer';
+import userReducer from '../../../store/user/reducer';
+import type {
+  AuthorsState,
+  CoursesState,
+  EnrollmentsState,
+  UserState,
+} from '../../../types';
+import useRegistrationForm from './useRegistrationForm';
 
 vi.mock('../../../services');
 
@@ -41,13 +50,19 @@ const buildStore = () =>
       } as UserState,
       courses: { courses: [], status: 'idle', error: null } as CoursesState,
       authors: { authors: [], status: 'idle', error: null } as AuthorsState,
-      enrollments: { enrollments: [], status: 'idle', error: null } as EnrollmentsState,
+      enrollments: {
+        enrollments: [],
+        status: 'idle',
+        error: null,
+      } as EnrollmentsState,
     },
   });
 
-const buildWrapper = (store: ReturnType<typeof buildStore>) =>
-  ({ children }: { children: ReactNode }) =>
-    <Provider store={store}>{children}</Provider>;
+const buildWrapper =
+  (store: ReturnType<typeof buildStore>) =>
+  ({ children }: { children: ReactNode }) => (
+    <Provider store={store}>{children}</Provider>
+  );
 
 type HookResult = { current: ReturnType<typeof useRegistrationForm> };
 
@@ -121,7 +136,10 @@ describe('useRegistrationForm', () => {
       const { result } = renderHook(() => useRegistrationForm(), {
         wrapper: buildWrapper(buildStore()),
       });
-      await fillFields(result, { name: 'Jan Kowalski', email: 'jan@example.com' });
+      await fillFields(result, {
+        name: 'Jan Kowalski',
+        email: 'jan@example.com',
+      });
       expect(result.current.userData.name).toBe('Jan Kowalski');
       expect(result.current.userData.email).toBe('jan@example.com');
     });
@@ -156,7 +174,9 @@ describe('useRegistrationForm', () => {
       await fillFields(result, { name: 'Jan Kowalski', email: 'notanemail' });
       await submitForm(result);
       await waitFor(() => {
-        expect(result.current.errors.email).toBe('Please enter a valid email address');
+        expect(result.current.errors.email).toBe(
+          'Please enter a valid email address'
+        );
       });
     });
 
@@ -164,7 +184,10 @@ describe('useRegistrationForm', () => {
       const { result } = renderHook(() => useRegistrationForm(), {
         wrapper: buildWrapper(buildStore()),
       });
-      await fillFields(result, { name: 'Jan Kowalski', email: 'jan@example.com' });
+      await fillFields(result, {
+        name: 'Jan Kowalski',
+        email: 'jan@example.com',
+      });
       await submitForm(result);
       await waitFor(() => {
         expect(result.current.errors.password).toBe('Password is required');
@@ -202,7 +225,11 @@ describe('useRegistrationForm', () => {
       vi.mocked(registerUserService).mockResolvedValueOnce({
         data: {
           successful: true,
-          user: { name: 'Jan Kowalski', email: 'jan@example.com', role: 'user' },
+          user: {
+            name: 'Jan Kowalski',
+            email: 'jan@example.com',
+            role: 'user',
+          },
         },
       } as any);
 

@@ -1,14 +1,25 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { Provider } from 'react-redux';
 import { MemoryRouter as Router } from 'react-router-dom';
+
+import { Provider } from 'react-redux';
+
 import { configureStore } from '@reduxjs/toolkit';
-import userReducer from '../../store/user/reducer';
-import coursesReducer from '../../store/courses/reducer';
+
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+
 import authorsReducer from '../../store/authors/reducer';
+import coursesReducer from '../../store/courses/reducer';
 import enrollmentsReducer from '../../store/enrollments/reducer';
-import Header from './Header';
+import userReducer from '../../store/user/reducer';
+
 import { logoutUserService } from '../../services';
-import type { UserState, CoursesState, AuthorsState, EnrollmentsState } from '../../types';
+import type {
+  AuthorsState,
+  CoursesState,
+  EnrollmentsState,
+  UserState,
+} from '../../types';
+
+import Header from './Header';
 
 vi.mock('../../services');
 
@@ -80,7 +91,9 @@ const renderHeader = (state: TestPreloadedState = initialState) =>
 describe('Header Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(logoutUserService).mockResolvedValue({ data: { successful: true } } as any);
+    vi.mocked(logoutUserService).mockResolvedValue({
+      data: { successful: true },
+    } as any);
   });
 
   it('should contain a logo', () => {

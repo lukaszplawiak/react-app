@@ -1,10 +1,13 @@
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+
+import { useLocation, useNavigate } from 'react-router-dom';
+
 import { useDispatch, useSelector } from 'react-redux';
-import { loginUser } from '../../../store/user/thunk';
-import { selectUserStatus } from '../../../store/user/selectors';
+
 import isValidEmail from '../../../helpers/isValidEmail';
 import type { AppDispatch } from '../../../store';
+import { selectUserStatus } from '../../../store/user/selectors';
+import { loginUser } from '../../../store/user/thunk';
 import type { LoginFormData } from '../../../types';
 
 interface LoginFormErrors {

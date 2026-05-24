@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+
 import './Button.css';
 
 interface ButtonProps {
@@ -24,7 +25,11 @@ function Button({
 
   if (to) {
     return (
-      <Link to={to} className={classes} style={{ display: 'inline-block', textDecoration: 'none' }}>
+      <Link
+        to={to}
+        className={classes}
+        style={{ display: 'inline-block', textDecoration: 'none' }}
+      >
         {label}
       </Link>
     );

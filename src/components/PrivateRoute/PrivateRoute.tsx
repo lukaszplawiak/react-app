@@ -1,7 +1,10 @@
-import { Navigate, useLocation } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { selectIsAuth, selectIsAdmin } from '../../store/user/selectors';
 import type { ReactNode } from 'react';
+
+import { Navigate, useLocation } from 'react-router-dom';
+
+import { useSelector } from 'react-redux';
+
+import { selectIsAdmin, selectIsAuth } from '../../store/user/selectors';
 
 interface PrivateRouteProps {
   children: ReactNode;

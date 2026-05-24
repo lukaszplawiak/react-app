@@ -1,4 +1,5 @@
 import type { ChangeEvent, FormEvent } from 'react';
+
 import { INPUT_PLACEHOLDER } from '../../../../constants';
 import './SearchBar.css';
 

@@ -1,13 +1,24 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import { Provider } from 'react-redux';
 import { MemoryRouter as Router } from 'react-router-dom';
+
+import { Provider } from 'react-redux';
+
 import { configureStore } from '@reduxjs/toolkit';
-import userReducer from '../../../../store/user/reducer';
-import coursesReducer from '../../../../store/courses/reducer';
+
+import { fireEvent, render, screen } from '@testing-library/react';
+
 import authorsReducer from '../../../../store/authors/reducer';
+import coursesReducer from '../../../../store/courses/reducer';
 import enrollmentsReducer from '../../../../store/enrollments/reducer';
+import userReducer from '../../../../store/user/reducer';
+import type {
+  Author,
+  AuthorsState,
+  Course,
+  CoursesState,
+  EnrollmentsState,
+  UserState,
+} from '../../../../types';
 import CourseCard from './CourseCard';
-import type { UserState, CoursesState, AuthorsState, EnrollmentsState, Course, Author } from '../../../../types';
 
 vi.mock('../../../../services');
 

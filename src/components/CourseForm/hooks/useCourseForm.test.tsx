@@ -1,18 +1,27 @@
-import { renderHook, waitFor } from '@testing-library/react';
-import { configureStore } from '@reduxjs/toolkit';
-import { Provider } from 'react-redux';
 import type { ReactNode } from 'react';
+
 import * as reactRouterDom from 'react-router-dom';
-import coursesReducer from '../../../store/courses/reducer';
+
+import { Provider } from 'react-redux';
+
+import { configureStore } from '@reduxjs/toolkit';
+
+import { renderHook, waitFor } from '@testing-library/react';
+
+import { createAuthorService, createCourseService } from '../../../services';
 import authorsReducer from '../../../store/authors/reducer';
-import userReducer from '../../../store/user/reducer';
+import coursesReducer from '../../../store/courses/reducer';
 import enrollmentsReducer from '../../../store/enrollments/reducer';
+import userReducer from '../../../store/user/reducer';
+import type {
+  Author,
+  AuthorsState,
+  Course,
+  CoursesState,
+  EnrollmentsState,
+  UserState,
+} from '../../../types';
 import useCourseForm from './useCourseForm';
-import {
-  createCourseService,
-  createAuthorService,
-} from '../../../services';
-import type { Author, Course, CoursesState, AuthorsState, UserState, EnrollmentsState } from '../../../types';
 
 vi.mock('../../../services');
 
@@ -39,12 +48,41 @@ const existingCourse: Course = {
   creationDate: '2024-01-01T00:00:00Z',
 };
 
-const buildStore = (preloadedState: {
-  courses?: CoursesState;
-  authors?: AuthorsState;
-  user?: UserState;
-  enrollments?: EnrollmentsState;
-} = {}) =>
+const defaultCoursesState: CoursesState = {
+  courses: [],
+  status: 'idle',
+  error: null,
+};
+
+const defaultAuthorsState: AuthorsState = {
+  authors: [existingAuthor, existingAuthor2],
+  status: 'succeeded',
+  error: null,
+};
+
+const defaultUserState: UserState = {
+  isAuth: true,
+  role: 'admin',
+  name: 'Admin',
+  email: 'admin@test.com',
+  status: 'succeeded',
+  error: null,
+};
+
+const defaultEnrollmentsState: EnrollmentsState = {
+  enrollments: [],
+  status: 'idle',
+  error: null,
+};
+
+const buildStore = (
+  preloadedState: {
+    courses?: CoursesState;
+    authors?: AuthorsState;
+    user?: UserState;
+    enrollments?: EnrollmentsState;
+  } = {}
+) =>
   configureStore({
     reducer: {
       courses: coursesReducer,
@@ -53,17 +91,19 @@ const buildStore = (preloadedState: {
       enrollments: enrollmentsReducer,
     },
     preloadedState: {
-      courses: { courses: [], status: 'idle', error: null },
-      authors: { authors: [existingAuthor, existingAuthor2], status: 'succeeded', error: null },
-      user: { isAuth: true, role: 'admin', name: 'Admin', email: 'admin@test.com', status: 'succeeded', error: null },
-      enrollments: { enrollments: [], status: 'idle', error: null },
+      courses: defaultCoursesState,
+      authors: defaultAuthorsState,
+      user: defaultUserState,
+      enrollments: defaultEnrollmentsState,
       ...preloadedState,
     },
   });
 
-const buildWrapper = (store: ReturnType<typeof buildStore>) =>
-  ({ children }: { children: ReactNode }) =>
-    <Provider store={store}>{children}</Provider>;
+const buildWrapper =
+  (store: ReturnType<typeof buildStore>) =>
+  ({ children }: { children: ReactNode }) => (
+    <Provider store={store}>{children}</Provider>
+  );
 
 type HookResult = { current: ReturnType<typeof useCourseForm> };
 
@@ -88,7 +128,9 @@ describe('useCourseForm', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(reactRouterDom.useNavigate).mockReturnValue(mockNavigate);
-    vi.mocked(reactRouterDom.useParams).mockReturnValue({ courseId: undefined });
+    vi.mocked(reactRouterDom.useParams).mockReturnValue({
+      courseId: undefined,
+    });
   });
 
   describe('initial state — create mode', () => {
@@ -121,7 +163,10 @@ describe('useCourseForm', () => {
       const { result } = renderHook(() => useCourseForm(), {
         wrapper: buildWrapper(buildStore()),
       });
-      expect(result.current.availableAuthors).toEqual([existingAuthor, existingAuthor2]);
+      expect(result.current.availableAuthors).toEqual([
+        existingAuthor,
+        existingAuthor2,
+      ]);
     });
   });
 
@@ -130,7 +175,11 @@ describe('useCourseForm', () => {
       vi.mocked(reactRouterDom.useParams).mockReturnValue({ courseId: 'c1' });
 
       const store = buildStore({
-        courses: { courses: [existingCourse], status: 'succeeded', error: null },
+        courses: {
+          courses: [existingCourse],
+          status: 'succeeded',
+          error: null,
+        },
       });
 
       const { result } = renderHook(() => useCourseForm(), {
@@ -140,7 +189,9 @@ describe('useCourseForm', () => {
       await waitFor(() => {
         expect(result.current.register('title').value).toBe('Existing Course');
       });
-      expect(result.current.register('description').value).toBe('Existing description');
+      expect(result.current.register('description').value).toBe(
+        'Existing description'
+      );
     });
 
     it('isEditMode is true when courseId is present', () => {
@@ -262,7 +313,9 @@ describe('useCourseForm', () => {
     it('isSaving is true during submit and false after', async () => {
       let resolveFn!: (value: any) => void;
       vi.mocked(createCourseService).mockReturnValueOnce(
-        new Promise((resolve) => { resolveFn = resolve; })
+        new Promise((resolve) => {
+          resolveFn = resolve;
+        })
       );
 
       const { result } = renderHook(() => useCourseForm(), {
@@ -316,7 +369,10 @@ describe('useCourseForm', () => {
       result.current.handleRemoveAuthorFromCourse('a1');
       await waitFor(() => {
         expect(result.current.courseAuthorObjects).toEqual([]);
-        expect(result.current.availableAuthors).toEqual([existingAuthor, existingAuthor2]);
+        expect(result.current.availableAuthors).toEqual([
+          existingAuthor,
+          existingAuthor2,
+        ]);
       });
     });
   });
@@ -354,7 +410,9 @@ describe('useCourseForm', () => {
       } as React.ChangeEvent<HTMLInputElement>);
 
       await waitFor(() => {
-        expect(result.current.register('newAuthorName').value).toBe('Grace Hopper');
+        expect(result.current.register('newAuthorName').value).toBe(
+          'Grace Hopper'
+        );
       });
 
       await result.current.handleCreateAuthor();
