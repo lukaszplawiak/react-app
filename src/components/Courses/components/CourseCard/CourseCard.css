@@ -1,3 +1,69 @@
+.Course-card {
+  width: 100%;
+  background: var(--color-surface);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-lg);
+  transition: box-shadow 0.2s;
+  min-height: 200px;
+}
+
+.Course-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.Course-rect {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--spacing-lg);
+  width: 100%;
+}
+
+.Course-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.Course-info h3 {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 10px;
+}
+
+.Course-info p {
+  font-size: var(--font-size-base);
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+
+.Course-details {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 250px;
+  align-items: flex-end;
+}
+
+.Course-details-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  text-align: right;
+}
+
+.Course-details-info p {
+  margin: 0;
+}
+
+.Course-button {
+  white-space: nowrap;
+}
+
 .Course-button--enrolled {
   opacity: 0.7;
   cursor: not-allowed;
@@ -8,4 +74,19 @@
   font-size: var(--font-size-sm);
   margin: var(--spacing-xs) 0 0 0;
   text-align: right;
+}
+
+@media (max-width: 768px) {
+  .Course-rect {
+    flex-direction: column;
+  }
+
+  .Course-details {
+    width: 100%;
+    align-items: stretch;
+  }
+
+  .Course-details-info {
+    text-align: left;
+  }
 }
