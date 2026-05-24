@@ -24,6 +24,21 @@ function Button({
   const classes = `Button Button--${variant} ${className}`.trim();
 
   if (to) {
+    if (disabled) {
+      if (import.meta.env.DEV) {
+        console.warn(
+          '[Button] Received both `to` and `disabled` props. ' +
+            'Rendering as a non-interactive <span>. ' +
+            'Consider whether this button should navigate at all when disabled.'
+        );
+      }
+      return (
+        <span className={`${classes} Button--disabled`} aria-disabled="true">
+          {label}
+        </span>
+      );
+    }
+
     return (
       <Link
         to={to}

@@ -57,14 +57,16 @@
   box-shadow: none;
 }
 
-.Button:disabled {
+.Button:disabled,
+.Button--disabled {
   background-color: var(--color-border);
   cursor: not-allowed;
   opacity: 0.6;
   box-shadow: none;
 }
 
-.Button:disabled:hover {
+.Button:disabled:hover,
+.Button--disabled:hover {
   background-color: var(--color-border);
   transform: none;
 }
