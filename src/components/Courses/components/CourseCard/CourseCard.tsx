@@ -1,15 +1,14 @@
 import { useState } from 'react';
-
 import { useDispatch, useSelector } from 'react-redux';
 
 import Button from '../../../../common/Button/Button';
 import formatCreationDate from '../../../../helpers/formatCreationDate';
-import getAuthorNames from '../../../../helpers/getAuthorNames';
 import getCourseDuration from '../../../../helpers/getCourseDuration';
-import type { AppDispatch } from '../../../../store';
-import { selectIsEnrolled } from '../../../../store/enrollments/selectors';
+import getAuthorNames from '../../../../helpers/getAuthorNames';
 import { enrollCourse } from '../../../../store/enrollments/thunk';
-import type { Author, Course } from '../../../../types';
+import { selectIsEnrolled } from '../../../../store/enrollments/selectors';
+import type { Course, Author } from '../../../../types';
+import type { AppDispatch, RootState } from '../../../../store';
 import './CourseCard.css';
 
 interface CourseCardProps {
@@ -30,7 +29,9 @@ function CourseCard({
   onUpdate,
 }: CourseCardProps) {
   const dispatch = useDispatch<AppDispatch>();
-  const isEnrolled = useSelector(selectIsEnrolled(course.id));
+  const isEnrolled = useSelector((state: RootState) =>
+    selectIsEnrolled(state, course.id)
+  );
   const [enrollError, setEnrollError] = useState<string | null>(null);
 
   const handleEnroll = async (): Promise<void> => {
@@ -38,7 +39,9 @@ function CourseCard({
     const result = await dispatch(enrollCourse(course.id));
 
     if (enrollCourse.rejected.match(result)) {
-      setEnrollError(result.payload || 'Failed to enroll. Please try again.');
+      setEnrollError(
+        result.payload || 'Failed to enroll. Please try again.'
+      );
     }
   };
 
@@ -51,10 +54,7 @@ function CourseCard({
         </div>
         <div className="Course-details">
           <div className="Course-details-info">
-            <p>
-              Authors:{' '}
-              {getAuthorNames(course.authors, authors, { truncate: true })}
-            </p>
+            <p>Authors: {getAuthorNames(course.authors, authors, { truncate: true })}</p>
             <p>Duration: {getCourseDuration(course.duration)}</p>
             <p>Creation date: {formatCreationDate(course.creationDate)}</p>
           </div>
@@ -85,7 +85,9 @@ function CourseCard({
                 onClick={handleEnroll}
                 disabled={isEnrolled}
               />
-              {enrollError && <p className="enroll-error">{enrollError}</p>}
+              {enrollError && (
+                <p className="enroll-error">{enrollError}</p>
+              )}
             </>
           )}
         </div>
