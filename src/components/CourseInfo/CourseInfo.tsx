@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 
@@ -31,6 +32,8 @@ function CourseInfo() {
     selectIsEnrolled(state, courseId ?? '')
   );
 
+  const [enrollError, setEnrollError] = useState<string | null>(null);
+
   const isLoading = coursesStatus === 'loading' || authorsStatus === 'loading';
   const hasFailed = coursesStatus === 'failed';
 
@@ -38,8 +41,17 @@ function CourseInfo() {
     dispatch(fetchCourses());
   };
 
-  const handleEnroll = (): void => {
-    if (courseId) dispatch(enrollCourse(courseId));
+  // Previously: dispatch result was ignored — API errors silently dropped.
+  // Now matches the CourseCard pattern: check rejected action and surface the error.
+  const handleEnroll = async (): Promise<void> => {
+    if (!courseId) return;
+    setEnrollError(null);
+    const result = await dispatch(enrollCourse(courseId));
+    if (enrollCourse.rejected.match(result)) {
+      setEnrollError(
+        result.payload || 'Failed to enroll. Please try again.'
+      );
+    }
   };
 
   if (isLoading) {
@@ -91,12 +103,17 @@ function CourseInfo() {
           </div>
         </div>
         {!isAdmin && (
-          <Button
-            label={isEnrolled ? 'Enrolled ✓' : 'Enroll in this course'}
-            className={`enroll-button${isEnrolled ? ' enroll-button--enrolled' : ''}`}
-            onClick={handleEnroll}
-            disabled={isEnrolled}
-          />
+          <>
+            <Button
+              label={isEnrolled ? 'Enrolled ✓' : 'Enroll in this course'}
+              className={`enroll-button${isEnrolled ? ' enroll-button--enrolled' : ''}`}
+              onClick={handleEnroll}
+              disabled={isEnrolled}
+            />
+            {enrollError && (
+              <p className="enroll-error">{enrollError}</p>
+            )}
+          </>
         )}
       </div>
       <Button label="Back to Courses" to="/courses" />
