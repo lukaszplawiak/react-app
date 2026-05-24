@@ -1,0 +1,67 @@
+.ErrorBoundary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: var(--spacing-lg);
+  background-color: var(--color-background);
+}
+
+.ErrorBoundary-content {
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+  padding: var(--spacing-lg);
+  background: var(--color-surface);
+  border-radius: var(--border-radius);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.ErrorBoundary-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-danger);
+  margin-bottom: var(--spacing-sm);
+}
+
+.ErrorBoundary-message {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-lg);
+  line-height: 1.5;
+}
+
+.ErrorBoundary-detail {
+  text-align: left;
+  font-size: 0.8rem;
+  background: var(--color-background);
+  color: var(--color-danger);
+  padding: var(--spacing-sm);
+  border-radius: var(--border-radius);
+  margin-bottom: var(--spacing-lg);
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.ErrorBoundary-button {
+  padding: 10px var(--spacing-lg);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  color: var(--color-surface);
+  background-color: var(--color-primary);
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-family: inherit;
+}
+
+.ErrorBoundary-button:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.ErrorBoundary-button:focus {
+  outline: 2px solid var(--color-primary-dark);
+  outline-offset: 2px;
+}
