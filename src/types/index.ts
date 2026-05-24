@@ -1,4 +1,10 @@
 // ============================================================
+// Utility types — defined first so domain types can reference them
+// ============================================================
+
+export type UserRole = 'admin' | 'user';
+
+// ============================================================
 // Domain types — business entities
 // ============================================================
 
@@ -19,7 +25,7 @@ export interface Author {
 export interface User {
   name: string;
   email: string;
-  role: 'admin' | 'user';
+  role: UserRole;
 }
 
 export interface Enrollment {
@@ -66,7 +72,7 @@ export interface UserState {
   name: string | null;
   email: string | null;
   isAuth: boolean;
-  role: 'admin' | 'user' | null;
+  role: UserRole | null;
   status: LoadingStatus;
   error: string | null;
 }
@@ -110,9 +116,3 @@ export interface CourseFormFields {
   duration: string | number;
   newAuthorName: string;
 }
-
-// ============================================================
-// Utility types
-// ============================================================
-
-export type UserRole = 'admin' | 'user';
