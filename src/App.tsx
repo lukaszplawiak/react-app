@@ -10,13 +10,12 @@ import Login from './components/Login/Login';
 import CourseForm from './components/CourseForm/CourseForm';
 import Enrolled from './components/Enrolled/Enrolled';
 import { useAppBootstrap } from './hooks/useAppBootstrap';
-import { selectIsAuth, selectIsAdmin } from './store/user/selectors';
+import { selectIsAuth } from './store/user/selectors';
 import './App.css';
 
 function App() {
   const { isBootstrapping } = useAppBootstrap();
   const isAuth = useSelector(selectIsAuth);
-  const isAdmin = useSelector(selectIsAdmin);
   const defaultPath = isAuth ? '/courses' : '/login';
 
   if (isBootstrapping) {
