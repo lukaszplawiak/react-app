@@ -33,10 +33,13 @@ function CourseCard({
     selectIsEnrolled(state, course.id)
   );
   const [enrollError, setEnrollError] = useState<string | null>(null);
+  const [isEnrolling, setIsEnrolling] = useState<boolean>(false);
 
   const handleEnroll = async (): Promise<void> => {
     setEnrollError(null);
+    setIsEnrolling(true);
     const result = await dispatch(enrollCourse(course.id));
+    setIsEnrolling(false);
 
     if (enrollCourse.rejected.match(result)) {
       setEnrollError(
@@ -80,10 +83,10 @@ function CourseCard({
           ) : (
             <>
               <Button
-                label={isEnrolled ? 'Enrolled ✓' : 'Enroll'}
+                label={isEnrolling ? 'Enrolling...' : isEnrolled ? 'Enrolled ✓' : 'Enroll'}
                 className={`Course-button${isEnrolled ? ' Course-button--enrolled' : ''}`}
                 onClick={handleEnroll}
-                disabled={isEnrolled}
+                disabled={isEnrolled || isEnrolling}
               />
               {enrollError && (
                 <p className="enroll-error">{enrollError}</p>

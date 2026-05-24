@@ -33,6 +33,7 @@ function CourseInfo() {
   );
 
   const [enrollError, setEnrollError] = useState<string | null>(null);
+  const [isEnrolling, setIsEnrolling] = useState<boolean>(false);
 
   const isLoading = coursesStatus === 'loading' || authorsStatus === 'loading';
   const hasFailed = coursesStatus === 'failed';
@@ -41,12 +42,13 @@ function CourseInfo() {
     dispatch(fetchCourses());
   };
 
-  // Previously: dispatch result was ignored — API errors silently dropped.
-  // Now matches the CourseCard pattern: check rejected action and surface the error.
   const handleEnroll = async (): Promise<void> => {
     if (!courseId) return;
     setEnrollError(null);
+    setIsEnrolling(true);
     const result = await dispatch(enrollCourse(courseId));
+    setIsEnrolling(false);
+
     if (enrollCourse.rejected.match(result)) {
       setEnrollError(
         result.payload || 'Failed to enroll. Please try again.'
@@ -105,10 +107,10 @@ function CourseInfo() {
         {!isAdmin && (
           <>
             <Button
-              label={isEnrolled ? 'Enrolled ✓' : 'Enroll in this course'}
+              label={isEnrolling ? 'Enrolling...' : isEnrolled ? 'Enrolled ✓' : 'Enroll in this course'}
               className={`enroll-button${isEnrolled ? ' enroll-button--enrolled' : ''}`}
               onClick={handleEnroll}
-              disabled={isEnrolled}
+              disabled={isEnrolled || isEnrolling}
             />
             {enrollError && (
               <p className="enroll-error">{enrollError}</p>
