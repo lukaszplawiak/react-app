@@ -1,5 +1,6 @@
 import Button from '../../common/Button/Button';
 import Input from '../../common/Input/Input';
+
 import useRegistrationForm from './hooks/useRegistrationForm';
 
 function Registration() {

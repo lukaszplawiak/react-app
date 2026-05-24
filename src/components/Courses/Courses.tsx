@@ -1,18 +1,32 @@
-import { useState, useMemo } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useMemo, useState } from 'react';
+
 import { useNavigate } from 'react-router-dom';
-import CourseCard from './components/CourseCard/CourseCard';
-import SearchBar from './components/SearchBar/SearchBar';
-import Button from '../../common/Button/Button';
-import EmptyCourseList from './components/EmptyCourseList';
-import ErrorMessage from '../../common/ErrorMessage/ErrorMessage';
+
+import { useDispatch, useSelector } from 'react-redux';
+
+import {
+  selectAuthors,
+  selectAuthorsStatus,
+} from '../../store/authors/selectors';
+import {
+  selectCourses,
+  selectCoursesError,
+  selectCoursesStatus,
+} from '../../store/courses/selectors';
+import { deleteCourse, fetchCourses } from '../../store/courses/thunk';
 import { selectIsAdmin } from '../../store/user/selectors';
-import { selectCourses, selectCoursesStatus, selectCoursesError } from '../../store/courses/selectors';
-import { selectAuthors, selectAuthorsStatus } from '../../store/authors/selectors';
-import { fetchCourses, deleteCourse } from '../../store/courses/thunk';
+
+import CourseCard from './components/CourseCard/CourseCard';
+import EmptyCourseList from './components/EmptyCourseList';
+import SearchBar from './components/SearchBar/SearchBar';
+
+import Button from '../../common/Button/Button';
+import ErrorMessage from '../../common/ErrorMessage/ErrorMessage';
+
 import { ADD_NEW_COURSE_LABEL } from '../../constants';
-import type { AppDispatch } from '../../store';
 import type { Course } from '../../types';
+
+import type { AppDispatch } from '../../store';
 import './Courses.css';
 
 function Courses() {
@@ -38,7 +52,7 @@ function Courses() {
     [courses, query]
   );
 
-  const handleAddNewCourse = (): void => navigate('/courses/add');
+  const handleAddNewCourse = () => navigate('/courses/add');
 
   const handleCourseSelect = (course: Course): void => {
     navigate(`/courses/${course.id}`);
@@ -78,7 +92,7 @@ function Courses() {
     );
   }
 
-    return (
+  return (
     <div className="Courses">
       <div className="Courses-toolbar">
         <SearchBar value={query} onSearch={setQuery} />

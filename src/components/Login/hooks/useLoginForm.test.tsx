@@ -1,14 +1,23 @@
-import { renderHook, waitFor } from '@testing-library/react';
-import { configureStore } from '@reduxjs/toolkit';
-import { Provider } from 'react-redux';
 import type { ReactNode } from 'react';
-import userReducer from '../../../store/user/reducer';
-import coursesReducer from '../../../store/courses/reducer';
-import authorsReducer from '../../../store/authors/reducer';
-import enrollmentsReducer from '../../../store/enrollments/reducer';
-import useLoginForm from './useLoginForm';
+
+import { Provider } from 'react-redux';
+
+import { configureStore } from '@reduxjs/toolkit';
+
+import { renderHook, waitFor } from '@testing-library/react';
+
 import { loginUserService } from '../../../services';
-import type { UserState, CoursesState, AuthorsState, EnrollmentsState } from '../../../types';
+import authorsReducer from '../../../store/authors/reducer';
+import coursesReducer from '../../../store/courses/reducer';
+import enrollmentsReducer from '../../../store/enrollments/reducer';
+import userReducer from '../../../store/user/reducer';
+import type {
+  AuthorsState,
+  CoursesState,
+  EnrollmentsState,
+  UserState,
+} from '../../../types';
+import useLoginForm from './useLoginForm';
 
 vi.mock('../../../services');
 
@@ -43,13 +52,19 @@ const buildStore = () =>
       } as UserState,
       courses: { courses: [], status: 'idle', error: null } as CoursesState,
       authors: { authors: [], status: 'idle', error: null } as AuthorsState,
-      enrollments: { enrollments: [], status: 'idle', error: null } as EnrollmentsState,
+      enrollments: {
+        enrollments: [],
+        status: 'idle',
+        error: null,
+      } as EnrollmentsState,
     },
   });
 
-const buildWrapper = (store: ReturnType<typeof buildStore>) =>
-  ({ children }: { children: ReactNode }) =>
-    <Provider store={store}>{children}</Provider>;
+const buildWrapper =
+  (store: ReturnType<typeof buildStore>) =>
+  ({ children }: { children: ReactNode }) => (
+    <Provider store={store}>{children}</Provider>
+  );
 
 type HookResult = { current: ReturnType<typeof useLoginForm> };
 
@@ -132,7 +147,10 @@ describe('useLoginForm', () => {
       const { result } = renderHook(() => useLoginForm(), {
         wrapper: buildWrapper(buildStore()),
       });
-      await fillFields(result, { email: 'test@example.com', password: 'secret123' });
+      await fillFields(result, {
+        email: 'test@example.com',
+        password: 'secret123',
+      });
       expect(result.current.formData.email).toBe('test@example.com');
       expect(result.current.formData.password).toBe('secret123');
     });
@@ -160,7 +178,9 @@ describe('useLoginForm', () => {
         preventDefault: vi.fn(),
       } as unknown as React.FormEvent);
       await waitFor(() => {
-        expect(result.current.errors.email).toBe('Please enter a valid email address');
+        expect(result.current.errors.email).toBe(
+          'Please enter a valid email address'
+        );
       });
     });
 
@@ -205,7 +225,9 @@ describe('useLoginForm', () => {
       });
       await fillAndSubmit(result);
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('/courses', { replace: true });
+        expect(mockNavigate).toHaveBeenCalledWith('/courses', {
+          replace: true,
+        });
       });
     });
 
@@ -216,7 +238,9 @@ describe('useLoginForm', () => {
       });
       await fillAndSubmit(result);
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('/courses/add', { replace: true });
+        expect(mockNavigate).toHaveBeenCalledWith('/courses/add', {
+          replace: true,
+        });
       });
     });
 
@@ -227,7 +251,9 @@ describe('useLoginForm', () => {
       });
       await fillAndSubmit(result);
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('/courses', { replace: true });
+        expect(mockNavigate).toHaveBeenCalledWith('/courses', {
+          replace: true,
+        });
       });
     });
 
@@ -238,7 +264,9 @@ describe('useLoginForm', () => {
       });
       await fillAndSubmit(result);
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith('/courses', { replace: true });
+        expect(mockNavigate).toHaveBeenCalledWith('/courses', {
+          replace: true,
+        });
       });
     });
   });

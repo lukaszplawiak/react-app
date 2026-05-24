@@ -1,8 +1,15 @@
 import { useSelector } from 'react-redux';
-import { selectEnrollments, selectEnrollmentsStatus, selectEnrollmentsError } from '../../store/enrollments/selectors';
-import ErrorMessage from '../../common/ErrorMessage/ErrorMessage';
-import './Enrolled.css';
+
+import {
+  selectEnrollments,
+  selectEnrollmentsError,
+  selectEnrollmentsStatus,
+} from '../../store/enrollments/selectors';
+
 import Button from '../../common/Button/Button';
+import ErrorMessage from '../../common/ErrorMessage/ErrorMessage';
+
+import './Enrolled.css';
 
 function Enrolled() {
   const enrollments = useSelector(selectEnrollments);

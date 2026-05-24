@@ -1,8 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
-import userReducer from './user/reducer';
-import coursesReducer from './courses/reducer';
+
 import authorsReducer from './authors/reducer';
+import coursesReducer from './courses/reducer';
 import enrollmentsReducer from './enrollments/reducer';
+import userReducer from './user/reducer';
 
 const store = configureStore({
   reducer: {

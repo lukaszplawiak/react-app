@@ -1,5 +1,6 @@
-import Input from '../../common/Input/Input';
 import Button from '../../common/Button/Button';
+import Input from '../../common/Input/Input';
+
 import useLoginForm from './hooks/useLoginForm';
 
 // Login is a pure presentational component after hook extraction.

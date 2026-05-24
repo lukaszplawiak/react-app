@@ -2,11 +2,15 @@ import formatCreationDate from './formatCreationDate';
 
 describe('formatCreationDate', () => {
   it('should format date with zero-padded day and month', () => {
-    expect(formatCreationDate(new Date('2021-07-20T10:00:00Z'))).toBe('20.07.2021');
+    expect(formatCreationDate(new Date('2021-07-20T10:00:00Z'))).toBe(
+      '20.07.2021'
+    );
   });
 
   it('should format single-digit day and month with leading zeros', () => {
-    expect(formatCreationDate(new Date('2021-01-05T10:00:00Z'))).toBe('05.01.2021');
+    expect(formatCreationDate(new Date('2021-01-05T10:00:00Z'))).toBe(
+      '05.01.2021'
+    );
   });
 
   it('should accept ISO string as input', () => {

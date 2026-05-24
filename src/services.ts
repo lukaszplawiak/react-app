@@ -1,14 +1,15 @@
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
+
 import { API_BASE_URL } from './config';
 import type {
   ApiResponse,
+  Author,
+  Course,
+  Enrollment,
   LoginApiResponse,
   RegisterApiResponse,
-  Course,
-  Author,
   User,
-  Enrollment,
 } from './types';
 
 const apiClient = axios.create({
@@ -46,8 +47,9 @@ apiClient.interceptors.response.use(
 
 // --- Courses ---
 
-export const getCoursesService = (): Promise<AxiosResponse<ApiResponse<Course[]>>> =>
-  apiClient.get('/courses/all');
+export const getCoursesService = (): Promise<
+  AxiosResponse<ApiResponse<Course[]>>
+> => apiClient.get('/courses/all');
 
 export const createCourseService = (
   course: Omit<Course, 'id' | 'creationDate'>
@@ -66,8 +68,9 @@ export const updateCourseService = (
 
 // --- Authors ---
 
-export const getAuthorsService = (): Promise<AxiosResponse<ApiResponse<Author[]>>> =>
-  apiClient.get('/authors/all');
+export const getAuthorsService = (): Promise<
+  AxiosResponse<ApiResponse<Author[]>>
+> => apiClient.get('/authors/all');
 
 export const createAuthorService = (
   author: Pick<Author, 'name'>
@@ -76,21 +79,25 @@ export const createAuthorService = (
 
 // --- User ---
 
-export const registerUserService = (
-  userData: { name: string; email: string; password: string }
-): Promise<AxiosResponse<RegisterApiResponse>> =>
+export const registerUserService = (userData: {
+  name: string;
+  email: string;
+  password: string;
+}): Promise<AxiosResponse<RegisterApiResponse>> =>
   apiClient.post('/register', userData);
 
-export const loginUserService = (
-  credentials: { email: string; password: string }
-): Promise<AxiosResponse<LoginApiResponse>> =>
+export const loginUserService = (credentials: {
+  email: string;
+  password: string;
+}): Promise<AxiosResponse<LoginApiResponse>> =>
   apiClient.post('/login', credentials);
 
 export const getUserService = (): Promise<AxiosResponse<ApiResponse<User>>> =>
   apiClient.get('/users/me');
 
-export const logoutUserService = (): Promise<AxiosResponse<ApiResponse<null>>> =>
-  apiClient.delete('/logout');
+export const logoutUserService = (): Promise<
+  AxiosResponse<ApiResponse<null>>
+> => apiClient.delete('/logout');
 
 // --- Enrollments ---
 
@@ -99,5 +106,6 @@ export const enrollCourseService = (
 ): Promise<AxiosResponse<ApiResponse<Enrollment>>> =>
   apiClient.post('/enrollments', { courseId });
 
-export const getEnrollmentsService = (): Promise<AxiosResponse<ApiResponse<Enrollment[]>>> =>
-  apiClient.get('/enrollments');
+export const getEnrollmentsService = (): Promise<
+  AxiosResponse<ApiResponse<Enrollment[]>>
+> => apiClient.get('/enrollments');

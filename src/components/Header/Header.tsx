@@ -1,10 +1,20 @@
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+
 import { useDispatch, useSelector } from 'react-redux';
+
+import {
+  selectIsAdmin,
+  selectIsAuth,
+  selectUserName,
+} from '../../store/user/selectors';
 import { logoutUser } from '../../store/user/thunk';
-import { selectIsAuth, selectIsAdmin, selectUserName } from '../../store/user/selectors';
-import { LOGIN_LABEL } from '../../constants';
+
 import Logo from './components/Logo/Logo';
+
 import Button from '../../common/Button/Button';
+
+import { LOGIN_LABEL } from '../../constants';
+
 import type { AppDispatch } from '../../store';
 import './Header.css';
 
@@ -22,8 +32,7 @@ function Header() {
   };
 
   const isAuthPage =
-    location.pathname === '/login' ||
-    location.pathname === '/registration';
+    location.pathname === '/login' || location.pathname === '/registration';
 
   return (
     <div className="Header">

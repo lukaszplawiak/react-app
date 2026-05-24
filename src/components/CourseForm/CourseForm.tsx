@@ -1,7 +1,9 @@
 import AuthorItem from './components/AuthorItem/AuthorItem';
+
 import Button from '../../common/Button/Button';
-import useCourseForm from './hooks/useCourseForm';
+
 import './CourseForm.css';
+import useCourseForm from './hooks/useCourseForm';
 
 function CourseForm() {
   const {

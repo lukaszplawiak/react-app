@@ -1,16 +1,23 @@
 import { configureStore } from '@reduxjs/toolkit';
-import coursesReducer from './reducer';
-import authorsReducer from '../authors/reducer';
-import userReducer from '../user/reducer';
-import enrollmentsReducer from '../enrollments/reducer';
-import { fetchCourses, createCourse, deleteCourse, updateCourse } from './thunk';
+
 import {
-  getCoursesService,
   createCourseService,
   deleteCourseService,
+  getCoursesService,
   updateCourseService,
 } from '../../services';
-import type { CoursesState, Course } from '../../types';
+import type { Course, CoursesState } from '../../types';
+
+import authorsReducer from '../authors/reducer';
+import enrollmentsReducer from '../enrollments/reducer';
+import userReducer from '../user/reducer';
+import coursesReducer from './reducer';
+import {
+  createCourse,
+  deleteCourse,
+  fetchCourses,
+  updateCourse,
+} from './thunk';
 
 vi.mock('../../services');
 
@@ -98,18 +105,24 @@ describe('Courses Thunks', () => {
 
   describe('createCourse', () => {
     it('should add course to state on success', async () => {
-      const newCourse: Course = { ...sampleCourse, id: '2', title: 'New Course' };
+      const newCourse: Course = {
+        ...sampleCourse,
+        id: '2',
+        title: 'New Course',
+      };
       mockedCreateCourse.mockResolvedValueOnce({
         data: { successful: true, result: newCourse },
       } as any);
 
       const store = buildStore({ courses: [], status: 'idle', error: null });
-      await store.dispatch(createCourse({
-        title: 'New Course',
-        description: 'Description',
-        duration: 60,
-        authors: [],
-      }));
+      await store.dispatch(
+        createCourse({
+          title: 'New Course',
+          description: 'Description',
+          duration: 60,
+          authors: [],
+        })
+      );
 
       const state = store.getState().courses;
       expect(state.courses).toHaveLength(1);
@@ -120,12 +133,14 @@ describe('Courses Thunks', () => {
       mockedCreateCourse.mockRejectedValueOnce(new Error('Create failed'));
 
       const store = buildStore({ courses: [], status: 'idle', error: null });
-      await store.dispatch(createCourse({
-        title: 'New Course',
-        description: 'Description',
-        duration: 60,
-        authors: [],
-      }));
+      await store.dispatch(
+        createCourse({
+          title: 'New Course',
+          description: 'Description',
+          duration: 60,
+          authors: [],
+        })
+      );
 
       const state = store.getState().courses;
       expect(state.error).toBeDefined();

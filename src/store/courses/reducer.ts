@@ -1,7 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import type { CoursesState, Course } from '../../types';
-import { fetchCourses, createCourse, deleteCourse, updateCourse } from './thunk';
+
+import type { Course, CoursesState } from '../../types';
+
+import {
+  createCourse,
+  deleteCourse,
+  fetchCourses,
+  updateCourse,
+} from './thunk';
 
 const initialState: CoursesState = {
   courses: [],
@@ -19,17 +26,23 @@ const coursesSlice = createSlice({
         state.status = 'loading';
         state.error = null;
       })
-      .addCase(fetchCourses.fulfilled, (state, action: PayloadAction<Course[]>) => {
-        state.status = 'succeeded';
-        state.courses = action.payload;
-      })
+      .addCase(
+        fetchCourses.fulfilled,
+        (state, action: PayloadAction<Course[]>) => {
+          state.status = 'succeeded';
+          state.courses = action.payload;
+        }
+      )
       .addCase(fetchCourses.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload ?? null;
       })
-      .addCase(createCourse.fulfilled, (state, action: PayloadAction<Course>) => {
-        state.courses.push(action.payload);
-      })
+      .addCase(
+        createCourse.fulfilled,
+        (state, action: PayloadAction<Course>) => {
+          state.courses.push(action.payload);
+        }
+      )
       .addCase(createCourse.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload ?? null;
@@ -43,14 +56,17 @@ const coursesSlice = createSlice({
         state.status = 'failed';
         state.error = action.payload ?? null;
       })
-      .addCase(updateCourse.fulfilled, (state, action: PayloadAction<Course>) => {
-        const index = state.courses.findIndex(
-          (course) => course.id === action.payload.id
-        );
-        if (index !== -1) {
-          state.courses[index] = action.payload;
+      .addCase(
+        updateCourse.fulfilled,
+        (state, action: PayloadAction<Course>) => {
+          const index = state.courses.findIndex(
+            (course) => course.id === action.payload.id
+          );
+          if (index !== -1) {
+            state.courses[index] = action.payload;
+          }
         }
-      })
+      )
       .addCase(updateCourse.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload ?? null;

@@ -7,5 +7,30 @@
   "trailingComma": "es5",
   "bracketSpacing": true,
   "arrowParens": "always",
-  "endOfLine": "lf"
+  "endOfLine": "lf",
+  "plugins": ["@trivago/prettier-plugin-sort-imports"],
+  "importOrder": [
+    "^react$",
+    "^react-dom",
+    "^react-router-dom",
+    "^react-redux",
+    "^@reduxjs/toolkit",
+    "^axios",
+    "<THIRD_PARTY_MODULES>",
+    "^../../store/(.*)$",
+    "^../store/(.*)$",
+    "^../../components/(.*)$",
+    "^../components/(.*)$",
+    "^./components/(.*)$",
+    "^../../common/(.*)$",
+    "^../common/(.*)$",
+    "^../../helpers/(.*)$",
+    "^../helpers/(.*)$",
+    "^../../(types|constants|config|services)(.*)$",
+    "^../(types|constants|config|services)(.*)$",
+    "^./(types|constants|config|services|store|App)(.*)$",
+    "^[./]"
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true
 }
