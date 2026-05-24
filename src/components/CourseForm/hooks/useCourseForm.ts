@@ -1,19 +1,13 @@
-import { useEffect, useState } from 'react';
-
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-
 import { useDispatch, useSelector } from 'react-redux';
 
-import {
-  MIN_AUTHOR_NAME_LENGTH,
-  MIN_COURSE_DESCRIPTION_LENGTH,
-  MIN_COURSE_TITLE_LENGTH,
-} from '../../../constants';
-import type { AppDispatch } from '../../../store';
-import { selectAuthors } from '../../../store/authors/selectors';
+import { createCourse, updateCourse } from '../../../store/courses/thunk';
 import { createAuthor } from '../../../store/authors/thunk';
 import { selectCourses } from '../../../store/courses/selectors';
-import { createCourse, updateCourse } from '../../../store/courses/thunk';
+import { selectAuthors } from '../../../store/authors/selectors';
+import { MIN_AUTHOR_NAME_LENGTH, MIN_COURSE_TITLE_LENGTH, MIN_COURSE_DESCRIPTION_LENGTH } from '../../../constants';
+import type { AppDispatch } from '../../../store';
 import type { Author, CourseFormFields } from '../../../types';
 
 interface CourseFormErrors {
@@ -26,9 +20,7 @@ interface CourseFormErrors {
 
 interface RegisterField {
   value: string | number;
-  onChange: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 }
 
 interface UseCourseFormReturn {
@@ -83,8 +75,16 @@ const useCourseForm = (): UseCourseFormReturn => {
   const { courseId } = useParams<{ courseId: string }>();
   const isEditMode = Boolean(courseId);
 
+  // Guard against re-initialization on subsequent store updates.
+  //
+  // Previously the effect depended on `courses`, so any store change
+  // (e.g. a background delete of an unrelated course) would re-run the effect
+  // and overwrite whatever the user had typed. The ref acts as a one-shot flag:
+  // once the course is found and the form is populated, we never reset it again.
+  const initializedRef = useRef(false);
+
   useEffect(() => {
-    if (!courseId) return;
+    if (!courseId || initializedRef.current) return;
 
     const courseToUpdate = courses.find((course) => course.id === courseId);
     if (!courseToUpdate) return;
@@ -96,6 +96,7 @@ const useCourseForm = (): UseCourseFormReturn => {
       newAuthorName: '',
     });
     setCourseAuthors(courseToUpdate.authors);
+    initializedRef.current = true;
   }, [courses, courseId]);
 
   const register = (fieldName: keyof CourseFormFields): RegisterField => ({
@@ -151,9 +152,7 @@ const useCourseForm = (): UseCourseFormReturn => {
 
     if (isEditMode && courseId) {
       const courseToUpdate = courses.find((course) => course.id === courseId);
-
-      const creationDate =
-        courseToUpdate?.creationDate ?? new Date().toISOString();
+      const creationDate = courseToUpdate?.creationDate ?? new Date().toISOString();
 
       result = await dispatch(
         updateCourse({
@@ -203,8 +202,8 @@ const useCourseForm = (): UseCourseFormReturn => {
   const submitLabel = isSaving
     ? 'Saving...'
     : isEditMode
-      ? 'Update Course'
-      : 'Create Course';
+    ? 'Update Course'
+    : 'Create Course';
 
   return {
     register,
