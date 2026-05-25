@@ -1,8 +1,14 @@
-# Course Platform — Frontend
+# Course Management App
+[![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.4-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Redux Toolkit](https://img.shields.io/badge/Redux_Toolkit-2.x-764ABC?logo=redux&logoColor=white)](https://redux-toolkit.js.org/)
+[![React Router](https://img.shields.io/badge/React_Router-7-CA4245?logo=reactrouter&logoColor=white)](https://reactrouter.com/)
+[![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)](https://vite.dev/)
+[![Vitest](https://img.shields.io/badge/Vitest-4-6E9F18?logo=vitest&logoColor=white)](https://vitest.dev/)
+[![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
+[![License](https://img.shields.io/badge/license-MIT-2563eb)](LICENSE)
 
-React · Redux Toolkit · React Router · Axios · Vite · Vitest · Docker
-
-React 18 SPA for managing online courses — a portfolio project demonstrating modern frontend patterns: Redux Toolkit with async thunks, role-based access control, custom hooks architecture, centralized API layer, and containerized deployment.
+A React 19 SPA for managing online courses — a portfolio project demonstrating modern frontend patterns: Redux Toolkit 2 with typed async thunks, role-based access control, custom hooks architecture, centralized API layer, enrollment system, and containerized deployment.
 
 [Live Demo](https://react-app-production-d055.up.railway.app) — first load after inactivity may take 30–60 seconds (Railway free tier)
 
@@ -12,120 +18,137 @@ React 18 SPA for managing online courses — a portfolio project demonstrating m
 
 ## Overview
 
-A course management dashboard where administrators create, update and delete courses and authors, while regular users browse and search the catalogue. Authentication is cookie-based with role-derived UI — admin-only controls are absent from the DOM for non-admin users, not merely hidden via CSS.
+A course management dashboard where administrators create, update and delete courses and authors, while regular users browse, search and enroll in courses. Authentication is cookie-based with role-derived UI — admin-only controls are absent from the DOM for non-admin users, not merely hidden via CSS.
 
 ### What the application covers
 
 - **Authentication** — login and registration backed by HttpOnly cookie session; automatic session restore on page reload via `fetchUser` on app mount; data fetching deferred until auth is confirmed
 - **Course management** — full CRUD for courses and authors; admin-only write operations enforced at the route level via `PrivateRoute requireAdmin`
+- **Enrollment system** — users can enroll in courses; enrollment state tracked in Redux; enroll button disabled during in-flight request to prevent duplicate submissions; errors surfaced inline
 - **Search** — client-side title filter with `useMemo` to avoid redundant recomputation on every keystroke
 - **Form architecture** — `useCourseForm`, `useLoginForm`, `useRegistrationForm` custom hooks extract all business logic from components; components are pure JSX
+- **Bootstrap hook** — `useAppBootstrap` centralises all app-level data fetching: session check always, courses and authors once authenticated, enrollments for admin only
 - **Loading states** — `status: bootstrapping | idle | loading | succeeded | failed` in every Redux slice; submit buttons disabled and labels changed during in-flight requests to prevent duplicate submissions
-- **Error surfaces** — all API errors propagated through `rejectWithValue` and rendered in the UI; delete errors shown inline without collapsing the course list; no silent failures
+- **Error surfaces** — all API errors propagated through `rejectWithValue` and rendered in the UI; delete errors shown inline without collapsing the course list; enroll errors shown below the button; no silent failures
+- **Error boundary** — `ErrorBoundary` at the application root catches runtime errors and renders a graceful fallback with a reset button instead of a blank screen
 - **Deployment** — multi-container Docker setup (React build served by Nginx, backend mock on a private network) and single-container Railway deployment (Express + Nginx)
 
 ---
 
 ## Architecture
 
+### Application layers
+
 ```
-src/
-├── common/
-│   ├── Button/                # Reusable button — type, disabled, onClick props
-│   ├── Input/                 # Reusable input — error display, type, placeholder
-│   └── ErrorMessage/          # Error display with optional retry callback
-│
-├── components/
-│   ├── CourseForm/            # Create and update — one component, mode from useParams
-│   │   ├── hooks/
-│   │   │   └── useCourseForm.js     # All form logic: fields, validation, submit, authors
-│   │   └── components/
-│   │       └── AuthorItem/          # Add / remove author row
-│   ├── CourseInfo/            # Detail view — reads store via selectors
-│   ├── Courses/               # List view — filter, delete error, admin controls
-│   │   └── components/
-│   │       ├── CourseCard/    # Presentational only — all callbacks via props
-│   │       ├── EmptyCourseList/
-│   │       └── SearchBar/
-│   ├── Header/                # Logo, username, Login / Logout
-│   ├── Login/
-│   │   └── hooks/
-│   │       └── useLoginForm.js      # Validation, dispatch, navigation
-│   ├── PrivateRoute/          # requireAdmin prop — two access levels in one component
-│   └── Registration/
-│       └── hooks/
-│           └── useRegistrationForm.js
-│
-├── helpers/
-│   ├── formatCreationDate.js  # Date → DD.MM.YYYY (Intl.DateTimeFormat, UTC-safe)
-│   ├── getAuthorNames.js      # authorIds[] + authors[] → display string, truncate option
-│   └── getCourseDuration.js   # Minutes → HH:MM hours, guards for null/NaN/negative
-│
-├── store/
-│   ├── user/
-│   │   ├── reducer.js         # name, email, isAuth, role, status, error
-│   │   ├── selectors.js       # selectIsAuth, selectIsAdmin, selectUserStatus, …
-│   │   └── thunk.js           # fetchUser, loginUser, logoutUser, registerUser
-│   ├── courses/
-│   │   ├── reducer.js         # courses[], status, error — all CRUD cases
-│   │   ├── selectors.js       # selectCourses, selectCoursesStatus, selectCoursesError
-│   │   ├── thunk.js           # fetchCourses, createCourse, updateCourse, deleteCourse
-│   │   ├── reducer.test.js    # Slice unit tests — colocated
-│   │   └── thunk.test.js      # Thunk integration tests — colocated
-│   ├── authors/
-│   │   ├── reducer.js
-│   │   ├── selectors.js       # selectAuthors, selectAuthorsStatus, selectAuthorsError
-│   │   └── thunk.js           # fetchAuthors, createAuthor
-│   └── index.js               # configureStore — single export
-│
-├── constants/
-│   ├── validation.js          # MIN_PASSWORD_LENGTH, MIN_COURSE_TITLE_LENGTH, …
-│   └── ui.js                  # ADD_NEW_COURSE_LABEL, HAS_ERROR_CLASS, …
-│
-├── mocks/
-│   └── Mockeddata.js          # Static fixture data — not imported in production code
-│
-├── services.js                # All axios calls — one client, response interceptor
-├── config.js                  # VITE_API_URL with /api fallback
-└── index.jsx                  # React root — StrictMode, Provider, BrowserRouter
+Browser
+  └── React 19 (SPA)
+        ├── React Router 7      — declarative routing, PrivateRoute guards
+        ├── Redux store         — single source of truth for all async state
+        │     ├── user slice    — auth state, role, bootstrap status
+        │     ├── courses slice — CRUD state
+        │     ├── authors slice — author list
+        │     └── enrollments slice
+        ├── Axios (services.ts) — single HTTP client, response interceptor
+        └── Backend mock API    — json-server + Express (port 4000 / /api)
 ```
+
+### Startup sequence
+
+On every page load, `useAppBootstrap` runs three effects in order:
+
+1. `fetchUser` — always fires; calls `GET /users/me` with the HttpOnly cookie. If the session is valid the user slice populates and `isAuth` becomes `true`. If not, the slice resets to `idle` and the user sees the login page. `isBootstrapping` blocks rendering until this resolves.
+2. `fetchCourses` + `fetchAuthors` — fire once `isAuth` is `true`. Unauthenticated users never trigger these requests.
+3. `fetchEnrollments` — fires once `isAuth && isAdmin`. Regular users never fetch enrollment data.
+
+### Authentication and routing
+
+Every protected route is wrapped in `PrivateRoute`. On render it reads `isAuth` and `isAdmin` from the store:
+
+- Not authenticated → redirect to `/login?redirect=<original path>`
+- Authenticated, not admin, `requireAdmin` route → redirect to `/courses`
+- Authenticated (and admin where required) → render children
+
+After login, `useLoginForm` reads the `redirect` query param, validates it is a safe same-origin path, and navigates there — completing the round trip.
+
+### HTTP layer
+
+All API calls go through a single Axios instance in `services.ts` with `withCredentials: true`. A response interceptor handles two cross-cutting concerns:
+
+- **401 responses** — redirect to `/login` for all endpoints except `/users/me` (where a 401 is the expected unauthenticated response during bootstrap)
+- **Error logging** — errors are logged to the console in development only (`import.meta.env.DEV`); in production they should go to a monitoring service
+
+### State management
+
+Each domain has a Redux slice with a consistent shape: `{ data, status: LoadingStatus, error }`. Thunks use `createAsyncThunk` with `rejectWithValue` — errors always surface to the UI, never swallowed silently. Components never access `state.slice.field` directly — they go through typed selectors.
+
+`selectIsEnrolled` is a parametric selector `(state, courseId) => boolean` rather than a curried factory, so `useSelector` can compare the boolean result by value and skip re-renders when enrollment status hasn't changed.
+
+### Form architecture
+
+Each form has a dedicated custom hook (`useCourseForm`, `useLoginForm`, `useRegistrationForm`) that owns fields, validation, dispatch and navigation. Components are pure JSX — they receive values and handlers from the hook and render them. This makes hooks independently testable with `renderHook` and keeps components free of business logic.
+
+`useCourseForm` uses a `useRef` one-shot flag to initialize edit-mode fields only once — subsequent store updates (background refetches, concurrent deletes) do not overwrite unsaved user input.
+
+### Error handling
+
+Every async operation surfaces errors at the appropriate scope:
+
+- **Global** — `ErrorBoundary` at the root catches runtime errors and shows a reset UI instead of a blank screen
+- **Page-level** — fetch failures (courses, authors) render an `ErrorMessage` with a retry button
+- **Inline** — mutation failures (delete, enroll) render errors next to the triggering control without collapsing the surrounding UI
+- **Form** — validation errors per field, server error below the submit button
 
 ---
 
 ## Design Decisions
 
+**Why TypeScript instead of JavaScript?**
+TypeScript catches shape mismatches between API responses and Redux state at compile time, not at runtime in production. The store's `RootState` and `AppDispatch` types flow through selectors, thunks and components without casting. `UserRole`, `LoadingStatus` and domain interfaces serve as living documentation — a change to `Course` immediately surfaces every component that needs updating.
+
 **Why custom hooks for every form (`useCourseForm`, `useLoginForm`, `useRegistrationForm`)?**
-Components handle JSX. Hooks handle logic. A form component with `useState`, `useEffect`, `useSelector`, `dispatch`, validation and navigation is doing five jobs at once. Extracting the logic into a hook makes both parts independently testable — the hook with `renderHook`, the component with simple prop mocks. This follows the same pattern React's own docs recommend and matches how `react-hook-form` is designed.
+Components handle JSX. Hooks handle logic. A form component with `useState`, `useEffect`, `useSelector`, `dispatch`, validation and navigation is doing five jobs at once. Extracting the logic into a hook makes both parts independently testable — the hook with `renderHook`, the component with simple prop mocks.
+
+**Why `useAppBootstrap` instead of effects in `App.tsx`?**
+`App.tsx` is responsible for routing. Putting three `useEffect` calls for data fetching alongside routing logic violates the Single Responsibility Principle. `useAppBootstrap` owns the bootstrap sequence — `fetchUser` always, courses and authors once authenticated, enrollments for admin — and returns `{ isBootstrapping }` so `App` retains the loading gate without knowing the details.
 
 **Why `PrivateRoute` with a `requireAdmin` prop instead of two separate components?**
-A single `PrivateRoute` is the single source of truth for access control in routing. Adding `requireAdmin` gives two access levels without duplicating the auth check. Reading the route table in `App.jsx` is immediately informative — `<PrivateRoute>` means authenticated, `<PrivateRoute requireAdmin>` means authenticated admin — no need to look up two different component implementations.
+A single `PrivateRoute` is the single source of truth for access control in routing. Reading the route table in `App.tsx` is immediately informative: `<PrivateRoute>` means authenticated, `<PrivateRoute requireAdmin>` means authenticated admin.
 
 **Why are `fetchCourses` and `fetchAuthors` in a separate `useEffect` with `[isAuth]` dependency?**
-Fetching all data unconditionally on app mount sends requests for resources the unauthenticated user will never see. Splitting into two effects — one for `fetchUser` (always), one for data (only when `isAuth` is true) — means unauthenticated users generate one request, not three. The data effect re-runs automatically when `isAuth` transitions to `true` after login.
+Fetching all data unconditionally on app mount sends requests for resources the unauthenticated user will never see. Splitting into two effects — one for `fetchUser` (always), one for data (only when `isAuth` is true) — means unauthenticated users generate one request, not four.
+
+**Why `selectIsEnrolled(state, courseId)` instead of a curried factory `selectIsEnrolled(courseId)(state)`?**
+The curried factory pattern called inside `render` returns a new function reference on every render. `useSelector` uses referential equality to decide whether to re-run, so a new reference forces a re-run on every store update — even unrelated ones. The parametric selector `(state, courseId) => boolean` called via `useSelector((state) => selectIsEnrolled(state, id))` avoids this: the boolean result is compared by value, and re-renders only fire when enrollment status actually changes.
+
+**Why `initializedRef` in `useCourseForm`?**
+The edit form's `useEffect` initializes fields from the store when the course is found. Without a guard, any store update (a background refetch, a concurrent delete) would re-run the effect and overwrite whatever the user had typed. `useRef(false)` acts as a one-shot flag: the form populates once, then the effect is a no-op for all subsequent store changes.
 
 **Why `isSaving` is local state in `useCourseForm` instead of derived from `coursesStatus`?**
-`coursesStatus === 'loading'` is set by `fetchCourses`, `createCourse` and `updateCourse` — all three. A background refresh while the user is filling the form would incorrectly block the submit button. Local `useState(false)` scoped to the submission event is accurate: `true` from the moment submit is clicked until the response arrives, regardless of what the slice status is doing.
+`coursesStatus === 'loading'` is set by `fetchCourses`, `createCourse` and `updateCourse` — all three. A background refresh while the user is filling the form would incorrectly block the submit button. Local `isSaving` scoped to the submission event is accurate: `true` from the moment submit is clicked until the response arrives.
 
-**Why `deleteError` is local state in `Courses.jsx` instead of stored in Redux?**
-A delete failure is a transient UI event — it is relevant only while the user is looking at the list right now. Putting it in Redux would mean the error persists across navigation, requires cleanup actions, and adds reducer cases for UI state that no other component shares. `useState(null)` in the component it belongs to is the correct scope.
+**Why `deleteError` and `enrollError` are local state instead of stored in Redux?**
+These are transient UI events — relevant only while the user is looking at that component right now. Putting them in Redux would mean errors persist across navigation, require cleanup actions, and add reducer cases for UI state that no other component shares.
 
-**Why Redux Toolkit instead of plain Redux or Zustand?**
-RTK eliminates the boilerplate of manual action type strings, action creators and switch-case reducers. `createAsyncThunk` generates `pending / fulfilled / rejected` action types automatically and integrates directly with `extraReducers`. The slice pattern enforces consistent state shape across the three domains. Zustand would work for simpler state but RTK is the standard in enterprise React and better demonstrates understanding of the full Redux lifecycle.
+**Why `ErrorBoundary` is a class component?**
+React's `getDerivedStateFromError` and `componentDidCatch` lifecycle methods have no hook equivalents — this is the one case where a class component is the only correct choice in React 19. Placed at the root above `<App>` so any unhandled runtime error shows a graceful fallback with a reset button instead of a blank screen.
 
-**Why a single `services.js` instead of per-feature API files?**
-All HTTP calls share the same base URL, `withCredentials: true`, and the same response interceptor (401 redirect, centralized error logging). A single Axios instance configured once means base URL changes, interceptor additions or library swaps happen in one file. Per-feature files would either duplicate the client setup or import from a shared module — adding indirection without benefit.
+**Why `Button` renders `<span>` when both `to` and `disabled` are passed?**
+`<Link>` has no native `disabled` state — ignoring the prop would leave a clickable navigation element that appears inactive. A `<span>` with `aria-disabled="true"` and the same CSS classes looks identical but does not navigate and is not in the keyboard tab order.
+
+**Why Redux Toolkit 2 instead of plain Redux or Zustand?**
+RTK eliminates boilerplate, `createAsyncThunk` generates `pending / fulfilled / rejected` action types automatically, and the slice pattern enforces consistent state shape. RTK 2 tightened the `Reducer` generic — `preloadedState` must satisfy the slice's exact type — which catches shape mismatches in tests.
+
+**Why a single `services.ts` instead of per-feature API files?**
+All HTTP calls share the same base URL, `withCredentials: true`, and the same response interceptor (401 redirect, dev-only error logging). A single Axios instance configured once means base URL changes happen in one file.
 
 **Why `loginUser.fulfilled.match()` instead of try/catch after dispatch?**
-`createAsyncThunk` with `rejectWithValue` never throws — it always returns an action. A `catch` block after `await dispatch(loginUser())` never fires for API errors, only for unexpected JavaScript exceptions. `.fulfilled.match(result)` is the pattern RTK documents for this: it inspects the action type and handles both outcomes in the same synchronous flow.
-
-**Why selectors in separate files per slice?**
-Consistency and encapsulation. Components never access `state.courses.courses` directly — they use `selectCourses(state)`. If the slice shape changes, only the selector file changes, not every component that reads that value. The pattern mirrors what `reselect` and RTK's own documentation recommend.
+`createAsyncThunk` with `rejectWithValue` never throws — it always returns an action. A `catch` block after `await dispatch(loginUser())` never fires for API errors. `.fulfilled.match(result)` is the RTK-documented pattern for this.
 
 **Why `buildStore()` in each test file instead of importing the production store?**
-The production store may have middleware, devtools or shape changes that are irrelevant to a specific test. Each test file constructs an isolated store with only the reducers it exercises. A change to the production store configuration cannot break tests that do not involve that slice.
+Each test file constructs an isolated store with only the reducers it exercises. RTK 2 requires `preloadedState` to satisfy slice types exactly — typed constants per slice state enforce this and make the test setup self-documenting.
 
-**Why tests are colocated with source files (`.test.jsx` next to `.jsx`)?**
-Colocated tests are the current industry standard — Vite, Vitest and the Testing Library documentation all recommend this layout. A test file next to its source is immediately visible when editing the component, and removing a component also makes the orphaned test obvious. The `tests/` subfolder pattern belongs to older Java-style project structures.
+**Why tests are colocated with source files?**
+A test file next to its source is immediately visible when editing the component. Removing a component makes the orphaned test obvious. This is the layout Vite, Vitest and Testing Library documentation recommend.
 
 ---
 
@@ -133,16 +156,17 @@ Colocated tests are the current industry standard — Vite, Vitest and the Testi
 
 | Layer | Technology | Why |
 |---|---|---|
-| Framework | React 18 — functional components, hooks | Stable, widely adopted, hooks composition |
-| Language | JavaScript (ES2021) + PropTypes | Lightweight type safety at component boundaries |
-| State | Redux Toolkit — createSlice, createAsyncThunk | Generated action types, built-in Immer, RTK conventions |
-| HTTP | Axios — centralized services.js, response interceptor | Consistent base URL, 401 redirect, error logging |
-| Routing | React Router v6 — PrivateRoute, useNavigate | Declarative route protection, nested routes |
-| Build | Vite | Sub-second cold start, native ES modules, fast HMR |
-| Testing | Vitest + React Testing Library | Component behaviour over implementation, renderHook for hooks |
-| Linting | ESLint (Airbnb config) + Prettier | Enforced style, pre-commit hook via Husky |
-| Container | Docker multi-stage — Node 18 builder + Nginx Alpine | Small final image, no Node.js in production |
-| Server | Nginx — SPA routing, gzip, reverse proxy | index.html fallback, backend on private Docker network |
+| Framework | React 19 — functional components, hooks | Latest stable; no breaking changes vs 18 for this codebase |
+| Language | TypeScript 5.4 | Typed store, typed selectors, typed API responses; zero `any` in production code |
+| State | Redux Toolkit 2 — createSlice, createAsyncThunk | RTK 2 stricter generics, Immer built-in, standard in enterprise React |
+| HTTP | Axios — typed `services.ts`, response interceptor | Consistent base URL, 401 redirect, dev-only error logging |
+| Routing | React Router 7 — PrivateRoute, useNavigate | Full backward compatibility with v6 hooks API |
+| Build | Vite 8 | Sub-second cold start, native ES modules, fast HMR |
+| Testing | Vitest 4 + React Testing Library | Component behaviour over implementation, `renderHook` for hooks |
+| Linting | ESLint 9 (flat config) + Prettier | `eslint.config.js`, typescript-eslint, react-hooks rules, pre-commit via Husky 9 |
+| Import sorting | `@trivago/prettier-plugin-sort-imports` | Single tool for import order — avoids conflict with `eslint-plugin-import` |
+| Container | Docker multi-stage — Node builder + Nginx Alpine | Small final image, no Node.js in production |
+| Server | Nginx — SPA routing, gzip, reverse proxy | `index.html` fallback, backend on private Docker network |
 | Deployment | Railway — single container, Express + json-server | Auto-deploy on push to main |
 
 ---
@@ -155,7 +179,6 @@ Colocated tests are the current industry standard — Vite, Vitest and the Testi
 
 ```bash
 node --version   # v18.x.x or higher
-npm --version    # 9.x.x or higher
 ```
 
 ### Step 1 — Install dependencies
@@ -165,28 +188,25 @@ npm install
 cd backend-mock && npm install && cd ..
 ```
 
-### Step 2 — Create environment file
-
-```bash
-echo "VITE_API_URL=http://localhost:4000" > .env.local
-```
-
-### Step 3 — Start the backend
+### Step 2 — Start the backend
 
 ```bash
 # Terminal 1
 cd backend-mock
 npm start
-# Mock API running at http://localhost:4000
+# Initializes db.json from db.seed.json (if not present), then starts the mock API
+# Running at http://localhost:4000
 ```
 
-### Step 4 — Start the frontend
+### Step 3 — Start the frontend
 
 ```bash
 # Terminal 2
 npm start
 # App running at http://localhost:3000
 ```
+
+Vite proxies all `/api` requests to `http://localhost:4000` — no environment file needed for local development.
 
 ### Test credentials
 
@@ -195,7 +215,16 @@ npm start
 | Admin | `admin@test.com` | `admin123` |
 | User | `user@test.com` | `user123` |
 
-Admin sees CREATE, UPDATE and DELETE controls. User sees the course catalogue only.
+Admin sees CREATE, UPDATE and DELETE controls plus the Enrolled Students view. Regular users see the course catalogue and can enroll in courses.
+
+### Resetting test data
+
+If the database gets into a bad state during development:
+
+```bash
+cd backend-mock
+npm run start:fresh   # resets db.json to seed data, then starts the server
+```
 
 ---
 
@@ -252,31 +281,35 @@ npm run test:ci
 # Watch mode during development
 npm test
 
+# Type check
+npm run typecheck
+
 # Lint
 npm run lint
 npm run lint:fix
 
-# Format
+# Format (Prettier + import sorting)
 npm run format
 ```
 
 ### Test coverage
 
-72 tests across all layers — store, components, helpers and custom hooks.
+10 test files across all layers — store, components, helpers and custom hooks.
 
 | Test file | What it covers |
 |---|---|
-| `store/courses/reducer.test.js` | Courses slice — initial state, `createCourse.fulfilled`, `fetchCourses.pending/rejected`, `deleteCourse.fulfilled` |
-| `store/courses/thunk.test.js` | All four thunks — success paths, rejection, `successful: false` response handling |
-| `helpers/formatCreationDate.test.js` | Date formatting — zero-padded day/month, UTC safety, invalid input guard |
-| `components/Header/header.test.jsx` | Logo present, username displayed, Logout dispatched and navigation to `/login` |
-| `components/Courses/courses.test.jsx` | Card count matches store, loading state, navigation to `/courses/add`, admin button visibility |
-| `components/Courses/components/CourseCard/courseCard.test.jsx` | Title, description, duration format, authors list, date format, admin buttons, `onDelete` callback |
-| `components/CourseForm/hooks/useCourseForm.test.jsx` | Create/edit mode, `register()`, validation, submit success/failure, `isSaving` lifecycle, author management, `handleCreateAuthor` |
-| `components/Login/hooks/useLoginForm.test.jsx` | Initial state, `handleChange`, validation, success navigation to `/courses`, server error on failure |
-| `components/Registration/hooks/useRegistrationForm.test.jsx` | Initial state, `handleChange`, all three field validations, success navigation to `/login`, server error |
+| `store/courses/reducer.test.ts` | Courses slice — initial state, `createCourse.fulfilled`, `fetchCourses.pending/rejected`, `deleteCourse.fulfilled` |
+| `store/courses/thunk.test.ts` | All four thunks — success paths, rejection, `successful: false` response handling |
+| `helpers/formatCreationDate.test.ts` | Date formatting — zero-padded day/month, UTC safety, invalid input guard |
+| `helpers/isValidEmail.test.ts` | Email validation — valid formats, edge cases, invalid inputs |
+| `components/Header/Header.test.tsx` | Logo present, username displayed, Logout dispatched and navigation to `/login` |
+| `components/Courses/Courses.test.tsx` | Card count matches store, loading state, navigation to `/courses/add`, admin button visibility |
+| `components/Courses/components/CourseCard/CourseCard.test.tsx` | Title, description, duration format, authors list, date format, admin buttons, `onDelete` callback |
+| `components/CourseForm/hooks/useCourseForm.test.tsx` | Create/edit mode, `register()`, validation, submit success/failure, `isSaving` lifecycle, author management, `handleCreateAuthor` |
+| `components/Login/hooks/useLoginForm.test.tsx` | Initial state, validation, success navigation to `/courses`, server error on failure |
+| `components/Registration/hooks/useRegistrationForm.test.tsx` | Initial state, all field validations, success navigation to `/login`, server error |
 
-**Approach:** `configureStore` with `preloadedState` — no `redux-mock-store`. Hook tests use `renderHook` from Testing Library. All test files colocated with their source.
+**Approach:** `configureStore` with typed `preloadedState` — no `redux-mock-store`. Hook tests use `renderHook` from Testing Library. All test files colocated with their source. RTK 2 requires `preloadedState` to satisfy slice types exactly — typed state constants per slice enforce this.
 
 ---
 
@@ -287,20 +320,29 @@ This project uses a JSON file (`db.json`) as its database and `json-server` as a
 | Limitation | Production approach |
 |---|---|
 | Passwords stored in plaintext in `db.json` | `bcrypt` or `argon2` hashing; never store plaintext |
-| Tokens are predictable `Date.now()` strings | `crypto.randomBytes(32).toString('hex')` or signed JWT |
-| No authorization middleware on write endpoints | Auth middleware on every protected route; role checked server-side |
-| No rate limiting on login endpoint | `express-rate-limit` or API gateway throttling |
+| Session tokens stored in `db.json` (no expiry, no revocation list) | Signed JWT with expiry, or server-side session store (Redis) with revocation |
 | No Content Security Policy headers | CSP, `X-Frame-Options`, `HSTS`, `Referrer-Policy` in Nginx config |
-| `secure: true` not set on auth cookie | Required in production HTTPS environments |
 
 **What is correctly implemented:**
 - Auth cookie with `httpOnly: true` — JavaScript cannot access the session token
 - `sameSite: 'lax'` — CSRF protection for cross-origin GET requests
+- `secure: true` on auth cookie in production (`process.env.NODE_ENV === 'production'`)
 - `withCredentials: true` on Axios — credentials included automatically
+- Session tokens generated with `crypto.randomBytes(32).toString('hex')` — not predictable
+- Rate limiting on `/login` and `/register` — 10 requests per 15 minutes via `express-rate-limit`
+- `requireAuth` middleware on all protected endpoints — role checked server-side, not just client-side
+- `requireAdmin` middleware on all write endpoints (create/update/delete courses and authors)
+- Duplicate enrollment prevention — server returns 409 if user is already enrolled
 - Role-based UI — admin controls absent from DOM, not just CSS-hidden
 - `PrivateRoute` with `requireAdmin` — route-level access control on the client
+- Unauthenticated users redirected to `/login?redirect=<path>` — original destination preserved for post-login navigation
 - No `dangerouslySetInnerHTML` or `eval` anywhere in the codebase
-- 401 interceptor — expired sessions redirect to login automatically
+- 401 interceptor — expired sessions redirect to login automatically; `/users/me` exempted (expected 401 during bootstrap)
+- Open redirect protection in `useLoginForm` — `redirect` query param validated: must be relative, must not start with `//`, must not contain `://`
+- API errors logged to console in development only (`import.meta.env.DEV`) — production errors should go to a monitoring service, not the browser console
+- `ErrorBoundary` error detail (`error.message`) shown in development only — production users see a generic message
+- `aria-disabled="true"` on disabled link-buttons (`Button` with `to` + `disabled`) — correct semantic for screen readers
+- `isValidEmail` client-side validation before dispatching login/registration — reduces unnecessary API calls
 
 ---
 
@@ -310,83 +352,108 @@ This project uses a JSON file (`db.json`) as its database and `json-server` as a
 react-course-app/
 ├── src/
 │   ├── common/
-│   │   ├── Button/
+│   │   ├── Button/            # Renders <button>, <Link>, or <span> (disabled+to)
+│   │   ├── ErrorBoundary/     # App-level error catch with reset
 │   │   ├── ErrorMessage/
 │   │   └── Input/
 │   ├── components/
 │   │   ├── CourseForm/
 │   │   │   ├── hooks/
-│   │   │   │   ├── useCourseForm.js
-│   │   │   │   └── useCourseForm.test.jsx
-│   │   │   └── components/AuthorItem/
-│   │   ├── CourseInfo/
+│   │   │   │   ├── useCourseForm.ts
+│   │   │   │   └── useCourseForm.test.tsx
+│   │   │   ├── components/
+│   │   │   │   └── AuthorItem/
+│   │   │   └── CourseForm.tsx
+│   │   ├── CourseInfo/        # Detail view with enroll button
 │   │   ├── Courses/
 │   │   │   ├── components/
 │   │   │   │   ├── CourseCard/
-│   │   │   │   │   ├── CourseCard.jsx
-│   │   │   │   │   └── courseCard.test.jsx
-│   │   │   │   ├── EmptyCourseList/
+│   │   │   │   │   ├── CourseCard.tsx
+│   │   │   │   │   └── CourseCard.test.tsx
+│   │   │   │   ├── EmptyCourseList.tsx
 │   │   │   │   └── SearchBar/
-│   │   │   ├── Courses.jsx
-│   │   │   └── courses.test.jsx
+│   │   │   ├── Courses.tsx
+│   │   │   └── Courses.test.tsx
+│   │   ├── Enrolled/          # Admin — enrolled students view
 │   │   ├── Header/
-│   │   │   ├── Header.jsx
-│   │   │   └── header.test.jsx
+│   │   │   ├── components/
+│   │   │   │   └── Logo/      # Logo component
+│   │   │   ├── Header.tsx
+│   │   │   └── Header.test.tsx
 │   │   ├── Login/
-│   │   │   └── hooks/
-│   │   │       ├── useLoginForm.js
-│   │   │       └── useLoginForm.test.jsx
+│   │   │   ├── hooks/
+│   │   │   │   ├── useLoginForm.ts
+│   │   │   │   └── useLoginForm.test.tsx
+│   │   │   └── Login.tsx
 │   │   ├── PrivateRoute/
 │   │   └── Registration/
-│   │       └── hooks/
-│   │           ├── useRegistrationForm.js
-│   │           └── useRegistrationForm.test.jsx
+│   │       ├── hooks/
+│   │       │   ├── useRegistrationForm.ts
+│   │       │   └── useRegistrationForm.test.tsx
+│   │       └── Registration.tsx
 │   ├── helpers/
-│   │   ├── formatCreationDate.js
-│   │   ├── formatCreationDate.test.js
-│   │   ├── getAuthorNames.js
-│   │   └── getCourseDuration.js
+│   │   ├── formatCreationDate.ts
+│   │   ├── formatCreationDate.test.ts
+│   │   ├── getAuthorNames.ts
+│   │   ├── getCourseDuration.ts
+│   │   ├── isValidEmail.ts
+│   │   └── isValidEmail.test.ts
+│   ├── hooks/
+│   │   └── useAppBootstrap.ts # App-level data fetching sequence
 │   ├── store/
 │   │   ├── user/
-│   │   │   ├── reducer.js
-│   │   │   ├── selectors.js
-│   │   │   └── thunk.js
+│   │   │   ├── reducer.ts
+│   │   │   ├── selectors.ts
+│   │   │   └── thunk.ts
 │   │   ├── courses/
-│   │   │   ├── reducer.js
-│   │   │   ├── reducer.test.js
-│   │   │   ├── selectors.js
-│   │   │   ├── thunk.js
-│   │   │   └── thunk.test.js
+│   │   │   ├── reducer.ts
+│   │   │   ├── reducer.test.ts
+│   │   │   ├── selectors.ts
+│   │   │   ├── thunk.ts
+│   │   │   └── thunk.test.ts
 │   │   ├── authors/
-│   │   │   ├── reducer.js
-│   │   │   ├── selectors.js
-│   │   │   └── thunk.js
-│   │   └── index.js
+│   │   │   ├── reducer.ts
+│   │   │   ├── selectors.ts
+│   │   │   └── thunk.ts
+│   │   ├── enrollments/
+│   │   │   ├── reducer.ts
+│   │   │   ├── selectors.ts
+│   │   │   └── thunk.ts
+│   │   └── index.ts
+│   ├── types/
+│   │   └── index.ts           # UserRole, domain types, state interfaces, form types
 │   ├── constants/
-│   │   ├── validation.js
-│   │   └── ui.js
-│   ├── mocks/
-│   │   └── Mockeddata.js
-│   ├── App.jsx
-│   ├── services.js
-│   ├── config.js
-│   └── index.jsx
+│   │   ├── index.ts
+│   │   ├── validation.ts
+│   │   └── ui.ts
+│   ├── App.tsx
+│   ├── App.css
+│   ├── index.tsx
+│   ├── index.css
+│   ├── services.ts
+│   ├── config.ts
+│   └── setupTests.ts
 ├── backend-mock/
-│   ├── server.js              # json-server with custom auth, HttpOnly cookie
-│   └── db.json                # Seed data — users, courses, authors
+│   ├── server.js              # json-server with custom auth, HttpOnly cookie, rate limiting
+│   └── db.json                # Seed data — users, courses, authors, enrollments
 ├── public/
 ├── .vscode/
 │   └── settings.json          # formatOnSave, ESLint on save
+├── .husky/
+│   └── pre-commit             # typecheck → lint → test:ci (husky 9 format)
+├── eslint.config.js           # ESLint 9 flat config — typescript-eslint, react-hooks, prettier
+├── index.html                 # Vite entry point
 ├── Dockerfile                 # Single-container: multi-stage builder + Express runtime
 ├── Dockerfile.multi-container # Multi-container: multi-stage builder + Nginx runtime
 ├── docker-compose.yml         # frontend (Nginx) + backend on private app-network
 ├── nginx.conf                 # SPA fallback, /api proxy to backend container, gzip
 ├── nginx.render.conf          # SPA fallback, /api proxy to localhost:3001, gzip
 ├── server-railway.js          # Express — serves React build + all /api routes
-├── .eslintrc.json             # eslint:recommended + react/recommended + react-hooks + prettier
-├── .prettierrc.json           # singleQuote, printWidth: 80, trailingComma: es5
-├── vite.config.js             # Vite + Vitest config — globals, jsdom, setupFiles
-└── package.json
+├── MIGRATION.md               # Dependency migration notes (React 18→19, RTK 1→2, ESLint 8→9)
+├── .prettierrc.json           # singleQuote, printWidth 80, trivago import sorting
+├── tsconfig.json              # strict, moduleResolution: bundler, target: ES2022
+├── vite.config.ts             # Vite + Vitest — globals, jsdom, setupFiles
+└── package.json               # type: module, ESM-native
 ```
 
 ---
