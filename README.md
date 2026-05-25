@@ -25,6 +25,7 @@ A course management dashboard where administrators create, update and delete cou
 - **Authentication** — login and registration backed by HttpOnly cookie session; automatic session restore on page reload via `fetchUser` on app mount; data fetching deferred until auth is confirmed
 - **Course management** — full CRUD for courses and authors; admin-only write operations enforced at the route level via `PrivateRoute requireAdmin`
 - **Enrollment system** — users can enroll in courses; enrollment state tracked in Redux; enroll button disabled during in-flight request to prevent duplicate submissions; errors surfaced inline
+- **Enrolled Students view** — admin-only table showing all enrollments: student email, course name and enrollment date; accessible via Header
 - **Search** — client-side title filter with `useMemo` to avoid redundant recomputation on every keystroke
 - **Form architecture** — `useCourseForm`, `useLoginForm`, `useRegistrationForm` custom hooks extract all business logic from components; components are pure JSX
 - **Bootstrap hook** — `useAppBootstrap` centralises all app-level data fetching: session check always, courses and authors once authenticated, enrollments for admin only
