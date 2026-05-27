@@ -21,5 +21,27 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: './src/setupTests.ts',
+    coverage: {
+      provider: 'v8',
+      include: ['src/**/*.{ts,tsx}'],
+      exclude: [
+        'src/**/*.test.{ts,tsx}',
+        'src/setupTests.ts',
+        'src/types/**',
+        'src/constants/**',
+        'src/config.ts',
+        'src/index.tsx',
+      ],
+      // Thresholds set just below current coverage to prevent regression.
+      // Current: lines 58.8%, branches 40.69%, functions 51.76%, statements 60.03%
+      // Raise these thresholds as new tests are added.
+      thresholds: {
+        lines: 55,
+        branches: 38,
+        functions: 48,
+        statements: 57,
+      },
+      reporter: ['text', 'lcov'],
+    },
   },
 });
