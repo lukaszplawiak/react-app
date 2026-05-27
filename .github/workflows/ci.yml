@@ -7,37 +7,68 @@ on:
     branches: [main]
 
 jobs:
-  ci:
-    name: Typecheck · Lint · Test · Build
+  typecheck:
+    name: Typecheck
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
+      - run: npm ci
+      - run: npm run typecheck
 
-      # npm ci is deterministic — uses package-lock.json exactly,
-      # fails if lock file is out of sync with package.json.
-      # Never use npm install in CI.
-      - name: Install dependencies
-        run: npm ci
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
 
-      - name: Typecheck
-        run: npm run typecheck
+  test:
+    name: Unit tests · Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      # Runs tests and enforces thresholds defined in vite.config.ts
+      # (lines, functions, branches, statements >= 70%).
+      # CI fails if coverage drops below threshold.
+      - run: npm run test:coverage
 
-      - name: Lint
-        run: npm run lint
-
-      - name: Unit tests
-        run: npm run test:ci
-
-      # Verifies the production bundle compiles without errors.
-      # Vite can succeed even when tsc catches type errors if noEmit
-      # is not enforced during build — this step catches that gap.
+  build:
+    name: Build · Bundle size
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
       - name: Build
         run: npm run build
+
+      # Fails CI if the main JS bundle exceeds 350 KB (uncompressed).
+      # Current size: ~314 KB. Gives headroom for growth while catching
+      # accidental large imports before they reach production.
+      - name: Check bundle size
+        run: |
+          BUNDLE_SIZE=$(find build/assets -name "*.js" | xargs wc -c | tail -1 | awk '{print $1}')
+          LIMIT=358400
+          echo "Bundle size: ${BUNDLE_SIZE} bytes (limit: ${LIMIT} bytes)"
+          if [ "$BUNDLE_SIZE" -gt "$LIMIT" ]; then
+            echo "❌ Bundle size ${BUNDLE_SIZE}B exceeds limit of ${LIMIT}B (350KB)"
+            exit 1
+          fi
+          echo "✅ Bundle size OK"
