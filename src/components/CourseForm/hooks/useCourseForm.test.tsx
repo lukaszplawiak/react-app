@@ -1,3 +1,4 @@
+import { act } from 'react';
 import type { ReactNode } from 'react';
 
 import * as reactRouterDom from 'react-router-dom';
@@ -111,10 +112,12 @@ const fillCourseFields = async (
   result: HookResult,
   fields: { title?: string; description?: string; duration?: string }
 ) => {
-  Object.entries(fields).forEach(([key, value]) => {
-    result.current.register(key as any).onChange({
-      target: { value },
-    } as React.ChangeEvent<HTMLInputElement>);
+  act(() => {
+    Object.entries(fields).forEach(([key, value]) => {
+      result.current.register(key as any).onChange({
+        target: { value },
+      } as React.ChangeEvent<HTMLInputElement>);
+    });
   });
 
   await waitFor(() => {
@@ -328,13 +331,18 @@ describe('useCourseForm', () => {
         duration: '60',
       });
 
-      result.current.handleSubmit();
+      // handleSubmit not awaited — we want to observe isSaving mid-flight
+      act(() => {
+        result.current.handleSubmit();
+      });
 
       await waitFor(() => {
         expect(result.current.isSaving).toBe(true);
       });
 
-      resolveFn({ data: { successful: true, result: { id: 'c2' } } });
+      act(() => {
+        resolveFn({ data: { successful: true, result: { id: 'c2' } } });
+      });
 
       await waitFor(() => {
         expect(result.current.isSaving).toBe(false);
@@ -348,7 +356,9 @@ describe('useCourseForm', () => {
         wrapper: buildWrapper(buildStore()),
       });
 
-      result.current.handleAddAuthorToCourse('a1');
+      act(() => {
+        result.current.handleAddAuthorToCourse('a1');
+      });
 
       await waitFor(() => {
         expect(result.current.courseAuthorObjects).toEqual([existingAuthor]);
@@ -361,12 +371,16 @@ describe('useCourseForm', () => {
         wrapper: buildWrapper(buildStore()),
       });
 
-      result.current.handleAddAuthorToCourse('a1');
+      act(() => {
+        result.current.handleAddAuthorToCourse('a1');
+      });
       await waitFor(() => {
         expect(result.current.courseAuthorObjects).toEqual([existingAuthor]);
       });
 
-      result.current.handleRemoveAuthorFromCourse('a1');
+      act(() => {
+        result.current.handleRemoveAuthorFromCourse('a1');
+      });
       await waitFor(() => {
         expect(result.current.courseAuthorObjects).toEqual([]);
         expect(result.current.availableAuthors).toEqual([
@@ -383,9 +397,11 @@ describe('useCourseForm', () => {
         wrapper: buildWrapper(buildStore()),
       });
 
-      result.current.register('newAuthorName').onChange({
-        target: { value: 'A' },
-      } as React.ChangeEvent<HTMLInputElement>);
+      act(() => {
+        result.current.register('newAuthorName').onChange({
+          target: { value: 'A' },
+        } as React.ChangeEvent<HTMLInputElement>);
+      });
 
       await result.current.handleCreateAuthor();
 
@@ -405,9 +421,11 @@ describe('useCourseForm', () => {
         wrapper: buildWrapper(buildStore()),
       });
 
-      result.current.register('newAuthorName').onChange({
-        target: { value: 'Grace Hopper' },
-      } as React.ChangeEvent<HTMLInputElement>);
+      act(() => {
+        result.current.register('newAuthorName').onChange({
+          target: { value: 'Grace Hopper' },
+        } as React.ChangeEvent<HTMLInputElement>);
+      });
 
       await waitFor(() => {
         expect(result.current.register('newAuthorName').value).toBe(

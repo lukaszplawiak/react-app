@@ -1,3 +1,4 @@
+import { act } from 'react';
 import type { ReactNode } from 'react';
 
 import { Provider } from 'react-redux';
@@ -70,10 +71,12 @@ const fillFields = async (
   result: HookResult,
   fields: Partial<Record<'name' | 'email' | 'password', string>>
 ) => {
-  Object.entries(fields).forEach(([name, value]) => {
-    result.current.handleChange({
-      target: { name, value },
-    } as React.ChangeEvent<HTMLInputElement>);
+  act(() => {
+    Object.entries(fields).forEach(([name, value]) => {
+      result.current.handleChange({
+        target: { name, value },
+      } as React.ChangeEvent<HTMLInputElement>);
+    });
   });
 
   await waitFor(() => {
