@@ -32,14 +32,14 @@ export default defineConfig({
         'src/config.ts',
         'src/index.tsx',
       ],
-      // Thresholds set just below current coverage to prevent regression.
-      // Current: lines 58.8%, branches 40.69%, functions 51.76%, statements 60.03%
+      // Thresholds rounded down to nearest 5% below current coverage.
+      // Current: statements 84.7%, branches 71%, functions 73.5%, lines 84.7%
       // Raise these thresholds as new tests are added.
       thresholds: {
-        lines: 55,
-        branches: 38,
-        functions: 48,
-        statements: 57,
+        statements: 80,
+        branches: 70,
+        functions: 70,
+        lines: 80,
       },
       reporter: ['text', 'lcov'],
     },
