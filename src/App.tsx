@@ -1,17 +1,20 @@
-import { Route, Routes, Navigate } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
+
 import { useSelector } from 'react-redux';
 
-import PrivateRoute from './components/PrivateRoute/PrivateRoute';
-import Header from './components/Header/Header';
+import CourseForm from './components/CourseForm/CourseForm';
 import CourseInfo from './components/CourseInfo/CourseInfo';
 import Courses from './components/Courses/Courses';
-import Registration from './components/Registration/Registration';
-import Login from './components/Login/Login';
-import CourseForm from './components/CourseForm/CourseForm';
 import Enrolled from './components/Enrolled/Enrolled';
-import { useAppBootstrap } from './hooks/useAppBootstrap';
-import { selectIsAuth } from './store/user/selectors';
+import Header from './components/Header/Header';
+import Login from './components/Login/Login';
+import PrivateRoute from './components/PrivateRoute/PrivateRoute';
+import Registration from './components/Registration/Registration';
+
 import './App.css';
+import { selectIsAuth } from './store/user/selectors';
+
+import { useAppBootstrap } from './hooks/useAppBootstrap';
 
 function App() {
   const { isBootstrapping } = useAppBootstrap();

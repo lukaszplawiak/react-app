@@ -190,7 +190,11 @@ describe('User Thunks', () => {
     it('dispatches rejected on service failure', async () => {
       mockedLogoutUser.mockRejectedValueOnce(new Error('Logout failed'));
 
-      const store = buildStore({ isAuth: true, role: 'user', status: 'succeeded' });
+      const store = buildStore({
+        isAuth: true,
+        role: 'user',
+        status: 'succeeded',
+      });
       await store.dispatch(logoutUser());
 
       const state = store.getState().user;

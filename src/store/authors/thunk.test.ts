@@ -3,10 +3,10 @@ import { configureStore } from '@reduxjs/toolkit';
 import { createAuthorService, getAuthorsService } from '../../services';
 import type { Author, AuthorsState } from '../../types';
 
-import authorsReducer from './reducer';
 import coursesReducer from '../courses/reducer';
 import enrollmentsReducer from '../enrollments/reducer';
 import userReducer from '../user/reducer';
+import authorsReducer from './reducer';
 import { createAuthor, fetchAuthors } from './thunk';
 
 vi.mock('../../services');

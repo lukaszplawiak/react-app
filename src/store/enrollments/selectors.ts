@@ -18,10 +18,7 @@ export const selectEnrollmentsError = (state: RootState) =>
 // a measurable performance issue.
 //
 // Usage: useSelector((state) => selectIsEnrolled(state, courseId))
-export const selectIsEnrolled = (
-  state: RootState,
-  courseId: string
-): boolean =>
+export const selectIsEnrolled = (state: RootState, courseId: string): boolean =>
   state.enrollments.enrollments.some(
     (enrollment) => enrollment.courseId === courseId
   );

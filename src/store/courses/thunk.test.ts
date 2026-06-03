@@ -12,7 +12,12 @@ import authorsReducer from '../authors/reducer';
 import enrollmentsReducer from '../enrollments/reducer';
 import userReducer from '../user/reducer';
 import coursesReducer from './reducer';
-import { createCourse, deleteCourse, fetchCourses, updateCourse } from './thunk';
+import {
+  createCourse,
+  deleteCourse,
+  fetchCourses,
+  updateCourse,
+} from './thunk';
 
 vi.mock('../../services');
 
@@ -101,14 +106,23 @@ describe('Courses Thunks', () => {
 
   describe('createCourse', () => {
     it('adds course to state on success', async () => {
-      const newCourse: Course = { ...sampleCourse, id: '2', title: 'New Course' };
+      const newCourse: Course = {
+        ...sampleCourse,
+        id: '2',
+        title: 'New Course',
+      };
       mockedCreateCourse.mockResolvedValueOnce({
         data: { successful: true, result: newCourse },
       } as any);
 
       const store = buildStore({ courses: [], status: 'idle', error: null });
       await store.dispatch(
-        createCourse({ title: 'New Course', description: 'Desc', duration: 60, authors: [] })
+        createCourse({
+          title: 'New Course',
+          description: 'Desc',
+          duration: 60,
+          authors: [],
+        })
       );
 
       expect(store.getState().courses.courses).toHaveLength(1);
@@ -119,7 +133,12 @@ describe('Courses Thunks', () => {
 
       const store = buildStore({ courses: [], status: 'idle', error: null });
       const result = await store.dispatch(
-        createCourse({ title: 'New Course', description: 'Desc', duration: 60, authors: [] })
+        createCourse({
+          title: 'New Course',
+          description: 'Desc',
+          duration: 60,
+          authors: [],
+        })
       );
 
       expect(createCourse.rejected.match(result)).toBe(true);
@@ -131,7 +150,12 @@ describe('Courses Thunks', () => {
 
       const store = buildStore({ courses: [], status: 'idle', error: null });
       await store.dispatch(
-        createCourse({ title: 'New', description: 'Desc', duration: 60, authors: [] })
+        createCourse({
+          title: 'New',
+          description: 'Desc',
+          duration: 60,
+          authors: [],
+        })
       );
 
       expect(store.getState().courses.error).toBe('Failed to create course.');

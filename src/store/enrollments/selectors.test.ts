@@ -1,5 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 
+import type { Enrollment, EnrollmentsState } from '../../types';
+
 import authorsReducer from '../authors/reducer';
 import coursesReducer from '../courses/reducer';
 import userReducer from '../user/reducer';
@@ -10,7 +12,6 @@ import {
   selectEnrollmentsStatus,
   selectIsEnrolled,
 } from './selectors';
-import type { Enrollment, EnrollmentsState } from '../../types';
 
 const sampleEnrollment: Enrollment = {
   id: 'e1',
@@ -44,14 +45,22 @@ describe('Enrollments Selectors', () => {
     });
 
     it('returns empty array when no enrollments', () => {
-      const store = buildStore({ enrollments: [], status: 'idle', error: null });
+      const store = buildStore({
+        enrollments: [],
+        status: 'idle',
+        error: null,
+      });
       expect(selectEnrollments(store.getState())).toEqual([]);
     });
   });
 
   describe('selectEnrollmentsStatus', () => {
     it('returns current status', () => {
-      const store = buildStore({ enrollments: [], status: 'loading', error: null });
+      const store = buildStore({
+        enrollments: [],
+        status: 'loading',
+        error: null,
+      });
       expect(selectEnrollmentsStatus(store.getState())).toBe('loading');
     });
   });
@@ -67,7 +76,11 @@ describe('Enrollments Selectors', () => {
     });
 
     it('returns null when no error', () => {
-      const store = buildStore({ enrollments: [], status: 'idle', error: null });
+      const store = buildStore({
+        enrollments: [],
+        status: 'idle',
+        error: null,
+      });
       expect(selectEnrollmentsError(store.getState())).toBeNull();
     });
   });
@@ -92,7 +105,11 @@ describe('Enrollments Selectors', () => {
     });
 
     it('returns false when enrollments is empty', () => {
-      const store = buildStore({ enrollments: [], status: 'idle', error: null });
+      const store = buildStore({
+        enrollments: [],
+        status: 'idle',
+        error: null,
+      });
       expect(selectIsEnrolled(store.getState(), 'c1')).toBe(false);
     });
   });

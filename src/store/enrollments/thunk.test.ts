@@ -1,9 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 
-import {
-  enrollCourseService,
-  getEnrollmentsService,
-} from '../../services';
+import { enrollCourseService, getEnrollmentsService } from '../../services';
 import type { Enrollment, EnrollmentsState } from '../../types';
 
 import authorsReducer from '../authors/reducer';

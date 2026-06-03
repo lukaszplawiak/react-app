@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import type { ReactNode, ErrorInfo } from 'react';
+import type { ErrorInfo, ReactNode } from 'react';
 
 import './ErrorBoundary.css';
 
@@ -30,7 +30,11 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 
   componentDidCatch(error: Error, info: ErrorInfo): void {
     // In production you'd send this to an error tracking service (Sentry etc.)
-    console.error('[ErrorBoundary] Uncaught error:', error, info.componentStack);
+    console.error(
+      '[ErrorBoundary] Uncaught error:',
+      error,
+      info.componentStack
+    );
   }
 
   handleReset = (): void => {

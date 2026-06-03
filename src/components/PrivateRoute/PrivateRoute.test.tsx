@@ -1,13 +1,18 @@
-import { render, screen } from '@testing-library/react';
-import { MemoryRouter, Routes, Route } from 'react-router-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
+
 import { Provider } from 'react-redux';
+
 import { configureStore } from '@reduxjs/toolkit';
 
-import coursesReducer from '../../store/courses/reducer';
+import { render, screen } from '@testing-library/react';
+
 import authorsReducer from '../../store/authors/reducer';
+import coursesReducer from '../../store/courses/reducer';
 import enrollmentsReducer from '../../store/enrollments/reducer';
 import userReducer from '../../store/user/reducer';
+
 import type { UserState } from '../../types';
+
 import PrivateRoute from './PrivateRoute';
 
 const buildStore = (userState: Partial<UserState> = {}) =>
@@ -81,10 +86,7 @@ describe('PrivateRoute', () => {
                   </PrivateRoute>
                 }
               />
-              <Route
-                path="/login"
-                element={<div data-testid="login-page" />}
-              />
+              <Route path="/login" element={<div data-testid="login-page" />} />
             </Routes>
           </MemoryRouter>
         </Provider>

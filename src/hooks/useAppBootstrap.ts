@@ -1,11 +1,17 @@
 import { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
 
-import { fetchCourses } from '../store/courses/thunk';
+import { useDispatch, useSelector } from 'react-redux';
+
 import { fetchAuthors } from '../store/authors/thunk';
-import { fetchUser } from '../store/user/thunk';
+import { fetchCourses } from '../store/courses/thunk';
 import { fetchEnrollments } from '../store/enrollments/thunk';
-import { selectIsAuth, selectIsAdmin, selectUserStatus } from '../store/user/selectors';
+import {
+  selectIsAdmin,
+  selectIsAuth,
+  selectUserStatus,
+} from '../store/user/selectors';
+import { fetchUser } from '../store/user/thunk';
+
 import type { AppDispatch } from '../store';
 
 interface AppBootstrapResult {

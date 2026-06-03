@@ -1,6 +1,7 @@
+import { MemoryRouter } from 'react-router-dom';
+
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { MemoryRouter } from 'react-router-dom';
 
 import Button from './Button';
 
@@ -11,7 +12,9 @@ describe('Button', () => {
   describe('renders as <button> by default', () => {
     it('renders label text', () => {
       renderWithRouter(<Button label="Click me" />);
-      expect(screen.getByRole('button', { name: 'Click me' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Click me' })
+      ).toBeInTheDocument();
     });
 
     it('defaults to type="button"', () => {
@@ -59,7 +62,9 @@ describe('Button', () => {
   describe('renders as <Link> when to prop is provided', () => {
     it('renders an anchor element', () => {
       renderWithRouter(<Button label="Go to courses" to="/courses" />);
-      expect(screen.getByRole('link', { name: 'Go to courses' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('link', { name: 'Go to courses' })
+      ).toBeInTheDocument();
     });
 
     it('navigates to the correct path', () => {
@@ -68,9 +73,7 @@ describe('Button', () => {
     });
 
     it('applies variant class on link', () => {
-      renderWithRouter(
-        <Button label="Go" to="/courses" variant="primary" />
-      );
+      renderWithRouter(<Button label="Go" to="/courses" variant="primary" />);
       expect(screen.getByRole('link')).toHaveClass('Button--primary');
     });
   });

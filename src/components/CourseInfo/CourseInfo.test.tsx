@@ -1,6 +1,9 @@
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
+
 import { Provider } from 'react-redux';
+
 import { configureStore } from '@reduxjs/toolkit';
+
 import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 
@@ -8,15 +11,17 @@ import authorsReducer from '../../store/authors/reducer';
 import coursesReducer from '../../store/courses/reducer';
 import enrollmentsReducer from '../../store/enrollments/reducer';
 import userReducer from '../../store/user/reducer';
+
 import { enrollCourseService, getCoursesService } from '../../services';
 import type {
-  AuthorsState,
-  CoursesState,
-  Course,
   Author,
+  AuthorsState,
+  Course,
+  CoursesState,
   EnrollmentsState,
   UserState,
 } from '../../types';
+
 import CourseInfo from './CourseInfo';
 
 vi.mock('../../services');
@@ -105,13 +110,17 @@ describe('CourseInfo', () => {
 
   describe('loading state', () => {
     it('shows loading message when courses are loading', () => {
-      const store = buildStore({ courses: { courses: [], status: 'loading', error: null } });
+      const store = buildStore({
+        courses: { courses: [], status: 'loading', error: null },
+      });
       renderCourseInfo(store);
       expect(screen.getByText('Loading course...')).toBeInTheDocument();
     });
 
     it('shows loading message when authors are loading', () => {
-      const store = buildStore({ authors: { authors: [], status: 'loading', error: null } });
+      const store = buildStore({
+        authors: { authors: [], status: 'loading', error: null },
+      });
       renderCourseInfo(store);
       expect(screen.getByText('Loading course...')).toBeInTheDocument();
     });
@@ -135,7 +144,9 @@ describe('CourseInfo', () => {
         courses: { courses: [], status: 'failed', error: 'Network error' },
       });
       renderCourseInfo(store);
-      expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Try again' })
+      ).toBeInTheDocument();
     });
   });
 
@@ -149,7 +160,9 @@ describe('CourseInfo', () => {
     it('shows Back to Courses link when course not found', () => {
       const store = buildStore();
       renderCourseInfo(store, 'nonexistent-id');
-      expect(screen.getByRole('link', { name: 'Back to Courses' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('link', { name: 'Back to Courses' })
+      ).toBeInTheDocument();
     });
   });
 
@@ -157,7 +170,9 @@ describe('CourseInfo', () => {
     it('renders course title', () => {
       const store = buildStore();
       renderCourseInfo(store);
-      expect(screen.getByRole('heading', { name: 'React Fundamentals' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('heading', { name: 'React Fundamentals' })
+      ).toBeInTheDocument();
     });
 
     it('renders course description', () => {
@@ -181,7 +196,9 @@ describe('CourseInfo', () => {
     it('renders Back to Courses link', () => {
       const store = buildStore();
       renderCourseInfo(store);
-      expect(screen.getByRole('link', { name: 'Back to Courses' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('link', { name: 'Back to Courses' })
+      ).toBeInTheDocument();
     });
 
     it('shows No authors assigned when course has no authors', () => {

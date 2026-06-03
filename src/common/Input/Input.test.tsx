@@ -32,7 +32,9 @@ describe('Input', () => {
 
   it('renders with type="password"', () => {
     render(<Input {...defaultProps} type="password" />);
-    expect(document.querySelector('input[type="password"]')).toBeInTheDocument();
+    expect(
+      document.querySelector('input[type="password"]')
+    ).toBeInTheDocument();
   });
 
   it('calls onChange when user types', async () => {

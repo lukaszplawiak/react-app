@@ -1,35 +1,53 @@
-import { renderHook } from '@testing-library/react';
-import { Provider } from 'react-redux';
-import { configureStore } from '@reduxjs/toolkit';
 import type { ReactNode } from 'react';
+
+import { Provider } from 'react-redux';
+
+import { configureStore } from '@reduxjs/toolkit';
+
+import { renderHook } from '@testing-library/react';
 
 import authorsReducer from '../store/authors/reducer';
 import coursesReducer from '../store/courses/reducer';
 import enrollmentsReducer from '../store/enrollments/reducer';
 import userReducer from '../store/user/reducer';
+
+import {
+  getAuthorsService,
+  getCoursesService,
+  getEnrollmentsService,
+  getUserService,
+} from '../services';
 import type { UserState } from '../types';
+
 import { useAppBootstrap } from './useAppBootstrap';
 
 // Mock services — not thunks. Mocking thunks would strip .pending/.fulfilled/.rejected
 // from createAsyncThunk results, breaking reducer's addCase() calls.
 vi.mock('../services', () => ({
   getUserService: vi.fn().mockResolvedValue({
-    data: { successful: true, result: { name: 'Test', email: 'test@test.com', role: 'user' } },
+    data: {
+      successful: true,
+      result: { name: 'Test', email: 'test@test.com', role: 'user' },
+    },
   }),
   loginUserService: vi.fn(),
   logoutUserService: vi.fn(),
   registerUserService: vi.fn(),
-  getCoursesService: vi.fn().mockResolvedValue({ data: { successful: true, result: [] } }),
+  getCoursesService: vi
+    .fn()
+    .mockResolvedValue({ data: { successful: true, result: [] } }),
   createCourseService: vi.fn(),
   deleteCourseService: vi.fn(),
   updateCourseService: vi.fn(),
-  getAuthorsService: vi.fn().mockResolvedValue({ data: { successful: true, result: [] } }),
+  getAuthorsService: vi
+    .fn()
+    .mockResolvedValue({ data: { successful: true, result: [] } }),
   createAuthorService: vi.fn(),
-  getEnrollmentsService: vi.fn().mockResolvedValue({ data: { successful: true, result: [] } }),
+  getEnrollmentsService: vi
+    .fn()
+    .mockResolvedValue({ data: { successful: true, result: [] } }),
   enrollCourseService: vi.fn(),
 }));
-
-import { getCoursesService, getAuthorsService, getEnrollmentsService, getUserService } from '../services';
 
 const buildStore = (userState: Partial<UserState> = {}) =>
   configureStore({
