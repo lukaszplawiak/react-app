@@ -16,7 +16,9 @@ describe('ErrorMessage', () => {
 
   it('renders Try again button when onRetry is provided', () => {
     render(<ErrorMessage message="Error" onRetry={vi.fn()} />);
-    expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Try again' })
+    ).toBeInTheDocument();
   });
 
   it('does not render Try again button when onRetry is not provided', () => {

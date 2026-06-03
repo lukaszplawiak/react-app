@@ -1,7 +1,12 @@
 import type { Course, CoursesState } from '../../types';
 
 import coursesReducer from './reducer';
-import { createCourse, deleteCourse, fetchCourses, updateCourse } from './thunk';
+import {
+  createCourse,
+  deleteCourse,
+  fetchCourses,
+  updateCourse,
+} from './thunk';
 
 const initialState: CoursesState = {
   courses: [],

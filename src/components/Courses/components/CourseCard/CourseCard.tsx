@@ -1,14 +1,15 @@
 import { useState } from 'react';
+
 import { useDispatch, useSelector } from 'react-redux';
 
 import Button from '../../../../common/Button/Button';
 import formatCreationDate from '../../../../helpers/formatCreationDate';
-import getCourseDuration from '../../../../helpers/getCourseDuration';
 import getAuthorNames from '../../../../helpers/getAuthorNames';
-import { enrollCourse } from '../../../../store/enrollments/thunk';
-import { selectIsEnrolled } from '../../../../store/enrollments/selectors';
-import type { Course, Author } from '../../../../types';
+import getCourseDuration from '../../../../helpers/getCourseDuration';
 import type { AppDispatch, RootState } from '../../../../store';
+import { selectIsEnrolled } from '../../../../store/enrollments/selectors';
+import { enrollCourse } from '../../../../store/enrollments/thunk';
+import type { Author, Course } from '../../../../types';
 import './CourseCard.css';
 
 interface CourseCardProps {
@@ -42,9 +43,7 @@ function CourseCard({
     setIsEnrolling(false);
 
     if (enrollCourse.rejected.match(result)) {
-      setEnrollError(
-        result.payload || 'Failed to enroll. Please try again.'
-      );
+      setEnrollError(result.payload || 'Failed to enroll. Please try again.');
     }
   };
 
@@ -57,7 +56,10 @@ function CourseCard({
         </div>
         <div className="Course-details">
           <div className="Course-details-info">
-            <p>Authors: {getAuthorNames(course.authors, authors, { truncate: true })}</p>
+            <p>
+              Authors:{' '}
+              {getAuthorNames(course.authors, authors, { truncate: true })}
+            </p>
             <p>Duration: {getCourseDuration(course.duration)}</p>
             <p>Creation date: {formatCreationDate(course.creationDate)}</p>
           </div>
@@ -83,14 +85,18 @@ function CourseCard({
           ) : (
             <>
               <Button
-                label={isEnrolling ? 'Enrolling...' : isEnrolled ? 'Enrolled ✓' : 'Enroll'}
+                label={
+                  isEnrolling
+                    ? 'Enrolling...'
+                    : isEnrolled
+                      ? 'Enrolled ✓'
+                      : 'Enroll'
+                }
                 className={`Course-button${isEnrolled ? ' Course-button--enrolled' : ''}`}
                 onClick={handleEnroll}
                 disabled={isEnrolled || isEnrolling}
               />
-              {enrollError && (
-                <p className="enroll-error">{enrollError}</p>
-              )}
+              {enrollError && <p className="enroll-error">{enrollError}</p>}
             </>
           )}
         </div>
