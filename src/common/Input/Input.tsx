@@ -1,5 +1,7 @@
 import type { ChangeEvent } from 'react';
 
+import './Input.css';
+
 interface InputProps {
   name: string;
   value: string | number;
@@ -25,6 +27,7 @@ function Input({
         value={value}
         onChange={onChange}
         placeholder={placeholder}
+        className={error ? 'has-error' : undefined}
       />
       {error && <small className="error-text">{error}</small>}
     </div>
