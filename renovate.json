@@ -1,0 +1,85 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "timezone": "Europe/Warsaw",
+  "dependencyDashboard": true,
+  "dependencyDashboardTitle": "Dependency Dashboard 🔄",
+  "minimumReleaseAge": "3 days",
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": ["security"]
+  },
+  "schedule": ["before 10am on Monday"],
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  "commitMessagePrefix": "chore(deps):",
+  "commitMessageAction": "update",
+  "labels": ["dependencies"],
+  "automerge": false,
+  "packageRules": [
+    {
+      "groupName": "React ecosystem",
+      "matchPackageNames": [
+        "react",
+        "react-dom",
+        "react-redux",
+        "react-router-dom",
+        "@types/react",
+        "@types/react-dom"
+      ],
+      "automerge": false
+    },
+    {
+      "groupName": "Redux Toolkit",
+      "matchPackageNames": ["@reduxjs/toolkit"],
+      "automerge": false
+    },
+    {
+      "groupName": "Testing tools",
+      "matchPackageNames": ["vitest", "@vitest/**", "@testing-library/**"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true
+    },
+    {
+      "groupName": "Linting and formatting",
+      "matchPackageNames": [
+        "eslint",
+        "eslint-**",
+        "@eslint/**",
+        "typescript-eslint",
+        "@typescript-eslint/**",
+        "prettier",
+        "@trivago/**"
+      ],
+      "automerge": false
+    },
+    {
+      "groupName": "Build tools",
+      "matchPackageNames": ["vite", "@vitejs/**", "typescript"],
+      "matchUpdateTypes": ["patch"],
+      "automerge": true
+    },
+    {
+      "groupName": "GitHub Actions",
+      "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["patch"],
+      "automerge": true
+    },
+    {
+      "matchCategories": ["security"],
+      "minimumReleaseAge": "0 days",
+      "automerge": false,
+      "labels": ["dependencies", "security"],
+      "prPriority": 10
+    },
+    {
+      "matchUpdateTypes": ["patch"],
+      "automerge": true
+    },
+    {
+      "matchUpdateTypes": ["major"],
+      "automerge": false,
+      "labels": ["dependencies", "major-update"]
+    }
+  ]
+}
