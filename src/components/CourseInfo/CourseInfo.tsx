@@ -45,7 +45,7 @@ function CourseInfo() {
   const isAdmin = useSelector(selectIsAdmin);
 
   const isEnrolled = useSelector((state: RootState) =>
-    selectIsEnrolled(state, courseId ?? '')
+    courseId ? selectIsEnrolled(state, courseId) : false
   );
 
   const [enrollError, setEnrollError] = useState<string | null>(null);
