@@ -1,4 +1,6 @@
 # Course Management App
+
+[![CI](https://github.com/lukaszplawiak/course-management-app/actions/workflows/ci.yml/badge.svg)](https://github.com/lukaszplawiak/course-management-app/actions/workflows/ci.yml)
 [![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.4-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Redux Toolkit](https://img.shields.io/badge/Redux_Toolkit-2.x-764ABC?logo=redux&logoColor=white)](https://redux-toolkit.js.org/)
@@ -151,24 +153,32 @@ Each test file constructs an isolated store with only the reducers it exercises.
 **Why tests are colocated with source files?**
 A test file next to its source is immediately visible when editing the component. Removing a component makes the orphaned test obvious. This is the layout Vite, Vitest and Testing Library documentation recommend.
 
+**Why Renovate with `minimumReleaseAge: "3 days"` instead of Dependabot?**
+Dependabot opens PRs immediately when a new package version is published. Supply chain attacks — where a trusted package receives a malicious update — are typically detected by the community within hours (event-stream 2018, ua-parser-js 2021, node-ipc 2022). A 3-day delay means the community has time to discover the problem before this repository automatically pulls in the affected version. Dependabot has no equivalent of `minimumReleaseAge`. Known CVEs bypass the delay entirely — a confirmed vulnerability needs immediate remediation, which is a different risk profile from an unknown supply chain attack. Renovate also supports grouped PRs, automerge conditions per update type, and shared presets across multiple repositories.
+
+**Why Renovate and Socket.dev together?**
+They protect against supply chain risk at different layers. Renovate operates on time — it delays pulling new versions until the community has had a chance to react. Socket.dev operates on code analysis — it scans each new package version for suspicious changes: new network access, obfuscated code, new install scripts, new maintainers. A sophisticated attack that goes unnoticed for 3 days would still be caught by Socket if the malicious code exhibits anomalous behaviour patterns. Together they form a two-layer defence: temporal delay plus static analysis of the package itself.
+
 ---
 
 ## Tech Stack
 
-| Layer | Technology | Why |
-|---|---|---|
-| Framework | React 19 — functional components, hooks | Latest stable; no breaking changes vs 18 for this codebase |
-| Language | TypeScript 5.4 | Typed store, typed selectors, typed API responses; zero `any` in production code |
-| State | Redux Toolkit 2 — createSlice, createAsyncThunk | RTK 2 stricter generics, Immer built-in, standard in enterprise React |
-| HTTP | Axios — typed `services.ts`, response interceptor | Consistent base URL, 401 redirect, dev-only error logging |
-| Routing | React Router 7 — PrivateRoute, useNavigate | Full backward compatibility with v6 hooks API |
-| Build | Vite 8 | Sub-second cold start, native ES modules, fast HMR |
-| Testing | Vitest 4 + React Testing Library | Component behaviour over implementation, `renderHook` for hooks |
-| Linting | ESLint 9 (flat config) + Prettier | `eslint.config.js`, typescript-eslint, react-hooks rules, pre-commit via Husky 9 |
-| Import sorting | `@trivago/prettier-plugin-sort-imports` | Single tool for import order — avoids conflict with `eslint-plugin-import` |
-| Container | Docker multi-stage — Node builder + Nginx Alpine | Small final image, no Node.js in production |
-| Server | Nginx — SPA routing, gzip, reverse proxy | `index.html` fallback, backend on private Docker network |
-| Deployment | Railway — single container, Express + json-server | Auto-deploy on push to main |
+| Layer                 | Technology                                        | Why                                                                                       |
+| --------------------- | ------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| Framework             | React 19 — functional components, hooks           | Latest stable; no breaking changes vs 18 for this codebase                                |
+| Language              | TypeScript 5.4                                    | Typed store, typed selectors, typed API responses; zero `any` in production code          |
+| State                 | Redux Toolkit 2 — createSlice, createAsyncThunk   | RTK 2 stricter generics, Immer built-in, standard in enterprise React                     |
+| HTTP                  | Axios — typed `services.ts`, response interceptor | Consistent base URL, 401 redirect, dev-only error logging                                 |
+| Routing               | React Router 7 — PrivateRoute, useNavigate        | Full backward compatibility with v6 hooks API                                             |
+| Build                 | Vite 8                                            | Sub-second cold start, native ES modules, fast HMR                                        |
+| Testing               | Vitest 4 + React Testing Library                  | Component behaviour over implementation, `renderHook` for hooks                           |
+| Linting               | ESLint 9 (flat config) + Prettier                 | `eslint.config.js`, typescript-eslint, react-hooks rules, pre-commit via Husky 9          |
+| Import sorting        | `@trivago/prettier-plugin-sort-imports`           | Single tool for import order — avoids conflict with `eslint-plugin-import`                |
+| Dependency updates    | Renovate — `minimumReleaseAge: 3 days`            | Supply chain attack protection; CVEs bypass delay; grouped PRs, automerge for patches     |
+| Supply chain scanning | Socket.dev — static analysis on every PR          | Detects suspicious package changes (new network access, obfuscated code, new maintainers) |
+| Container             | Docker multi-stage — Node builder + Nginx Alpine  | Small final image, no Node.js in production                                               |
+| Server                | Nginx — SPA routing, gzip, reverse proxy          | `index.html` fallback, backend on private Docker network                                  |
+| Deployment            | Railway — single container, Express + json-server | Auto-deploy on push to master                                                             |
 
 ---
 
@@ -211,10 +221,10 @@ Vite proxies all `/api` requests to `http://localhost:4000` — no environment f
 
 ### Test credentials
 
-| Role | Email | Password |
-|---|---|---|
+| Role  | Email            | Password   |
+| ----- | ---------------- | ---------- |
 | Admin | `admin@test.com` | `admin123` |
-| User | `user@test.com` | `user123` |
+| User  | `user@test.com`  | `user123`  |
 
 Admin sees CREATE, UPDATE and DELETE controls plus the Enrolled Students view. Regular users see the course catalogue and can enroll in courses.
 
@@ -282,6 +292,9 @@ npm run test:ci
 # Watch mode during development
 npm test
 
+# Coverage report
+npm run test:coverage
+
 # Type check
 npm run typecheck
 
@@ -295,22 +308,50 @@ npm run format
 
 ### Test coverage
 
-10 test files across all layers — store, components, helpers and custom hooks.
+```
+Statements : 82%
+Branches   : 66%
+Functions  : 69%
+Lines      : 82%
+```
 
-| Test file | What it covers |
-|---|---|
-| `store/courses/reducer.test.ts` | Courses slice — initial state, `createCourse.fulfilled`, `fetchCourses.pending/rejected`, `deleteCourse.fulfilled` |
-| `store/courses/thunk.test.ts` | All four thunks — success paths, rejection, `successful: false` response handling |
-| `helpers/formatCreationDate.test.ts` | Date formatting — zero-padded day/month, UTC safety, invalid input guard |
-| `helpers/isValidEmail.test.ts` | Email validation — valid formats, edge cases, invalid inputs |
-| `components/Header/Header.test.tsx` | Logo present, username displayed, Logout dispatched and navigation to `/login` |
-| `components/Courses/Courses.test.tsx` | Card count matches store, loading state, navigation to `/courses/add`, admin button visibility |
-| `components/Courses/components/CourseCard/CourseCard.test.tsx` | Title, description, duration format, authors list, date format, admin buttons, `onDelete` callback |
-| `components/CourseForm/hooks/useCourseForm.test.tsx` | Create/edit mode, `register()`, validation, submit success/failure, `isSaving` lifecycle, author management, `handleCreateAuthor` |
-| `components/Login/hooks/useLoginForm.test.tsx` | Initial state, validation, success navigation to `/courses`, server error on failure |
-| `components/Registration/hooks/useRegistrationForm.test.tsx` | Initial state, all field validations, success navigation to `/login`, server error |
+26 test files, 253 tests across all layers — store, components, helpers and custom hooks.
 
-**Approach:** `configureStore` with typed `preloadedState` — no `redux-mock-store`. Hook tests use `renderHook` from Testing Library. All test files colocated with their source. RTK 2 requires `preloadedState` to satisfy slice types exactly — typed state constants per slice enforce this.
+| Test file                                                      | What it covers                                                                                                    |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `store/courses/reducer.test.ts`                                | All reducer cases — createCourse, deleteCourse, updateCourse (including index not found branch), ?? null branches |
+| `store/courses/thunk.test.ts`                                  | All four thunks — success, rejection, `successful: false`, non-Error fallback messages                            |
+| `store/enrollments/reducer.test.ts`                            | Enrollments slice — all cases including append to existing                                                        |
+| `store/enrollments/thunk.test.ts`                              | fetchEnrollments and enrollCourse — success, rejection, courseId passed to service                                |
+| `store/enrollments/selectors.test.ts`                          | All four selectors including selectIsEnrolled true/false/empty                                                    |
+| `store/user/reducer.test.ts`                                   | All 8 reducer cases — fetchUser, loginUser, logoutUser with ?? null branches                                      |
+| `store/user/thunk.test.ts`                                     | All four thunks — fetchUser, loginUser, logoutUser, registerUser                                                  |
+| `store/authors/reducer.test.ts`                                | All reducer cases — fetchAuthors and createAuthor                                                                 |
+| `store/authors/thunk.test.ts`                                  | fetchAuthors and createAuthor through real store                                                                  |
+| `helpers/formatCreationDate.test.ts`                           | Date formatting — zero-padded day/month, UTC safety, invalid input guard                                          |
+| `helpers/isValidEmail.test.ts`                                 | Email validation — valid formats, edge cases, invalid inputs                                                      |
+| `helpers/getCourseDuration.test.ts`                            | All branches — valid durations, N/A guard (null, undefined, NaN, negative), hour/hours label                      |
+| `helpers/getAuthorNames.test.ts`                               | All branches — truncate option, null/undefined inputs, id-not-found filtering                                     |
+| `hooks/useAppBootstrap.test.tsx`                               | fetchUser always fires, fetchCourses/Authors only when auth, fetchEnrollments only when admin, isBootstrapping    |
+| `components/Header/Header.test.tsx`                            | Logo present, username displayed, Logout dispatched, navigation to /login                                         |
+| `components/Courses/Courses.test.tsx`                          | Card count, loading state, navigation to /courses/add, admin button visibility                                    |
+| `components/Courses/components/CourseCard/CourseCard.test.tsx` | Title, description, duration, authors, date, admin buttons, onDelete callback                                     |
+| `components/Courses/components/SearchBar/SearchBar.test.tsx`   | handleChange, handleSubmit preventDefault                                                                         |
+| `components/Courses/components/EmptyCourseList.test.tsx`       | Empty message, admin button with/without                                                                          |
+| `components/CourseInfo/CourseInfo.test.tsx`                    | All 5 render paths — loading, error, not found, user with enroll, admin without enroll                            |
+| `components/CourseForm/hooks/useCourseForm.test.tsx`           | Create/edit mode, register(), validation, submit success/failure, isSaving, author management                     |
+| `components/Login/Login.test.tsx`                              | Form fields, submit button, register link                                                                         |
+| `components/Registration/Registration.test.tsx`                | Form fields, submit button, login link                                                                            |
+| `components/Enrolled/Enrolled.test.tsx`                        | All 4 render paths — loading, error, empty, data table                                                            |
+| `components/Login/hooks/useLoginForm.test.tsx`                 | Validation, success navigation, safe redirect, server error                                                       |
+| `components/Registration/hooks/useRegistrationForm.test.tsx`   | All field validations, success navigation, server error                                                           |
+| `components/PrivateRoute/PrivateRoute.test.tsx`                | All 3 access paths — unauthenticated, non-admin with requireAdmin, authenticated admin                            |
+| `common/Button/Button.test.tsx`                                | All 4 render paths — button, link, span (disabled+to), disabled button                                            |
+| `common/ErrorMessage/ErrorMessage.test.tsx`                    | Message, onRetry button with/without                                                                              |
+| `common/Input/Input.test.tsx`                                  | Value, placeholder, type, onChange, error message                                                                 |
+| `common/ErrorBoundary/ErrorBoundary.test.tsx`                  | Normal render, default fallback, custom fallback, componentDidCatch, handleReset                                  |
+
+**Approach:** `configureStore` with typed `preloadedState` — no `redux-mock-store`. Hook tests use `renderHook` from Testing Library. All test files colocated with their source.
 
 ---
 
@@ -318,13 +359,24 @@ npm run format
 
 This project uses a JSON file (`db.json`) as its database and `json-server` as a backend mock — chosen for simplicity of deployment and demonstration, not for production use. Known limitations of this setup, and how they would be addressed in a production system:
 
-| Limitation | Production approach |
-|---|---|
-| Passwords stored in plaintext in `db.json` | `bcrypt` or `argon2` hashing; never store plaintext |
+| Limitation                                                         | Production approach                                                          |
+| ------------------------------------------------------------------ | ---------------------------------------------------------------------------- |
+| Passwords stored in plaintext in `db.json`                         | `bcrypt` or `argon2` hashing; never store plaintext                          |
 | Session tokens stored in `db.json` (no expiry, no revocation list) | Signed JWT with expiry, or server-side session store (Redis) with revocation |
-| No Content Security Policy headers | CSP, `X-Frame-Options`, `HSTS`, `Referrer-Policy` in Nginx config |
+| No Content Security Policy headers                                 | CSP, `X-Frame-Options`, `HSTS`, `Referrer-Policy` in Nginx config            |
 
-**What is correctly implemented:**
+### Supply chain security
+
+Dependencies are managed with **Renovate** and **Socket.dev** as a two-layer supply chain defence:
+
+**Renovate** (`minimumReleaseAge: 3 days`) — new package versions are not pulled automatically the moment they are published. Supply chain attacks (malicious npm publishes) are typically detected by the community within hours. A 3-day delay ensures the community has time to react before this repository adopts a potentially compromised version. Known CVEs bypass this delay entirely and trigger immediate PRs — a confirmed vulnerability has a different risk profile from an unknown supply chain attack.
+
+**Socket.dev** — every PR that changes `package.json` or `package-lock.json` is scanned for suspicious changes in the new package version: unexpected network access, obfuscated code, new install scripts, new maintainers, dramatic size increases. A sophisticated attack that evades detection for 3 days would still be caught if the malicious code exhibits anomalous behaviour patterns that Socket flags.
+
+Together they form complementary layers: Renovate provides temporal protection (time-based delay), Socket provides content-based protection (static analysis of the package itself).
+
+### What is correctly implemented
+
 - Auth cookie with `httpOnly: true` — JavaScript cannot access the session token
 - `sameSite: 'lax'` — CSRF protection for cross-origin GET requests
 - `secure: true` on auth cookie in production (`process.env.NODE_ENV === 'production'`)
@@ -344,6 +396,7 @@ This project uses a JSON file (`db.json`) as its database and `json-server` as a
 - `ErrorBoundary` error detail (`error.message`) shown in development only — production users see a generic message
 - `aria-disabled="true"` on disabled link-buttons (`Button` with `to` + `disabled`) — correct semantic for screen readers
 - `isValidEmail` client-side validation before dispatching login/registration — reduces unnecessary API calls
+- Branch protection on `master` — all PRs require passing CI (typecheck, lint, tests, build) before merge; force pushes blocked
 
 ---
 
@@ -396,16 +449,21 @@ react-course-app/
 │   │   ├── formatCreationDate.ts
 │   │   ├── formatCreationDate.test.ts
 │   │   ├── getAuthorNames.ts
+│   │   ├── getAuthorNames.test.ts
 │   │   ├── getCourseDuration.ts
+│   │   ├── getCourseDuration.test.ts
 │   │   ├── isValidEmail.ts
 │   │   └── isValidEmail.test.ts
 │   ├── hooks/
-│   │   └── useAppBootstrap.ts # App-level data fetching sequence
+│   │   ├── useAppBootstrap.ts      # App-level data fetching sequence
+│   │   └── useAppBootstrap.test.tsx
 │   ├── store/
 │   │   ├── user/
 │   │   │   ├── reducer.ts
+│   │   │   ├── reducer.test.ts
 │   │   │   ├── selectors.ts
-│   │   │   └── thunk.ts
+│   │   │   ├── thunk.ts
+│   │   │   └── thunk.test.ts
 │   │   ├── courses/
 │   │   │   ├── reducer.ts
 │   │   │   ├── reducer.test.ts
@@ -414,12 +472,17 @@ react-course-app/
 │   │   │   └── thunk.test.ts
 │   │   ├── authors/
 │   │   │   ├── reducer.ts
+│   │   │   ├── reducer.test.ts
 │   │   │   ├── selectors.ts
-│   │   │   └── thunk.ts
+│   │   │   ├── thunk.ts
+│   │   │   └── thunk.test.ts
 │   │   ├── enrollments/
 │   │   │   ├── reducer.ts
+│   │   │   ├── reducer.test.ts
 │   │   │   ├── selectors.ts
-│   │   │   └── thunk.ts
+│   │   │   ├── selectors.test.ts
+│   │   │   ├── thunk.ts
+│   │   │   └── thunk.test.ts
 │   │   └── index.ts
 │   ├── types/
 │   │   └── index.ts           # UserRole, domain types, state interfaces, form types
@@ -440,9 +503,13 @@ react-course-app/
 ├── public/
 ├── .vscode/
 │   └── settings.json          # formatOnSave, ESLint on save
+├── .github/
+│   ├── workflows/
+│   │   └── ci.yml             # Parallel jobs: typecheck, lint, test+coverage, build+bundle size
 ├── .husky/
 │   └── pre-commit             # typecheck → lint → test:ci (husky 9 format)
 ├── eslint.config.js           # ESLint 9 flat config — typescript-eslint, react-hooks, prettier
+├── renovate.json              # Renovate config — minimumReleaseAge 3d, grouped PRs, automerge patches
 ├── index.html                 # Vite entry point
 ├── Dockerfile                 # Single-container: multi-stage builder + Express runtime
 ├── Dockerfile.multi-container # Multi-container: multi-stage builder + Nginx runtime
@@ -453,7 +520,7 @@ react-course-app/
 ├── MIGRATION.md               # Dependency migration notes (React 18→19, RTK 1→2, ESLint 8→9)
 ├── .prettierrc.json           # singleQuote, printWidth 80, trivago import sorting
 ├── tsconfig.json              # strict, moduleResolution: bundler, target: ES2022
-├── vite.config.ts             # Vite + Vitest — globals, jsdom, setupFiles
+├── vite.config.ts             # Vite + Vitest — globals, jsdom, setupFiles, coverage thresholds
 └── package.json               # type: module, ESM-native
 ```
 
@@ -465,13 +532,14 @@ Deployed on **Railway** as a single container. `server-railway.js` — Express s
 
 **Live:** https://react-app-production-d055.up.railway.app
 
-Auto-deploys on push to `main`. First load after inactivity takes 30–60 seconds on the Railway free tier.
+Auto-deploys on push to `master`. First load after inactivity takes 30–60 seconds on the Railway free tier.
 
 ---
 
 ## Author
 
 **Łukasz Pławiak**
+
 - GitHub: [github.com/lukaszplawiak](https://github.com/lukaszplawiak)
 - LinkedIn: [linkedin.com/in/lukasz-p-dev](https://www.linkedin.com/in/lukasz-p-dev/)
 
