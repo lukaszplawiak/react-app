@@ -42,7 +42,7 @@ jobs:
           cache: npm
       - run: npm ci
       # Runs tests and enforces thresholds defined in vite.config.ts
-      # (lines, functions, branches, statements >= 70%).
+      # (statements 80%, branches 70%, functions 70%, lines 80%).
       # CI fails if coverage drops below threshold.
       - run: npm run test:coverage
 
