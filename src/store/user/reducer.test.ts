@@ -8,7 +8,7 @@ const initialState: UserState = {
   email: null,
   isAuth: false,
   role: null,
-  status: 'bootstrapping',
+  status: 'idle',
   error: null,
 };
 
