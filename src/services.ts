@@ -27,6 +27,9 @@ apiClient.interceptors.response.use(
     // A 401 on /users/me simply means the user is not authenticated —
     // it is the expected response during app bootstrapping.
     if (status === 401 && !url.includes('/users/me')) {
+      // navigate() is not available outside the React component tree.
+      // Hard redirect is intentional — clears all in-flight requests
+      // and resets the browser to /login cleanly.
       window.location.href = '/login';
     }
 
