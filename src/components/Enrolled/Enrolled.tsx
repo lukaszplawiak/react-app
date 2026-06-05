@@ -9,6 +9,8 @@ import {
 import Button from '../../common/Button/Button';
 import ErrorMessage from '../../common/ErrorMessage/ErrorMessage';
 
+import formatCreationDate from '../../helpers/formatCreationDate';
+
 import './Enrolled.css';
 
 function Enrolled() {
@@ -57,9 +59,7 @@ function Enrolled() {
               <tr key={enrollment.id}>
                 <td>{enrollment.userEmail}</td>
                 <td>{enrollment.courseName}</td>
-                <td>
-                  {new Date(enrollment.enrolledAt).toLocaleDateString('pl-PL')}
-                </td>
+                <td>{formatCreationDate(enrollment.enrolledAt)}</td>
               </tr>
             ))}
           </tbody>

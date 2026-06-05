@@ -6,8 +6,8 @@ describe('getCourseDuration', () => {
       expect(getCourseDuration(60)).toBe('01:00 hour');
     });
 
-    it('formats 90 minutes as 01:30 hour', () => {
-      expect(getCourseDuration(90)).toBe('01:30 hour');
+    it('formats 90 minutes as 01:30 hours', () => {
+      expect(getCourseDuration(90)).toBe('01:30 hours');
     });
 
     it('formats 120 minutes as 02:00 hours', () => {

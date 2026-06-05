@@ -9,7 +9,8 @@ const getCourseDuration = (duration: number | null | undefined): string => {
   const minutes = value % 60;
   const formattedHours = String(hours).padStart(2, '0');
   const formattedMinutes = String(minutes).padStart(2, '0');
-  const label = hours === 1 ? 'hour' : 'hours';
+  const totalHours = value / 60;
+  const label = totalHours === 1 ? 'hour' : 'hours';
 
   return `${formattedHours}:${formattedMinutes} ${label}`;
 };
